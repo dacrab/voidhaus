@@ -57,19 +57,11 @@ const spreads = [
             <a href={`/product/${p.slug}`}>
               <div class="sg-img-wrap">
                 <img
-                  class="sg-img sg-img--primary"
+                  class="sg-img"
                   src={p.img.replace(/w=\d+/, 'w=700')}
                   alt={p.name}
                   loading="lazy" decoding="async"
                   width="700" height="933"
-                />
-                <img
-                  class="sg-img sg-img--secondary"
-                  src={p.img2.replace(/w=\d+/, 'w=700')}
-                  alt=""
-                  loading="lazy" decoding="async"
-                  width="700" height="933"
-                  aria-hidden="true"
                 />
               </div>
               <div class="sg-info">
@@ -176,22 +168,17 @@ onReady(() => {
 .sg-card a { display: block; }
 
 .sg-img-wrap {
-  position: relative;
   aspect-ratio: 3/4;
   overflow: hidden;
   background: var(--color-off);
 }
 .sg-img {
-  position: absolute;
-  inset: 0;
   width: 100%; height: 100%;
   object-fit: cover; object-position: center top;
   display: block;
-  transition: opacity 0.55s ease;
+  transition: transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.sg-img--primary   { opacity: 1; z-index: 1; }
-.sg-img--secondary { opacity: 0; z-index: 2; }
-.sg-card a:hover .sg-img--secondary { opacity: 1; }
+.sg-card a:hover .sg-img { transform: scale(1.03); }
 
 .sg-info {
   display: flex;

@@ -44,24 +44,13 @@ const featured = PRODUCTS.slice(0, 4);
         <article class="p-card">
           <a href={`/product/${p.slug}`}>
             <div class="p-img-wrap">
-              <!-- Primary image -->
               <img
-                class="p-img p-img--primary"
+                class="p-img"
                 src={p.img.replace(/w=\d+/, 'w=800')}
                 alt={p.name}
                 loading={i < 2 ? 'eager' : 'lazy'}
                 decoding="async"
                 width="800" height="1067"
-              />
-              <!-- Secondary image — revealed on hover -->
-              <img
-                class="p-img p-img--secondary"
-                src={p.img2.replace(/w=\d+/, 'w=800')}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                width="800" height="1067"
-                aria-hidden="true"
               />
             </div>
             <div class="p-info">
@@ -197,28 +186,21 @@ onReady(() => {
 .p-card { background: var(--color-white); }
 .p-card a { display: block; }
 
-/* ── Hover image swap ──────────────────────────────────────────────────── */
+/* ── Image hover — barely perceptible zoom, like The Row / Lemaire ────── */
 .p-img-wrap {
-  position: relative;
   aspect-ratio: 3/4;
   overflow: hidden;
   background: var(--color-off);
 }
 
 .p-img {
-  position: absolute;
-  inset: 0;
   width: 100%; height: 100%;
   object-fit: cover; object-position: center top;
   display: block;
-  transition: opacity 0.5s ease;
+  transition: transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.p-img--primary  { opacity: 1; z-index: 1; }
-.p-img--secondary { opacity: 0; z-index: 2; }
-
-/* On hover: fade secondary in over primary */
-.p-card a:hover .p-img--secondary { opacity: 1; }
+.p-card a:hover .p-img { transform: scale(1.03); }
 
 .p-info {
   display: flex; align-items: flex-start;

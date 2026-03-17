@@ -36,21 +36,12 @@ import { PRODUCTS, CATEGORIES } from '../../data/products';
         <a href={`/product/${p.slug}`}>
           <div class="card-img-wrap">
             <img
-              class="card-img card-img--primary"
+              class="card-img"
               src={p.img.replace(/w=\d+/, 'w=800')}
               alt={p.name}
               loading={i < 4 ? 'eager' : 'lazy'}
               decoding="async"
               width="800" height="1067"
-            />
-            <img
-              class="card-img card-img--secondary"
-              src={p.img2.replace(/w=\d+/, 'w=800')}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              width="800" height="1067"
-              aria-hidden="true"
             />
           </div>
           <div class="card-info">
@@ -148,26 +139,21 @@ onReady(() => {
 .card { background: var(--color-white); }
 .card a { display: block; }
 
-/* Hover image swap */
+/* Image hover — subtle zoom */
 .card-img-wrap {
-  position: relative;
   aspect-ratio: 2/3;
   overflow: hidden;
   background: var(--color-off);
 }
 
 .card-img {
-  position: absolute;
-  inset: 0;
   width: 100%; height: 100%;
   object-fit: cover; object-position: center top;
   display: block;
-  transition: opacity 0.55s ease;
+  transition: transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.card-img--primary   { opacity: 1; z-index: 1; }
-.card-img--secondary { opacity: 0; z-index: 2; }
-.card a:hover .card-img--secondary { opacity: 1; }
+.card a:hover .card-img { transform: scale(1.03); }
 
 .card-info {
   display: flex; align-items: flex-start;
