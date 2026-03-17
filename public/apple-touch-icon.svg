@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <!-- Apple touch icon — dark background, larger V mark, more padding -->
+  <rect width="180" height="180" fill="#1c1b19"/>
+  <polyline
+    points="36,54 90,136 144,54"
+    stroke="#faf9f7"
+    stroke-width="9"
+    stroke-linecap="butt"
+    stroke-linejoin="miter"
+    fill="none"
+  />
+</svg>
