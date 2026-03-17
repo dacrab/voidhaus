@@ -113,7 +113,7 @@ const details: [string, string][] = [
 </Layout>
 
 <script>
-import { onReady, revealHero, revealOnScroll, imageEntrance } from '../../lib/animate';
+import { onReady, reveal, imageEntrance } from '../../lib/animate';
 import { initToggleGroup } from '../../lib/toggle';
 import gsap from 'gsap';
 
@@ -121,8 +121,7 @@ onReady(() => {
   // Image entrance
   imageEntrance('.js-main-img');
 
-  revealHero();
-  revealOnScroll();
+  reveal();
 
   // Size toggle with aria
   const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
@@ -145,16 +144,12 @@ onReady(() => {
 
     // Opacity only — no y transform on text
     gsap.timeline()
-      .to(addText, { opacity: 0, duration: 0.15 })
-      .set(addText, { textContent: 'Added ✓' })
-      .to(addText, { opacity: 1, duration: 0.25, ease: 'power2.out' });
-
-    setTimeout(() => {
-      gsap.to(addText, { opacity: 0, duration: 0.15, onComplete: () => {
-        addText.textContent = 'Add to Selection';
-        gsap.to(addText, { opacity: 1, duration: 0.2 });
-      }});
-    }, 2200);
+      .to(addText,   { opacity: 0, duration: 0.15 })
+      .set(addText,  { textContent: 'Added ✓' })
+      .to(addText,   { opacity: 1, duration: 0.25, ease: 'power2.out' })
+      .to(addText,   { opacity: 0, duration: 0.15, delay: 1.8 })
+      .set(addText,  { textContent: 'Add to Selection' })
+      .to(addText,   { opacity: 1, duration: 0.2 });
   });
 });
 </script>

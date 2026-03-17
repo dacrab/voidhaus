@@ -1,29 +1,20 @@
 /**
- * VOIDHAUS — Animation system v3
+ * VOIDHAUS — Animation system
  *
- * Core principle: OPACITY ONLY for text reveals.
- * No translateY. No transforms on text. Ever.
- *
- * Why: Any Y-axis animation on text (even 1px) causes subpixel
- * rounding artifacts when the transform is removed, making text
- * appear to "jump" or "shift". Luxury sites use pure opacity fades
- * (Louis Vuitton, The Row, Lemaire) — the restraint IS the design.
- *
- * Transforms are only used for:
- * - Images (scale on entrance, parallax scroll)
- * - Cards (very subtle scale on group reveal)
- * - Never on text elements
+ * Rules:
+ * - Text elements: opacity only — no transforms, no subpixel shift
+ * - Images: scale/translate allowed — no clearProps on continuing transforms
+ * - All animations wait for fonts via onReady()
  */
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ── Constants ──────────────────────────────────────────────────────────
-const EASE = 'power2.out';
-const DUR  = { fast: 0.5, base: 0.8, slow: 1.1 };
+const EASE   = 'power2.out';
+const DUR    = { base: 0.7, slow: 1.0, xslow: 1.4 };
 
-// ── Wait for fonts before any animation ───────────────────────────────
+// ── Wait for fonts, then run ───────────────────────────────────────────
 export function onReady(cb: () => void): void {
   if (document.fonts?.ready) {
     document.fonts.ready.then(() => requestAnimationFrame(cb));
@@ -32,31 +23,32 @@ export function onReady(cb: () => void): void {
   }
 }
 
-// ── Hero: fade in elements on load, no movement ───────────────────────
-export function revealHero(): void {
-  const els = document.querySelectorAll<HTMLElement>('[data-anim="hero"]');
-  els.forEach(el => {
-    const delay = Number(el.dataset.delay ?? 0);
-    gsap.fromTo(el,
-      { opacity: 0 },
-      { opacity: 1, duration: DUR.slow, ease: EASE, delay }
-    );
-  });
-}
-
-// ── Scroll: fade in on enter, no movement ─────────────────────────────
-export function revealOnScroll(): void {
+// ── Reveal ALL data-anim elements (hero + scroll) in one call ─────────
+// data-anim="hero"   → fires immediately (no scroll trigger)
+// data-anim="scroll" → fires on ScrollTrigger enter
+export function reveal(): void {
   ScrollTrigger.refresh();
 
+  // Hero elements — immediate opacity fade
+  document.querySelectorAll<HTMLElement>('[data-anim="hero"]').forEach(el => {
+    gsap.fromTo(el,
+      { opacity: 0 },
+      {
+        opacity:  1,
+        duration: DUR.slow,
+        ease:     EASE,
+        delay:    Number(el.dataset.delay ?? 0),
+      }
+    );
+  });
+
+  // Scroll elements — fade on enter
   document.querySelectorAll<HTMLElement>('[data-anim="scroll"]').forEach(el => {
-    // Already visible (e.g. above fold) — skip
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight) {
+    // Already in viewport — show immediately
+    if (el.getBoundingClientRect().top < window.innerHeight) {
       gsap.set(el, { opacity: 1 });
       return;
     }
-
-    gsap.set(el, { opacity: 0 });
 
     ScrollTrigger.create({
       trigger: el,
@@ -72,7 +64,7 @@ export function revealOnScroll(): void {
   });
 }
 
-// ── Stagger group: fade in children on scroll ─────────────────────────
+// ── Stagger group on scroll ────────────────────────────────────────────
 export function staggerReveal(
   selector: string,
   trigger:  string,
@@ -90,43 +82,38 @@ export function staggerReveal(
     start:   'top 90%',
     once:    true,
     onEnter: () => gsap.to(els, {
-      opacity:  1,
-      duration: DUR.base,
-      ease:     EASE,
-      stagger,
-      delay,
+      opacity: 1, duration: DUR.base, ease: EASE, stagger, delay,
     }),
   });
 }
 
-// ── Hero image: scale entrance + scroll parallax ───────────────────────
-// Single continuous GSAP context — no clearProps gap between entrance + parallax
+// ── Hero image: entrance + scroll parallax ────────────────────────────
 export function heroParallax(selector: string, strength = 15): void {
   const img = document.querySelector<HTMLElement>(selector);
   if (!img) return;
 
-  // Set oversized scale upfront so edges never show
-  // 1.14 = enough room for both entrance animation and parallax travel
-  gsap.set(img, { scale: 1.14, yPercent: 0 });
-
-  // Entrance: animate from slightly more scaled to 1.14 (not to 1.0)
-  // This way the transform is always live — no clearProps, no snap
+  // GSAP owns this transform permanently — no clearProps ever
+  gsap.set(img, { scale: 1.14 });
   gsap.fromTo(img,
     { opacity: 0, scale: 1.2 },
     { opacity: 1, scale: 1.14, duration: 1.8, ease: 'power2.out' }
   );
 
-  // Parallax scrub — runs continuously, transform always owned by GSAP
   ScrollTrigger.create({
     trigger:  document.documentElement,
     start:    'top top',
     end:      'bottom top',
     scrub:    1.5,
-    onUpdate: st => gsap.set(img, {
-      yPercent:  -st.progress * strength,
-      overwrite: 'auto',
-    }),
+    onUpdate: st => gsap.set(img, { yPercent: -st.progress * strength, overwrite: 'auto' }),
   });
+}
+
+// ── Product image entrance ────────────────────────────────────────────
+export function imageEntrance(selector: string): void {
+  const el = document.querySelector<HTMLElement>(selector);
+  if (!el) return;
+  gsap.set(el, { opacity: 0, scale: 1.06 });
+  gsap.to(el, { opacity: 1, scale: 1, duration: 1.6, ease: 'power3.out' });
 }
 
 // ── Lookbook chapter parallax ─────────────────────────────────────────
@@ -136,49 +123,18 @@ export function chapterParallax(): void {
     const cap = hero.querySelector<HTMLElement>('.spread-cap');
     if (!img) return;
 
-    // Set scale upfront — GSAP owns this transform permanently
-    gsap.set(img, { scale: 1.18, yPercent: 0, transformOrigin: 'center center' });
+    gsap.set(img, { scale: 1.18, transformOrigin: 'center center' });
 
     ScrollTrigger.create({
-      trigger: hero,
-      start:   'top bottom',
-      end:     'bottom top',
-      scrub:   1.2,
-      onUpdate: st => gsap.set(img, {
-        yPercent:  -16 * st.progress,
-        overwrite: 'auto',
-      }),
+      trigger: hero, start: 'top bottom', end: 'bottom top', scrub: 1.2,
+      onUpdate: st => gsap.set(img, { yPercent: -16 * st.progress, overwrite: 'auto' }),
     });
 
-    // Caption counter-parallax — opacity only on cap text, yPercent on cap container
     if (cap) {
       ScrollTrigger.create({
-        trigger: hero,
-        start:   'top bottom',
-        end:     'bottom top',
-        scrub:   2,
-        onUpdate: st => gsap.set(cap, {
-          yPercent:  5 * st.progress,
-          overwrite: 'auto',
-        }),
+        trigger: hero, start: 'top bottom', end: 'bottom top', scrub: 2,
+        onUpdate: st => gsap.set(cap, { yPercent: 5 * st.progress, overwrite: 'auto' }),
       });
     }
-  });
-}
-
-// ── Product image entrance — opacity + scale, no clearProps ───────────
-// Scale stays at 1 via GSAP ownership (not cleared back to CSS)
-export function imageEntrance(selector: string): void {
-  const el = document.querySelector<HTMLElement>(selector);
-  if (!el) return;
-
-  // Set scale via GSAP first so it owns the transform
-  gsap.set(el, { opacity: 0, scale: 1.06 });
-  gsap.to(el, {
-    opacity:  1,
-    scale:    1,
-    duration: 1.6,
-    ease:     'power3.out',
-    // No clearProps — GSAP keeps transform at scale(1), no snap to CSS
   });
 }

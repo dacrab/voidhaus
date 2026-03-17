@@ -74,13 +74,12 @@ const info = [
 </Layout>
 
 <script>
-import { onReady, revealHero, revealOnScroll } from '../../lib/animate';
+import { onReady, reveal } from '../../lib/animate';
 import { initToggleGroup } from '../../lib/toggle';
 import gsap from 'gsap';
 
 onReady(() => {
-  revealHero();
-  revealOnScroll();
+  reveal();
   initToggleGroup('.chip');
 
   document.getElementById('js-form')?.addEventListener('submit', e => {

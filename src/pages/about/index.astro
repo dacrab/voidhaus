@@ -87,11 +87,10 @@ import { SITE } from '../../data/site';
 </Layout>
 
 <script>
-import { onReady, revealHero, revealOnScroll, staggerReveal } from '../../lib/animate';
+import { onReady, reveal, staggerReveal } from '../../lib/animate';
 
 onReady(() => {
-  revealHero();
-  revealOnScroll();
+  reveal();
   staggerReveal('.js-at-item', '.atelier-grid', 0.1, 0.07);
 });
 </script>

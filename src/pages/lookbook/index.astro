@@ -94,11 +94,10 @@ const spreads = [
 </Layout>
 
 <script>
-import { onReady, revealHero, revealOnScroll, staggerReveal, chapterParallax } from '../../lib/animate';
+import { onReady, reveal, staggerReveal, chapterParallax } from '../../lib/animate';
 
 onReady(() => {
-  revealHero();
-  revealOnScroll();
+  reveal();
 
   // Per-chapter stagger
   [0, 1, 2].forEach(i => {
@@ -176,7 +175,7 @@ onReady(() => {
   width: 100%; height: 100%;
   object-fit: cover; object-position: center top;
   display: block;
-  transition: transform 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.9s var(--ease-img);
 }
 .sg-card a:hover .sg-img { transform: scale(1.03); }
 
