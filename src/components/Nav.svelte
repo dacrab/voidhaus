@@ -1,67 +1,139 @@
 <script lang="ts">
-  let open = $state(false);
+  import { onMount } from 'svelte';
+
+  // Astro passes current URL via a prop on client:load — we read window.location
+  let currentPath = $state('');
+  let open        = $state(false);
+  let cartCount   = $state(0);
 
   const links = [
     { href: '/collection', label: 'Collection' },
     { href: '/lookbook',   label: 'Lookbook'   },
     { href: '/about',      label: 'Manifesto'  },
-    { href: '/contact',    label: 'Contact'     },
+    { href: '/contact',    label: 'Contact'    },
   ];
 
-  function close() { open = false; }
+  onMount(() => {
+    currentPath = window.location.pathname;
+
+    // Sync cart count from localStorage
+    const syncCount = () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem('vh-cart') ?? '[]');
+        cartCount = saved.length;
+      } catch { cartCount = 0; }
+    };
+
+    syncCount();
+    window.addEventListener('vh:add-to-cart', syncCount);
+    window.addEventListener('vh:cart-updated', syncCount);
+
+    return () => {
+      window.removeEventListener('vh:add-to-cart', syncCount);
+      window.removeEventListener('vh:cart-updated', syncCount);
+    };
+  });
+
+  const isActive = (href: string) =>
+    href === '/'
+      ? currentPath === '/'
+      : currentPath.startsWith(href);
+
+  function openCart() {
+    window.dispatchEvent(new Event('vh:open-cart'));
+  }
+
+  function toggleMenu() {
+    open = !open;
+    // Lock body scroll when menu is open
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  function closeMenu() {
+    open = false;
+    document.body.style.overflow = '';
+  }
 </script>
 
-<!-- Non-sticky header — luxury brands do not use sticky navs -->
-<header class="nav">
-  <a href="/" class="nav-logo" aria-label="Voidhaus">VOIDHAUS</a>
+<a href="#main" class="skip-link">Skip to content</a>
 
-  <nav class="nav-links" aria-label="Primary">
-    {#each links as { href, label }}
-      <a {href} class="nav-link label">{label}</a>
+<header class="nav" role="banner">
+  <!-- Left: primary nav links (desktop) -->
+  <nav class="nav-links" aria-label="Primary navigation">
+    {#each links.slice(0, 2) as { href, label }}
+      <a
+        {href}
+        class="nav-link label"
+        class:active={isActive(href)}
+        aria-current={isActive(href) ? 'page' : undefined}
+      >
+        {label}
+      </a>
     {/each}
   </nav>
 
+  <!-- Centre: wordmark -->
+  <a href="/" class="nav-logo" aria-label="Voidhaus — home">VOIDHAUS</a>
+
+  <!-- Right: actions -->
   <div class="nav-actions">
     <button
-      class="nav-link label"
-      onclick={() => window.dispatchEvent(new Event('vh:open-cart'))}
+      class="nav-link label nav-cart-btn"
+      onclick={openCart}
+      aria-label={`Open selection${cartCount > 0 ? `, ${cartCount} item${cartCount > 1 ? 's' : ''}` : ''}`}
     >
-      Selection
+      Selection{#if cartCount > 0}<span class="cart-badge" aria-hidden="true">{cartCount}</span>{/if}
     </button>
     <button
       class="nav-link label nav-menu-btn"
-      onclick={() => open = !open}
+      onclick={toggleMenu}
       aria-expanded={open}
-      aria-label={open ? 'Close menu' : 'Menu'}
+      aria-controls="mobile-menu"
+      aria-label={open ? 'Close menu' : 'Open menu'}
     >
       {open ? 'Close' : 'Menu'}
     </button>
   </div>
 </header>
 
-<!-- Mobile overlay -->
+<!-- Mobile menu -->
 {#if open}
+  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
+    id="mobile-menu"
     class="menu"
     role="dialog"
     aria-modal="true"
-    aria-label="Navigation"
+    aria-label="Site navigation"
+    onkeydown={e => e.key === 'Escape' && closeMenu()}
   >
     <div class="menu-head">
-      <a href="/" class="nav-logo" onclick={close}>VOIDHAUS</a>
-      <button class="label menu-close" onclick={close} aria-label="Close">Close</button>
+      <a href="/" class="nav-logo" onclick={closeMenu}>VOIDHAUS</a>
+      <button
+        class="label menu-close"
+        onclick={closeMenu}
+        aria-label="Close menu"
+      >Close</button>
     </div>
-    <nav class="menu-links">
+
+    <nav class="menu-links" aria-label="Mobile navigation">
       {#each links as { href, label }, i}
-        <a {href} class="menu-link serif" style="--i:{i}" onclick={close}>{label}</a>
+        <a
+          {href}
+          class="menu-link serif"
+          class:active={isActive(href)}
+          aria-current={isActive(href) ? 'page' : undefined}
+          style="--i:{i}"
+          onclick={closeMenu}
+        >
+          {label}
+        </a>
       {/each}
     </nav>
+
     <div class="menu-foot">
-      <span class="label" style="opacity:.35">SS 2026</span>
-      <button
-        class="label menu-cart"
-        onclick={() => { close(); window.dispatchEvent(new Event('vh:open-cart')); }}
-      >
+      <span class="label op-35">SS 2026</span>
+      <button class="label op-35 menu-cart" onclick={() => { closeMenu(); openCart(); }}>
         Selection →
       </button>
     </div>
@@ -69,18 +141,21 @@
 {/if}
 
 <style>
-  /* ── Header — never sticky, breathes at top of page ─────────────────── */
+  /* ── Nav ─────────────────────────────────────────────────────────────── */
   .nav {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 2.25rem 2.5rem;
+    padding: 1.5rem 1.5rem;
     border-bottom: 1px solid var(--color-rule);
+    position: relative;
+    z-index: 300;
   }
+  @media (min-width: 640px)  { .nav { padding-inline: 2.5rem; } }
+  @media (min-width: 1024px) { .nav { padding-inline: 4rem; padding-block: 1.875rem; } }
+  @media (min-width: 1280px) { .nav { padding-inline: 6rem; } }
 
-  @media (min-width: 1024px) { .nav { padding: 2.25rem 4rem; } }
-  @media (min-width: 1280px) { .nav { padding: 2.25rem 6rem; } }
-
+  /* ── Logo ────────────────────────────────────────────────────────────── */
   .nav-logo {
     font-family: var(--font-sans);
     font-size: 0.6875rem;
@@ -88,11 +163,11 @@
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: var(--color-ink);
+    justify-self: center;
     grid-column: 2;
-    white-space: nowrap;
   }
 
-  /* Links — left side desktop */
+  /* ── Desktop links ───────────────────────────────────────────────────── */
   .nav-links {
     display: none;
     gap: 2rem;
@@ -100,48 +175,82 @@
   }
   @media (min-width: 768px) { .nav-links { display: flex; } }
 
-  /* Actions — right side */
-  .nav-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 2rem;
-    grid-column: 3;
-  }
-
   .nav-link {
     background: none;
     border: none;
     color: var(--color-ink);
     opacity: 0.4;
-    transition: opacity 0.2s;
+    transition: opacity 0.25s var(--ease-out);
     padding: 0;
     white-space: nowrap;
   }
-  .nav-link:hover { opacity: 1; }
+  .nav-link:hover     { opacity: 1; }
+  .nav-link.active    { opacity: 1; }
 
-  /* Hide desktop links on mobile */
+  /* Active page indicator — subtle underline */
+  a.nav-link.active {
+    position: relative;
+  }
+  a.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--color-ink);
+  }
+
+  /* ── Actions ─────────────────────────────────────────────────────────── */
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.5rem;
+    grid-column: 3;
+  }
+
+  .nav-cart-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .cart-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    background: var(--color-ink);
+    color: var(--color-white);
+    font-size: 0.5rem;
+    font-variation-settings: 'wght' 500;
+    letter-spacing: 0;
+    border-radius: 50% !important; /* intentional exception */
+  }
+
+  /* Hide desktop-only links on mobile */
   @media (max-width: 767px) {
-    .nav-links + .nav-actions .nav-link:not(.nav-menu-btn) { display: none; }
+    .nav-cart-btn { display: none; }
   }
 
   /* ── Mobile menu ─────────────────────────────────────────────────────── */
   .menu {
     position: fixed;
     inset: 0;
-    z-index: 200;
+    z-index: 299;
     background: var(--color-white);
     display: flex;
     flex-direction: column;
-    padding: 2.25rem 2.5rem;
-    border-top: 1px solid var(--color-rule);
-    animation: menu-open 0.55s var(--ease-out) both;
+    padding: 1.5rem 1.5rem 3rem;
     overflow-y: auto;
+    animation: menu-open 0.45s var(--ease-out) both;
   }
+  @media (min-width: 640px) { .menu { padding-inline: 2.5rem; } }
 
   @keyframes menu-open {
-    from { opacity: 0; transform: translateY(-1rem); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; clip-path: inset(0 0 100% 0); }
+    to   { opacity: 1; clip-path: inset(0 0 0% 0); }
   }
 
   .menu-head {
@@ -152,12 +261,9 @@
   }
 
   .menu-close {
-    background: none;
-    border: none;
-    color: var(--color-ink);
-    opacity: 0.4;
-    transition: opacity 0.2s;
-    padding: 0;
+    background: none; border: none;
+    color: var(--color-ink); opacity: 0.4;
+    transition: opacity 0.2s; padding: 0;
   }
   .menu-close:hover { opacity: 1; }
 
@@ -178,13 +284,15 @@
     padding-block: 1rem;
     border-bottom: 1px solid var(--color-rule);
     opacity: 0;
-    animation: link-fade 0.5s var(--ease-out) both;
-    animation-delay: calc(0.1s + var(--i) * 0.07s);
+    animation: link-in 0.45s var(--ease-out) both;
+    animation-delay: calc(0.08s + var(--i) * 0.06s);
+    transition: opacity 0.2s;
   }
-  .menu-link:hover { opacity: 0.45 !important; }
+  .menu-link:hover { opacity: 0.4 !important; }
+  .menu-link.active { opacity: 1 !important; }
 
-  @keyframes link-fade {
-    from { opacity: 0; transform: translateY(0.5rem); }
+  @keyframes link-in {
+    from { opacity: 0; transform: translateY(0.4rem); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
@@ -198,12 +306,9 @@
   }
 
   .menu-cart {
-    background: none;
-    border: none;
+    background: none; border: none;
     color: var(--color-ink);
-    opacity: 0.4;
-    transition: opacity 0.2s;
-    padding: 0;
+    transition: opacity 0.2s; padding: 0;
   }
-  .menu-cart:hover { opacity: 1; }
+  .menu-cart:hover { opacity: 1 !important; }
 </style>

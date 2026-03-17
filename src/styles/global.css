@@ -4,7 +4,7 @@
 
 /* ── Design tokens ───────────────────────────────────────────────────── */
 :root {
-  /* Palette — warm, restrained, editorial */
+  /* Palette */
   --color-white:    #faf9f7;
   --color-off:      #f4f2ee;
   --color-paper:    #edeae4;
@@ -20,7 +20,10 @@
 
   /* Easing */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-io:  cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* Nav height — used for PageHeader padding-top */
+  --nav-height-mobile:  4.75rem;
+  --nav-height-desktop: 5.25rem;
 }
 
 /* ── FOUC prevention ─────────────────────────────────────────────────── */
@@ -53,27 +56,28 @@ body        { overflow-x: hidden; }
 a           { color: inherit; text-decoration: none; }
 img, video  { display: block; max-width: 100%; height: auto; }
 button      { cursor: pointer; font-family: inherit; }
-
-/* Luxury brands: zero radius globally */
 * { border-radius: 0 !important; }
 
 /* ── Typography ──────────────────────────────────────────────────────── */
-
-/* Reusable opacity utility — replaces style="opacity:.4" everywhere */
-.muted { opacity: 0.4; }
-
 .label {
-  font-size:              0.625rem;
-  font-variation-settings:'wght' 400;
-  letter-spacing:         0.18em;
-  text-transform:         uppercase;
-  color:                  var(--color-soft);
+  font-size:               0.625rem;
+  font-variation-settings: 'wght' 400;
+  letter-spacing:          0.18em;
+  text-transform:          uppercase;
+  color:                   var(--color-soft);
 }
 
 .serif {
-  font-family:            var(--font-serif);
-  font-variation-settings:'wght' 400;
+  font-family:             var(--font-serif);
+  font-variation-settings: 'wght' 400;
 }
+
+/* ── Opacity utilities ───────────────────────────────────────────────── */
+/* Single consistent system — replaces all inline style="opacity:X" */
+.op-30  { opacity: 0.3; }
+.op-35  { opacity: 0.35; }
+.muted  { opacity: 0.4; }   /* default muted — most common */
+.op-45  { opacity: 0.45; }
 
 /* ── Layout ──────────────────────────────────────────────────────────── */
 .wrap {
@@ -86,21 +90,46 @@ button      { cursor: pointer; font-family: inherit; }
 
 .rule { width: 100%; height: 1px; background: var(--color-rule); flex-shrink: 0; }
 
+/* ── Page header spacing — accounts for non-sticky nav ──────────────── */
+.page-top-spacing {
+  padding-top: calc(var(--nav-height-mobile) + 2rem);
+}
+@media (min-width: 768px) {
+  .page-top-spacing {
+    padding-top: calc(var(--nav-height-desktop) + 3.5rem);
+  }
+}
+
 /* ── Animation base states ───────────────────────────────────────────── */
-/*
-  New system: data-anim="hero" and data-anim="scroll"
-  GSAP sets opacity: 0 itself via fromTo/set — no CSS transform states.
-  This eliminates all subpixel shift artifacts on animation end.
-*/
 [data-anim="hero"],
 [data-anim="scroll"] {
   opacity: 0;
-  /* will-change: opacity tells the browser to promote this to its own layer
-     without creating a transform context — no subpixel rounding */
   will-change: opacity;
 }
-
 html.no-js [data-anim] { opacity: 1 !important; }
+
+/* ── Focus visible — keyboard navigation ────────────────────────────── */
+:focus { outline: none; }
+:focus-visible {
+  outline: 1px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* ── Skip to main — accessibility ───────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-ink);
+  color: var(--color-white);
+  font-size: 0.75rem;
+  font-variation-settings: 'wght' 400;
+  letter-spacing: 0.1em;
+  z-index: 9999;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: 1rem; }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 1px; }
