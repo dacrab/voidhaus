@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
 
   // Astro passes current URL via a prop on client:load — we read window.location
   let currentPath = $state('');
@@ -52,6 +54,22 @@
   function closeMenu() {
     open = false;
     document.body.style.overflow = '';
+  }
+
+  // Custom clip-path transition for menu panel
+  function menuTransition(node: Element, { duration = 500 } = {}) {
+    return {
+      duration,
+      easing: cubicOut,
+      css: (t: number) => {
+        // t: 0 = hidden, 1 = visible
+        const pct = (1 - t) * 100;
+        return `
+          clip-path: inset(0 0 ${pct}% 0);
+          opacity: ${t};
+        `;
+      },
+    };
   }
 </script>
 
@@ -106,6 +124,7 @@
     aria-modal="true"
     aria-label="Site navigation"
     onkeydown={e => e.key === 'Escape' && closeMenu()}
+    transition:menuTransition={{ duration: 480 }}
   >
     <div class="menu-head">
       <a href="/" class="nav-logo" onclick={closeMenu}>VOIDHAUS</a>
@@ -244,14 +263,9 @@
     flex-direction: column;
     padding: 1.5rem 1.5rem 3rem;
     overflow-y: auto;
-    animation: menu-open 0.45s var(--ease-out) both;
+    /* Animation handled by menuTransition() — no CSS keyframes needed */
   }
   @media (min-width: 640px) { .menu { padding-inline: 2.5rem; } }
-
-  @keyframes menu-open {
-    from { opacity: 0; clip-path: inset(0 0 100% 0); }
-    to   { opacity: 1; clip-path: inset(0 0 0% 0); }
-  }
 
   .menu-head {
     display: flex;

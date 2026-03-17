@@ -1,5 +1,16 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
+  import { fade } from 'svelte/transition';
+  import { cubicOut, cubicIn } from 'svelte/easing';
+
+  // Slide in from right (enter) / slide out to right (exit)
+  function slideRight(node: Element, { duration = 450, intro = true } = {}) {
+    return {
+      duration,
+      easing: intro ? cubicOut : cubicIn,
+      css: (t: number) => `transform: translateX(${(1 - t) * 100}%);`,
+    };
+  }
 
   type CartItem = {
     slug:  string;
@@ -89,14 +100,15 @@
 <svelte:window onkeydown={trapFocus} />
 
 {#if open}
-  <!-- Backdrop -->
+  <!-- Backdrop — fade in/out -->
   <div
     class="backdrop"
     role="presentation"
     onclick={closeCart}
+    transition:fade={{ duration: 300 }}
   ></div>
 
-  <!-- Panel -->
+  <!-- Panel — slide in from right / slide out to right -->
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
     class="cart-panel"
@@ -104,6 +116,7 @@
     aria-modal="true"
     aria-label="Your selection"
     bind:this={panelEl}
+    transition:slideRight={{ duration: 450 }}
   >
     <!-- Header -->
     <div class="cart-header">
@@ -177,17 +190,15 @@
 {/if}
 
 <style>
-  /* Backdrop */
+  /* Backdrop — transition handled by Svelte fade() */
   .backdrop {
     position: fixed;
     inset: 0;
     background: rgb(28 27 25 / 0.4);
     z-index: 400;
-    animation: fade-in 0.3s ease both;
   }
-  @keyframes fade-in { from { opacity: 0; } }
 
-  /* Panel */
+  /* Panel — transition handled by Svelte slideRight() */
   .cart-panel {
     position: fixed;
     inset-block: 0;
@@ -197,12 +208,8 @@
     z-index: 401;
     display: flex;
     flex-direction: column;
-    animation: slide-in 0.45s var(--ease-out) both;
     border-left: 1px solid var(--color-rule);
-  }
-  @keyframes slide-in {
-    from { transform: translateX(100%); }
-    to   { transform: translateX(0); }
+    will-change: transform;
   }
 
   /* Header */
