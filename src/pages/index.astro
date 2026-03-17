@@ -7,7 +7,7 @@ const featured = PRODUCTS.slice(0, 4);
 
 <Layout>
 
-  <!-- ── HERO ─────────────────────────────────────────────────────────── -->
+  <!-- ── HERO — single image, minimal text ────────────────────────────── -->
   <section class="hero">
     <div class="hero-media">
       <img
@@ -22,67 +22,54 @@ const featured = PRODUCTS.slice(0, 4);
       <div class="hero-scrim"></div>
     </div>
 
+    <!-- Minimal: season label + one word + single CTA -->
     <div class="hero-body wrap">
-      <div class="hero-top" data-anim="hero" data-delay="0">
-        <span class="label" style="color:rgb(255 255 255/.6)">SS 2026</span>
-        <span class="label" style="color:rgb(255 255 255/.35)">08 Pieces</span>
-      </div>
-
-      <h1 class="hero-title" data-anim="hero" data-delay="0.2">
-        VOID<em>haus</em>
-      </h1>
-
-      <div class="hero-bottom" data-anim="hero" data-delay="0.45">
-        <p class="hero-sub">Eight pieces. Four ateliers.<br/>One position.</p>
-        <a href="/collection" class="label hero-cta">Explore →</a>
-      </div>
+      <span class="label hero-season" data-anim="hero" data-delay="0.1">SS 2026</span>
+      <h1 class="hero-title" data-anim="hero" data-delay="0.25">VOIDHAUS</h1>
+      <a href="/collection" class="label hero-cta" data-anim="hero" data-delay="0.4">
+        New Collection →
+      </a>
     </div>
   </section>
 
-  <!-- ── TICKER ────────────────────────────────────────────────────────── -->
-  <div class="ticker" aria-hidden="true">
-    <div class="ticker-track">
-      {Array(6).fill(null).map(() => (
-        <>
-          <span class="ticker-item label">SS 2026</span>
-          <span class="ticker-sep">—</span>
-          <span class="ticker-item label">Dark Luxury</span>
-          <span class="ticker-sep">—</span>
-          <span class="ticker-item label">Voidhaus</span>
-          <span class="ticker-sep">—</span>
-          <span class="ticker-item label">Uncompromising</span>
-          <span class="ticker-sep">—</span>
-        </>
-      ))}
-    </div>
-  </div>
-
-  <!-- ── PRODUCTS ───────────────────────────────────────────────────────── -->
+  <!-- ── PRODUCT GRID — no preamble, straight to products ─────────────── -->
   <section class="products wrap">
-    <div class="products-head" data-anim="scroll">
-      <span class="label" style="opacity:.4">New Arrivals</span>
-      <a href="/collection" class="label prod-all">All pieces ({PRODUCTS.length}) →</a>
+    <div class="products-head">
+      <span class="label muted">SS 2026 — New Arrivals</span>
+      <a href="/collection" class="label muted prod-all">All ({PRODUCTS.length}) →</a>
     </div>
-    <div class="products-grid" id="js-products">
+
+    <div class="products-grid">
       {featured.map((p, i) => (
-        <article class="p-card js-p-card" style={`--i:${i}`}>
+        <article class="p-card">
           <a href={`/product/${p.slug}`}>
             <div class="p-img-wrap">
+              <!-- Primary image -->
               <img
-                class="p-img"
+                class="p-img p-img--primary"
                 src={p.img.replace(/w=\d+/, 'w=800')}
                 alt={p.name}
                 loading={i < 2 ? 'eager' : 'lazy'}
                 decoding="async"
                 width="800" height="1067"
               />
+              <!-- Secondary image — revealed on hover -->
+              <img
+                class="p-img p-img--secondary"
+                src={p.img2.replace(/w=\d+/, 'w=800')}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                width="800" height="1067"
+                aria-hidden="true"
+              />
             </div>
             <div class="p-info">
               <div class="p-info-l">
-                <span class="label" style="opacity:.3">{p.num}</span>
+                <span class="label muted">{p.num}</span>
                 <span class="p-name">{p.name}</span>
               </div>
-              <span class="label" style="opacity:.4">€ {p.price}</span>
+              <span class="label muted">€ {p.price}</span>
             </div>
           </a>
         </article>
@@ -113,8 +100,8 @@ const featured = PRODUCTS.slice(0, 4);
   <div class="bottom-strip wrap" data-anim="scroll">
     <div class="rule"></div>
     <div class="bottom-inner">
-      <span class="label" style="opacity:.35">Press & Inquiries</span>
-      <a href="/contact" class="label bottom-link">studio@voidhaus.com →</a>
+      <span class="label muted">Press & Inquiries</span>
+      <a href="/contact" class="label muted bottom-link">studio@voidhaus.com →</a>
     </div>
     <div class="rule"></div>
   </div>
@@ -122,18 +109,17 @@ const featured = PRODUCTS.slice(0, 4);
 </Layout>
 
 <script>
-import { onReady, revealHero, revealOnScroll, staggerReveal, heroParallax } from '../lib/animate';
+import { onReady, revealHero, revealOnScroll, heroParallax } from '../lib/animate';
 
 onReady(() => {
   heroParallax('.js-hero-img');
   revealHero();
   revealOnScroll();
-  staggerReveal('.js-p-card', '#js-products', 0.05, 0.1);
 });
 </script>
 
 <style>
-/* Hero */
+/* ── Hero ──────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
   height: 100svh;
@@ -156,81 +142,47 @@ onReady(() => {
 .hero-scrim {
   position: absolute; inset: 0;
   background:
-    linear-gradient(to bottom, transparent 35%, rgb(28 27 25 / 0.65) 100%),
-    linear-gradient(to top, transparent 80%, rgb(28 27 25 / 0.12) 100%);
+    linear-gradient(to bottom, transparent 40%, rgb(28 27 25 / 0.7) 100%),
+    linear-gradient(to top, transparent 85%, rgb(28 27 25 / 0.1) 100%);
 }
 
 .hero-body {
   position: relative; z-index: 1;
-  padding-bottom: 2.5rem;
-  display: flex; flex-direction: column; gap: 1.5rem;
-}
-@media (min-width: 768px) { .hero-body { padding-bottom: 3.5rem; gap: 2rem; } }
-
-.hero-top {
+  padding-bottom: 3rem;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 1.25rem;
 }
+
+.hero-season { color: rgb(255 255 255 / 0.5); }
 
 .hero-title {
   font-family: var(--font-sans);
   font-size: clamp(4rem, 14vw, 13rem);
   font-variation-settings: 'wght' 200;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.05em;
   line-height: 0.92;
   color: rgb(255 255 255 / 0.92);
 }
-.hero-title em {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-variation-settings: 'wght' 300;
-  color: rgb(255 255 255 / 0.45);
-}
 
-.hero-bottom {
-  display: flex; align-items: flex-end;
-  justify-content: space-between; gap: 1rem;
+.hero-cta {
+  color: rgb(255 255 255 / 0.55);
+  transition: color 0.2s;
+  align-self: flex-start;
 }
-.hero-sub {
-  font-size: 0.8rem;
-  font-variation-settings: 'wght' 300;
-  line-height: 1.75;
-  color: rgb(255 255 255 / 0.45);
-}
-.hero-cta { color: rgb(255 255 255 / 0.6); transition: color 0.2s; white-space: nowrap; }
 .hero-cta:hover { color: #fff; }
 
-/* Ticker */
-.ticker {
-  border-block: 1px solid var(--color-rule);
-  overflow: hidden;
-  padding-block: 0.875rem;
-  background: var(--color-off);
-}
-.ticker-track {
-  display: flex; gap: 2rem;
-  width: max-content;
-  animation: ticker 28s linear infinite;
-}
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.ticker-item { color: var(--color-ink); opacity: 0.4; white-space: nowrap; }
-.ticker-sep  { color: var(--color-rule); }
-
-/* Products */
-.products { padding-block: 5rem 4rem; }
-@media (min-width: 768px) { .products { padding-block: 7rem 5rem; } }
+/* ── Products ──────────────────────────────────────────────────────────── */
+.products { padding-block: 4rem 3rem; }
+@media (min-width: 768px) { .products { padding-block: 6rem 4rem; } }
 
 .products-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--color-rule);
 }
-.prod-all { opacity: 0.4; transition: opacity 0.2s; }
-.prod-all:hover { opacity: 1; }
+.prod-all { transition: opacity 0.2s; }
+.prod-all:hover { opacity: 1 !important; }
 
 .products-grid {
   display: grid;
@@ -245,13 +197,28 @@ onReady(() => {
 .p-card { background: var(--color-white); }
 .p-card a { display: block; }
 
-.p-img-wrap { aspect-ratio: 3/4; overflow: hidden; background: var(--color-off); }
-.p-img {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center top; display: block;
-  transition: transform 0.9s var(--ease-out);
+/* ── Hover image swap ──────────────────────────────────────────────────── */
+.p-img-wrap {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background: var(--color-off);
 }
-.p-card a:hover .p-img { transform: scale(1.04); }
+
+.p-img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  display: block;
+  transition: opacity 0.5s ease;
+}
+
+.p-img--primary  { opacity: 1; z-index: 1; }
+.p-img--secondary { opacity: 0; z-index: 2; }
+
+/* On hover: fade secondary in over primary */
+.p-card a:hover .p-img--secondary { opacity: 1; }
 
 .p-info {
   display: flex; align-items: flex-start;
@@ -268,7 +235,7 @@ onReady(() => {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* Editorial */
+/* ── Editorial ─────────────────────────────────────────────────────────── */
 .editorial {
   position: relative; height: 75svh; min-height: 420px;
   margin-block: 5rem; overflow: hidden;
@@ -281,7 +248,6 @@ onReady(() => {
   position: absolute; inset: 0;
   background: linear-gradient(135deg, rgb(28 27 25 / 0.72) 0%, rgb(28 27 25 / 0.2) 60%, transparent 100%);
 }
-
 .ed-text {
   position: absolute; inset-block-end: 3rem; inset-inline: 0;
   display: flex; flex-direction: column; gap: 1.5rem;
@@ -297,12 +263,11 @@ onReady(() => {
 .ed-link { color: rgb(255 255 255 / 0.5); transition: color 0.2s; }
 .ed-link:hover { color: #fff; }
 
-/* Bottom */
+/* ── Bottom ────────────────────────────────────────────────────────────── */
 .bottom-strip { padding-block: 2.5rem 4rem; }
 .bottom-inner {
   display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: 0.75rem; padding-block: 1.5rem;
 }
-.bottom-link { opacity: 0.4; transition: opacity 0.2s; }
-.bottom-link:hover { opacity: 1; }
+.bottom-link:hover { opacity: 1 !important; }
 </style>
