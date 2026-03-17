@@ -1,7 +1,7 @@
 export const SITE = {
   name: 'VOIDHAUS',
   season: 'SS 2026',
-  tagline: 'Uncompromising design. Limited production.',
+  tagline: 'Dark luxury fashion. Twelve pieces. Four ateliers. One position.',
   email: {
     studio: 'studio@voidhaus.com',
     press:  'press@voidhaus.com',

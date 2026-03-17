@@ -9,16 +9,19 @@ interface Props {
   title?:       string;
   description?: string;
   image?:       string;
+  type?:        'website' | 'product';
 }
 
 const {
   title       = SITE.name,
   description = SITE.tagline,
   image       = '/og.jpg',
+  type        = 'website',
 } = Astro.props;
 
 const fullTitle  = title === SITE.name ? title : `${title} — ${SITE.name}`;
-const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.com').href;
+const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.vercel.app').href;
+const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site ?? 'https://voidhaus.vercel.app').href;
 ---
 
 <!doctype html>
@@ -26,52 +29,57 @@ const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.c
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
     <meta name="theme-color" content="#faf9f7" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Primary meta -->
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
 
     <!-- Open Graph -->
-    <meta property="og:type"        content="website" />
+    <meta property="og:type"        content={type} />
+    <meta property="og:site_name"   content={SITE.name} />
     <meta property="og:title"       content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image"       content={image} />
+    <meta property="og:image"       content={ogImage} />
+    <meta property="og:image:alt"   content={`${SITE.name} — ${description}`} />
     <meta property="og:url"         content={canonical} />
-    <meta property="og:site_name"   content={SITE.name} />
+    <meta property="og:locale"      content="en_US" />
 
-    <!-- Twitter -->
+    <!-- Twitter / X -->
     <meta name="twitter:card"        content="summary_large_image" />
     <meta name="twitter:title"       content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image"       content={image} />
+    <meta name="twitter:image"       content={ogImage} />
+    <meta name="twitter:image:alt"   content={`${SITE.name} — ${description}`} />
 
-    <title>{fullTitle}</title>
+    <!-- Structured data — Brand -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "ClothingStore",
+      "name": SITE.name,
+      "description": SITE.tagline,
+      "url": "https://voidhaus.vercel.app",
+      "logo": "https://voidhaus.vercel.app/favicon.svg",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Via della Spiga, 19",
+        "addressLocality": "Milan",
+        "postalCode": "20121",
+        "addressCountry": "IT"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "studio@voidhaus.com",
+        "contactType": "customer service"
+      },
+      "sameAs": []
+    })} />
 
-    <script>
-      // Newsletter form — simple feedback, no backend for demo
-      document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('nl-form')?.addEventListener('submit', e => {
-          e.preventDefault();
-          const form   = e.target as HTMLFormElement;
-          const input  = form.querySelector<HTMLInputElement>('.nl-input');
-          const btn    = form.querySelector<HTMLButtonElement>('.nl-btn');
-          if (!input || !btn) return;
-          // Simple validation
-          if (!input.value.includes('@')) {
-            input.style.borderBottom = '1px solid var(--color-ink)';
-            input.focus();
-            return;
-          }
-          btn.textContent = 'Subscribed ✓';
-          btn.style.opacity = '1';
-          input.value = '';
-          input.disabled = true;
-          btn.disabled  = true;
-        });
-      });
-    </script>
-
-    <!-- Banner dismissed state — must run before paint to prevent nav jump -->
+    <!-- Banner dismissed state — runs before paint to prevent nav jump -->
     <script is:inline>
       try {
         if (sessionStorage.getItem('vh-sale-dismissed') === '1') {
@@ -80,7 +88,7 @@ const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.c
       } catch {}
     </script>
 
-    <!-- FOUC prevention — inline, runs before first paint -->
+    <!-- FOUC prevention — runs before first paint -->
     <script is:inline>
       document.documentElement.classList.remove('no-js');
       if (document.fonts?.ready) {
@@ -93,6 +101,25 @@ const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.c
       } else {
         document.documentElement.classList.add('fonts-loaded');
       }
+    </script>
+
+    <!-- Newsletter form handler -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('nl-form')?.addEventListener('submit', e => {
+          e.preventDefault();
+          const form  = e.target as HTMLFormElement;
+          const input = form.querySelector<HTMLInputElement>('.nl-input');
+          const btn   = form.querySelector<HTMLButtonElement>('.nl-btn');
+          if (!input || !btn) return;
+          if (!input.value.includes('@')) { input.focus(); return; }
+          btn.textContent = 'Subscribed ✓';
+          btn.style.opacity = '1';
+          input.value   = '';
+          input.disabled = true;
+          btn.disabled   = true;
+        });
+      });
     </script>
   </head>
   <body>
@@ -119,19 +146,19 @@ const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.c
               name="email"
               placeholder="your@email.com"
               autocomplete="email"
-              aria-label="Email address"
+              aria-label="Email address for newsletter"
             />
             <button class="nl-btn label" type="submit">Subscribe</button>
           </form>
         </div>
       </div>
 
-      <!-- Footer bottom -->
+      <!-- Bottom bar -->
       <div class="wrap footer-bottom">
         <div class="rule"></div>
         <div class="footer-inner">
           <span class="label muted">© 2026 {SITE.name}</span>
-          <nav class="footer-links" aria-label="Legal">
+          <nav class="footer-links" aria-label="Legal navigation">
             <a href="/stockists" class="label muted footer-link">Stockists</a>
             <a href="/privacy"   class="label muted footer-link">Privacy</a>
             <a href="/terms"     class="label muted footer-link">Terms</a>
@@ -144,95 +171,39 @@ const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.c
 </html>
 
 <style>
-  .site-footer {
-    border-top: 1px solid var(--color-rule);
-    margin-top: 5rem;
-  }
+  .site-footer { border-top: 1px solid var(--color-rule); margin-top: 5rem; }
 
   /* Newsletter */
-  .newsletter {
-    padding-block: 3rem;
-    border-bottom: 1px solid var(--color-rule);
-  }
-
-  .nl-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .nl-left { display: flex; flex-direction: column; gap: 0.4rem; }
-
-  .nl-text {
-    font-size: 0.8125rem;
-    font-variation-settings: 'wght' 300;
-    color: var(--color-soft);
-    max-width: 32ch;
-  }
-
-  .nl-form {
-    display: flex;
-    gap: 0;
-    border: 1px solid var(--color-rule);
-    flex-shrink: 0;
-  }
-
+  .newsletter { padding-block: 3rem; border-bottom: 1px solid var(--color-rule); }
+  .nl-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+  .nl-left  { display: flex; flex-direction: column; gap: 0.4rem; }
+  .nl-text  { font-size: 0.8125rem; font-variation-settings: 'wght' 300; color: var(--color-soft); max-width: 32ch; }
+  .nl-form  { display: flex; border: 1px solid var(--color-rule); flex-shrink: 0; }
   .nl-input {
-    background: none;
-    border: none;
-    color: var(--color-ink);
-    font-family: var(--font-sans);
+    background: none; border: none;
+    color: var(--color-ink); font-family: var(--font-sans);
     font-variation-settings: 'wght' 300;
     font-size: max(16px, 0.8125rem);
-    padding: 0.75rem 1rem;
-    outline: none;
-    width: 220px;
-    transition: border-color 0.2s;
+    padding: 0.75rem 1rem; outline: none; width: 220px;
   }
   .nl-input::placeholder { color: var(--color-mid); }
-
   .nl-btn {
-    background: none;
-    border: none;
-    border-left: 1px solid var(--color-rule);
-    color: var(--color-ink);
-    opacity: 0.5;
-    padding: 0.75rem 1rem;
-    white-space: nowrap;
-    transition: opacity 0.2s, background 0.2s;
+    background: none; border: none; border-left: 1px solid var(--color-rule);
+    color: var(--color-ink); opacity: 0.5; padding: 0.75rem 1rem;
+    white-space: nowrap; transition: opacity 0.2s, background 0.2s;
   }
   .nl-btn:hover { opacity: 1; background: var(--color-off); }
-
-  @media (max-width: 640px) {
-    .nl-form { width: 100%; }
-    .nl-input { flex: 1; width: auto; }
-  }
+  @media (max-width: 640px) { .nl-form { width: 100%; } .nl-input { flex: 1; width: auto; } }
 
   /* Footer bottom */
   .footer-bottom { padding-block: 1.5rem 2rem; }
-
   .footer-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    padding-top: 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 0.75rem; padding-top: 1.5rem;
   }
-
-  .footer-links {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-  }
-
-  .footer-link {
-    transition: opacity 0.2s;
-  }
+  .footer-links  { display: flex; gap: 1.5rem; align-items: center; }
+  .footer-link   { transition: opacity 0.2s; }
   .footer-link:hover { opacity: 1 !important; }
-
   .footer-cities { display: none; }
   @media (min-width: 640px) { .footer-cities { display: block; } }
 </style>
