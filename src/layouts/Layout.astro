@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.svelte';
 import Cart from '../components/Cart.svelte';
+import ForSale from '../components/ForSale.svelte';
 import { SITE } from '../data/site';
 
 interface Props {
@@ -86,6 +87,7 @@ const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.c
     </script>
   </head>
   <body>
+    <ForSale client:load />
     <Nav client:load />
     <Cart client:load />
 
