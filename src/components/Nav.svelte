@@ -171,6 +171,12 @@
     z-index: 300;
     /* Offset for the for-sale banner strip above */
     margin-top: 2.25rem;
+    transition: margin-top 0.35s var(--ease-out);
+  }
+
+  /* When banner is dismissed, nav snaps back up smoothly */
+  :global(html.banner-dismissed) .nav {
+    margin-top: 0;
   }
   @media (min-width: 640px)  { .nav { padding-inline: 2.5rem; } }
   @media (min-width: 1024px) { .nav { padding-inline: 4rem; padding-block: 1.875rem; } }

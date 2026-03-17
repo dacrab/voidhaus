@@ -18,6 +18,8 @@
 
   function dismiss() {
     visible = false;
+    // Remove the nav top offset so nav snaps back up
+    document.documentElement.classList.add('banner-dismissed');
     try { sessionStorage.setItem('vh-sale-dismissed', '1'); } catch {}
   }
 
@@ -29,7 +31,10 @@
 
   onMount(() => {
     try {
-      if (sessionStorage.getItem('vh-sale-dismissed') === '1') visible = false;
+      if (sessionStorage.getItem('vh-sale-dismissed') === '1') {
+        visible = false;
+        document.documentElement.classList.add('banner-dismissed');
+      }
     } catch {}
   });
 </script>
@@ -161,6 +166,7 @@
     justify-content: space-between;
     padding: 0.625rem 1.5rem;
     gap: 1rem;
+    /* Height is exactly 2.25rem — matches nav margin-top in Nav.svelte */
   }
   @media (min-width: 640px)  { .sale-strip { padding-inline: 2.5rem; } }
   @media (min-width: 1024px) { .sale-strip { padding-inline: 4rem; } }
