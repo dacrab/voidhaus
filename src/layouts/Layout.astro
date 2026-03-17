@@ -1,0 +1,79 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.svelte';
+import Cart from '../components/Cart.svelte';
+import { SITE } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = SITE.name,
+  description = SITE.tagline,
+} = Astro.props;
+
+const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{fullTitle}</title>
+
+    <!-- FOUC prevention: runs sync before first paint -->
+    <script is:inline>
+      document.documentElement.classList.remove('no-js');
+      if (document.fonts?.ready) {
+        document.fonts.ready.then(() =>
+          document.documentElement.classList.add('fonts-loaded')
+        );
+        // Failsafe — never stay hidden longer than 600ms
+        setTimeout(() =>
+          document.documentElement.classList.add('fonts-loaded')
+        , 600);
+      } else {
+        document.documentElement.classList.add('fonts-loaded');
+      }
+    </script>
+  </head>
+  <body>
+    <Nav client:load />
+    <Cart client:load />
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer wrap">
+      <div class="rule"></div>
+      <div class="footer-inner">
+        <span class="label">© 2026 {SITE.name}</span>
+        <span class="label footer-cities">Milan · Antwerp · Florence · Tokyo</span>
+        <span class="label">All rights reserved</span>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-footer { padding-block: 2rem; margin-top: 5rem; }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 1.5rem;
+  }
+
+  .footer-inner .label { opacity: 0.4; }
+
+  .footer-cities { display: none; }
+  @media (min-width: 640px) { .footer-cities { display: block; } }
+</style>

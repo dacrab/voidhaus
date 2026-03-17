@@ -1,0 +1,54 @@
+---
+interface Props {
+  label?: string;
+  title: string;
+  aside?: string;
+}
+const { label, title, aside } = Astro.props;
+---
+
+<div class="page-header wrap">
+  <div class="ph-inner">
+    <div class="ph-left">
+      {label && <span class="label ph-label" data-anim="hero" data-delay="0">{label}</span>}
+      <h1 class="ph-title" data-anim="hero" data-delay="0.15">{title}</h1>
+    </div>
+    {aside && (
+      <span class="label ph-aside" data-anim="hero" data-delay="0.25">{aside}</span>
+    )}
+  </div>
+  <div class="rule"></div>
+</div>
+
+<style>
+  .page-header {
+    padding-top: 5.5rem;
+  }
+  @media (min-width: 768px) { .page-header { padding-top: 8rem; } }
+
+  .ph-inner {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .ph-left { display: flex; flex-direction: column; gap: 0.5rem; }
+  .ph-label { opacity: 0.4; }
+
+  .ph-title {
+    font-family: var(--font-sans);
+    font-size: clamp(2rem, 8vw, 6rem);
+    font-variation-settings: 'wght' 200;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--color-ink);
+  }
+
+  .ph-aside {
+    opacity: 0.35;
+    align-self: flex-end;
+    padding-bottom: 0.3rem;
+  }
+</style>

@@ -1,0 +1,212 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { PRODUCTS } from '../../data/products';
+
+const spreads = [
+  {
+    issue: '01',
+    title: 'Weight',
+    subtitle: 'On the architecture of outerwear',
+    img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85&auto=format&fit=crop',
+    products: PRODUCTS.filter(p => p.category === 'Outerwear'),
+  },
+  {
+    issue: '02',
+    title: 'Structure',
+    subtitle: 'The tailored body',
+    img: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=85&auto=format&fit=crop',
+    products: PRODUCTS.filter(p => ['Tailoring', 'Ready-to-wear', 'Tops'].includes(p.category)),
+  },
+  {
+    issue: '03',
+    title: 'Surface',
+    subtitle: 'Leather, cotton, detail',
+    img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&q=85&auto=format&fit=crop',
+    products: PRODUCTS.filter(p => ['Footwear', 'Accessories'].includes(p.category)),
+  },
+];
+---
+
+<Layout title="Lookbook">
+  <PageHeader label="SS 2026" title="Lookbook" aside="Three chapters" />
+
+  {spreads.map((s, si) => (
+    <section class="spread" id={`chapter-${s.issue}`}>
+
+      <div class="spread-hero" data-anim="scroll">
+        <img
+          class="spread-img"
+          src={s.img}
+          alt={s.title}
+          loading={si === 0 ? 'eager' : 'lazy'}
+          decoding="async"
+          width="1600" height="1000"
+        />
+        <div class="spread-scrim"></div>
+        <div class="spread-cap wrap">
+          <span class="label spread-issue">Chapter {s.issue}</span>
+          <h2 class="spread-title serif">{s.title}</h2>
+          <p class="label spread-sub">{s.subtitle}</p>
+        </div>
+      </div>
+
+      <div class={`spread-grid wrap js-sg-${si}`}>
+        {s.products.map((p, pi) => (
+          <article class={`sg-card js-sgc-${si}`} style={`--i:${pi}`}>
+            <a href={`/product/${p.slug}`}>
+              <div class="sg-img-wrap">
+                <img
+                  class="sg-img"
+                  src={p.img.replace(/w=\d+/, 'w=700')}
+                  alt={p.name}
+                  loading="lazy" decoding="async"
+                  width="700" height="933"
+                />
+              </div>
+              <div class="sg-info">
+                <div>
+                  <span class="label" style="opacity:.3">{p.num}</span>
+                  <span class="sg-name">{p.name}</span>
+                </div>
+                <span class="label" style="opacity:.4">€ {p.price}</span>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+
+      {si < spreads.length - 1 && (
+        <div class="spread-gap wrap"><div class="rule"></div></div>
+      )}
+
+    </section>
+  ))}
+
+  <div class="lb-end wrap" data-anim="scroll">
+    <div class="rule"></div>
+    <div class="lb-end-inner">
+      <span class="label" style="opacity:.35">SS 2026 — All pieces</span>
+      <a href="/collection" class="label lb-end-link">View Collection →</a>
+    </div>
+    <div class="rule"></div>
+  </div>
+</Layout>
+
+<script>
+import { onReady, revealHero, revealOnScroll, staggerReveal, chapterParallax } from '../../lib/animate';
+
+onReady(() => {
+  revealHero();
+  revealOnScroll();
+
+  // Per-chapter stagger
+  [0, 1, 2].forEach(i => {
+    staggerReveal(`.js-sgc-${i}`, `.js-sg-${i}`, 0.1, 0.08);
+  });
+
+  // Per-chapter parallax with counter-parallax on captions
+  chapterParallax();
+});
+</script>
+
+<style>
+.spread-hero {
+  position: relative;
+  height: 85svh; min-height: 440px;
+  overflow: hidden;
+}
+@media (min-width: 768px) { .spread-hero { height: 90svh; } }
+
+.spread-img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+
+.spread-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 40%, rgb(28 27 25 / 0.72) 100%);
+}
+
+.spread-cap {
+  position: absolute;
+  inset-block-end: 3.5rem;
+  inset-inline: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+@media (min-width: 768px) { .spread-cap { inset-block-end: 4.5rem; } }
+
+.spread-issue { color: rgb(255 255 255 / 0.45); }
+
+.spread-title {
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-style: italic;
+  font-variation-settings: 'wght' 400;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: rgb(255 255 255 / 0.92);
+}
+
+.spread-sub { color: rgb(255 255 255 / 0.45); }
+
+/* Product grid per chapter */
+.spread-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--color-rule);
+  border-inline: 1px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-rule);
+}
+@media (min-width: 768px)  { .spread-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1280px) { .spread-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.sg-card { background: var(--color-white); }
+.sg-card a { display: block; }
+
+.sg-img-wrap {
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background: var(--color-off);
+}
+.sg-img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  display: block;
+  transition: transform 0.9s var(--ease-out);
+}
+.sg-card a:hover .sg-img { transform: scale(1.04); }
+
+.sg-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1rem 1.25rem;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-rule);
+}
+@media (min-width: 768px) { .sg-info { padding: 1.25rem 1.5rem 1.75rem; } }
+
+.sg-name {
+  display: block;
+  font-size: 0.8125rem;
+  font-variation-settings: 'wght' 300;
+  color: var(--color-ink);
+  margin-top: 0.2rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.spread-gap { padding-block: 5rem; }
+@media (min-width: 768px) { .spread-gap { padding-block: 7rem; } }
+
+.lb-end { padding-block: 2rem 4rem; }
+.lb-end-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 0.75rem; padding-block: 1.5rem;
+}
+.lb-end-link { opacity: 0.4; transition: opacity 0.2s; }
+.lb-end-link:hover { opacity: 1; }
+</style>

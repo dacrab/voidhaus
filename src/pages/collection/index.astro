@@ -1,0 +1,144 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { PRODUCTS, CATEGORIES } from '../../data/products';
+---
+
+<Layout title="Collection">
+  <PageHeader label="SS 2026" title="Collection" aside={`${PRODUCTS.length} pieces`} />
+
+  <div class=\"filters wrap\">
+    <div class=\"filters-inner\" role=\"group\" aria-label=\"Filter by category\" data-anim='hero' data-delay='0.3'>
+      {CATEGORIES.map((f, i) => (
+        <button
+          class:list={['filter-btn', 'label', { active: i === 0 }]}
+          data-filter={f}
+          type=\"button\"
+        >
+          {f}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div class="grid wrap" id="js-grid">
+    {PRODUCTS.map((p, i) => (
+      <article class="card js-card" data-category={p.category} style={`--i:${i}`}>
+        <a href={`/product/${p.slug}`}>
+          <div class="card-img-wrap">
+            <img
+              class="card-img"
+              src={p.img.replace(/w=\d+/, 'w=800')}
+              alt={p.name}
+              loading={i < 3 ? 'eager' : 'lazy'}
+              decoding="async"
+              width="800" height="1067"
+            />
+          </div>
+          <div class="card-info">
+            <div class="card-info-l">
+              <span class="label" style="opacity:.3">{p.num}</span>
+              <span class="card-name">{p.name}</span>
+              <span class="label card-cat">{p.category}</span>
+            </div>
+            <span class="label" style="opacity:.4">€ {p.price}</span>
+          </div>
+        </a>
+      </article>
+    ))}
+  </div>
+</Layout>
+
+<script>
+import { onReady, revealHero, revealOnScroll, staggerReveal } from '../../lib/animate';
+import { initToggleGroup } from '../../lib/toggle';
+import gsap from 'gsap';
+
+onReady(() => {
+  revealHero();
+  revealOnScroll();
+  staggerReveal('.js-card', '#js-grid', 0.1, 0.06);
+
+  const cards = document.querySelectorAll<HTMLElement>('.card');
+  initToggleGroup('.filter-btn', btn => {
+    const f = btn.dataset.filter;
+    cards.forEach(card => {
+      const show = f === 'All' || card.dataset.category === f;
+      // Opacity only — no scale transform (avoids leftover inline style)
+      gsap.to(card, { opacity: show ? 1 : 0.12, duration: 0.3, ease: 'power2.out' });
+    });
+  });
+});
+</script>
+
+<style>
+.filters {
+  border-bottom: 1px solid var(--color-rule);
+}
+.filters-inner {
+  display: flex;
+  gap: 2rem;
+  padding-block: 1.125rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filters-inner::-webkit-scrollbar { display: none; }
+
+.filter-btn {
+  background: none; border: none;
+  color: var(--color-ink); opacity: 0.3;
+  transition: opacity 0.2s;
+  white-space: nowrap; flex-shrink: 0; padding: 0;
+}
+.filter-btn:hover { opacity: 0.65; }
+.filter-btn.active { opacity: 1; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--color-rule);
+  border-inline: 1px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-rule);
+  padding: 0;
+}
+@media (min-width: 768px)  { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1280px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+
+.card { background: var(--color-white); }
+.card a { display: block; }
+
+.card-img-wrap {
+  aspect-ratio: 2/3;
+  overflow: hidden;
+  background: var(--color-off);
+}
+.card-img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  display: block;
+  transition: transform 0.9s var(--ease-out);
+}
+.card a:hover .card-img { transform: scale(1.04); }
+
+.card-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1rem 1.25rem;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-rule);
+}
+@media (min-width: 768px) { .card-info { padding: 1.25rem 1.5rem 1.75rem; } }
+
+.card-info-l { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+.card-name {
+  font-size: 0.8125rem;
+  font-variation-settings: 'wght' 300;
+  color: var(--color-ink);
+  display: block;
+  margin-top: 0.2rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-cat { opacity: 0.4; display: block; margin-top: 0.15rem; }
+</style>

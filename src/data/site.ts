@@ -1,0 +1,17 @@
+export const SITE = {
+  name: 'VOIDHAUS',
+  season: 'SS 2026',
+  tagline: 'Uncompromising design. Limited production.',
+  email: {
+    studio: 'studio@voidhaus.com',
+    press:  'press@voidhaus.com',
+  },
+  address: ['Via della Spiga, 19', '20121 Milan, Italy'],
+  hours: 'Mon – Fri, 10:00 – 18:00 CET',
+  ateliers: [
+    { city: 'Milan',    role: 'Outerwear' },
+    { city: 'Antwerp',  role: 'Tailoring' },
+    { city: 'Florence', role: 'Leather'   },
+    { city: 'Tokyo',    role: 'Textiles'  },
+  ],
+} as const;
