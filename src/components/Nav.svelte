@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { lockScroll, unlockScroll } from '../lib/scrollLock';
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
 
@@ -47,14 +48,12 @@
   }
 
   function toggleMenu() {
-    open = !open;
-    // Lock body scroll when menu is open
-    document.body.style.overflow = open ? 'hidden' : '';
+    if (open) { closeMenu(); } else { open = true; lockScroll(); }
   }
 
   function closeMenu() {
     open = false;
-    document.body.style.overflow = '';
+    unlockScroll();
   }
 
   // Custom clip-path transition for menu panel

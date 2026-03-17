@@ -22,6 +22,11 @@
   }
 
   import { onMount } from 'svelte';
+  import { lockScroll, unlockScroll } from '../lib/scrollLock';
+
+  function openPanel() { open = true; lockScroll(); }
+  function closePanel() { open = false; unlockScroll(); }
+
   onMount(() => {
     try {
       if (sessionStorage.getItem('vh-sale-dismissed') === '1') visible = false;
@@ -32,7 +37,7 @@
 <!-- ── Top banner strip ───────────────────────────────────────────────── -->
 {#if visible}
   <div class="sale-strip" transition:fade={{ duration: 300 }}>
-    <button class="strip-inner" onclick={() => open = true} aria-label="This site is for sale — click to learn more">
+    <button class="strip-inner" onclick={openPanel} aria-label="This site is for sale — click to learn more">
       <span class="strip-dot" aria-hidden="true"></span>
       <span class="label strip-text">This site is available for purchase</span>
       <span class="label strip-cta">Learn more →</span>
@@ -46,7 +51,7 @@
   <div
     class="sale-backdrop"
     role="presentation"
-    onclick={() => open = false}
+    onclick={closePanel}
     transition:fade={{ duration: 300 }}
   ></div>
 
@@ -61,7 +66,7 @@
       <span class="label panel-tag">Available</span>
       <button
         class="label panel-close muted"
-        onclick={() => open = false}
+        onclick={closePanel}
         aria-label="Close"
       >Close</button>
     </div>
@@ -77,15 +82,14 @@
           <span class="label muted detail-label">What you get</span>
           <ul class="detail-list">
             {#each [
-              'Full source code — Astro 6 + Svelte 5 + GSAP',
-              '12-piece luxury fashion catalog',
-              'Cart / selection island with localStorage',
-              'Size guide modal component',
-              'Custom 404, legal pages, stockists',
-              'Newsletter capture (ready to wire)',
-              'FOUC-free font loading system',
-              'GitHub repository transfer',
-              'Zero dependencies on paid services',
+              'Complete, production-ready website — ready to deploy in minutes',
+              'Full source code with clean, well-organised file structure',
+              '12-piece luxury fashion catalog with editorial photography',
+              'Working shopping cart — items persist between visits',
+              'Size guide, stockists, privacy & terms pages',
+              'Newsletter signup form — ready to connect to any email service',
+              'Mobile-friendly across all screen sizes',
+              'GitHub repository transfer included',
             ] as item}
               <li class="detail-item">
                 <span class="detail-check label" aria-hidden="true">—</span>
@@ -96,16 +100,14 @@
         </div>
 
         <div class="detail-block">
-          <span class="label muted detail-label">Stack</span>
+          <span class="label muted detail-label">Built with</span>
           <div class="stack-grid">
             {#each [
-              ['Framework', 'Astro 6'],
-              ['Islands',   'Svelte 5'],
-              ['Animation', 'GSAP 3 + ScrollTrigger'],
-              ['Fonts',     'DM Sans + Cormorant (self-hosted)'],
-              ['Styling',   'Pure CSS custom properties'],
-              ['Bundler',   'Bun'],
-              ['Deploy',    'Vercel-ready'],
+              ['Framework', 'Astro 6 — blazing fast, great for SEO'],
+              ['Interactivity', 'Svelte 5 — modern, minimal JavaScript'],
+              ['Animations', 'GSAP — smooth, cinematic transitions'],
+              ['Typography', 'DM Sans + Cormorant — self-hosted, no Google'],
+              ['Deployment', 'Vercel-ready — one click to go live'],
             ] as [k, v]}
               <div class="stack-row">
                 <span class="label muted">{k}</span>
@@ -116,12 +118,12 @@
         </div>
 
         <div class="detail-block">
-          <span class="label muted detail-label">Designed to match</span>
+          <span class="label muted detail-label">Design quality</span>
           <p class="detail-note">
-            Researched and benchmarked against Rick Owens, Maison Margiela,
-            The Row, Lemaire, Jil Sander, and Balenciaga. Every design decision
-            — typography, spacing, animation, interaction — references real
-            luxury brand standards.
+            Every page was benchmarked against Rick Owens, Maison Margiela,
+            The Row, Lemaire, Jil Sander, and Balenciaga. The typography,
+            spacing, interactions, and overall feel are modelled on how
+            the world's most respected fashion houses present themselves online.
           </p>
         </div>
 
@@ -130,13 +132,11 @@
       <div class="panel-divider"></div>
 
       <div class="panel-contact">
-        <p class="contact-line">
-          Interested? Reach out directly:
-        </p>
+        <p class="contact-line">Interested? Get in touch:</p>
         <a
           href="mailto:vkavouras@proton.me"
           class="contact-email"
-          onclick={() => open = false}
+          onclick={closePanel}
         >
           vkavouras@proton.me
         </a>

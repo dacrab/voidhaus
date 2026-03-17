@@ -2,6 +2,7 @@
   import { onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import { cubicOut, cubicIn } from 'svelte/easing';
+  import { lockScroll, unlockScroll } from '../lib/scrollLock';
 
   // Slide in from right (enter) / slide out to right (exit)
   function slideRight(node: Element, { duration = 450, intro = true } = {}) {
@@ -39,14 +40,14 @@
   async function openCart() {
     lastFocused = document.activeElement as HTMLElement;
     open = true;
-    document.body.style.overflow = 'hidden';
+    lockScroll();
     await tick();
     panelEl?.querySelector<HTMLElement>('button, [href], [tabindex]')?.focus();
   }
 
   function closeCart() {
     open = false;
-    document.body.style.overflow = '';
+    unlockScroll();
     lastFocused?.focus();
   }
 
