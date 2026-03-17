@@ -12,6 +12,7 @@
     { href: '/collection', label: 'Collection' },
     { href: '/lookbook',   label: 'Lookbook'   },
     { href: '/about',      label: 'Manifesto'  },
+    { href: '/stockists',  label: 'Stockists'  },
     { href: '/contact',    label: 'Contact'    },
   ];
 
