@@ -71,6 +71,15 @@ const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.c
       });
     </script>
 
+    <!-- Banner dismissed state — must run before paint to prevent nav jump -->
+    <script is:inline>
+      try {
+        if (sessionStorage.getItem('vh-sale-dismissed') === '1') {
+          document.documentElement.classList.add('banner-dismissed');
+        }
+      } catch {}
+    </script>
+
     <!-- FOUC prevention — inline, runs before first paint -->
     <script is:inline>
       document.documentElement.classList.remove('no-js');
