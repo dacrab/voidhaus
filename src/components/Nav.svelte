@@ -24,6 +24,11 @@
   onMount(() => {
     path = window.location.pathname;
 
+    // Animate nav links in on first load only
+    if (!document.documentElement.hasAttribute('data-astro-transition')) {
+      import('../lib/animate').then(({ navEntrance }) => navEntrance());
+    }
+
     const syncCart = () => {
       try { cartCount = JSON.parse(localStorage.getItem('vh-cart') ?? '[]').length; }
       catch { cartCount = 0; }

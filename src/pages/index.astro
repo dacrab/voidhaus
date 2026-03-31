@@ -26,9 +26,9 @@ const featured = PRODUCTS.slice(0, 4);
       <div class="hero-scrim"></div>
     </div>
     <div class="hero-body wrap">
-      <span class="label hero-season" data-anim="hero" data-delay="0.1">SS 2026</span>
-      <h1 class="hero-title" data-anim="hero" data-delay="0.25">VOIDHAUS</h1>
-      <a href="/collection" class="label hero-cta" data-anim="hero" data-delay="0.4">
+      <span class="label hero-season" data-anim="hero" data-delay="0.55">SS 2026</span>
+      <h1 class="hero-title">VOIDHAUS</h1>
+      <a href="/collection" class="label hero-cta" data-anim="hero" data-delay="0.72">
         New Collection →
       </a>
     </div>
@@ -68,12 +68,18 @@ const featured = PRODUCTS.slice(0, 4);
 </Layout>
 
 <script>
-import { onReady, reveal, heroParallax } from '../lib/animate';
+import { onReady, reveal, heroParallax, titleReveal, lineReveal, cardsCascade } from '../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
+    // Hero: image → season label → title (skewY snap) → CTA
     heroParallax('.js-hero-img');
-    reveal();
+    titleReveal('.hero-title', 0.3);
+    reveal(); // handles [data-anim="hero"] for season + cta, [data-anim="scroll"] for editorial
+
+    // Products section: header rule draws in, then cards cascade
+    lineReveal('.products-head', 0.15);
+    cardsCascade('.products .pc');
   });
 });
 </script>
