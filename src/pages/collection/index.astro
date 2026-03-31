@@ -49,16 +49,11 @@ document.addEventListener('astro:page-load', () => {
       const f = btn.dataset.filter;
       cards.forEach(card => {
         const show = f === 'All' || card.dataset.category === f;
-        gsap.to(card, {
-          autoAlpha: show ? 1 : 0.1,
-          scale: show ? 1 : 0.97,
-          duration: 0.3,
-          ease: 'power2.out',
-        });
+        gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: 0.3, ease: 'power2.out' });
       });
     });
   });
-}, { once: false });
+});
 </script>
 
 <style>

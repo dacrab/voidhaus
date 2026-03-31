@@ -2,88 +2,56 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
-
-// Shared GSAP config — smooth defaults
-gsap.defaults({ ease: 'power2.out', overwrite: 'auto' });
 gsap.config({ force3D: true });
 
 const EASE = 'power2.out';
 const DUR  = { base: 0.65, slow: 0.9 };
 
-// Per-page GSAP context — enables clean kill on navigation
+// Track whether the last navigation used a View Transition morph
+let _morphed = false;
 let _ctx: gsap.Context | null = null;
 
-// Kill all ScrollTriggers & tweens from the previous page before the swap
-// astro:before-swap is the right moment — DOM is still the old page
 document.addEventListener('astro:before-swap', () => {
   _ctx?.revert();
   _ctx = null;
 });
 
-// True when this navigation used the View Transition API morph
-// Detected reliably on astro:page-load via the data-astro-transition-fallback attribute
-// or by checking if the VT API was actually used (set during astro:after-swap)
-let _morphed = false;
 document.addEventListener('astro:after-swap', () => {
-  // After swap the new HTML is in place; the VT is running if supported
-  _morphed = !!(document as any).startViewTransition || document.documentElement.hasAttribute('data-astro-transition');
+  _morphed = document.documentElement.hasAttribute('data-astro-transition');
 });
 
-// Public helper — did the last nav use a VT morph?
-function didMorph(): boolean {
-  return _morphed;
-}
-
-/**
- * Run cb after fonts are ready AND the view-transition has completed painting.
- * Uses astro:page-load which fires after the new page is fully visible —
- * the correct replacement for DOMContentLoaded with ClientRouter.
- */
+// Run cb once fonts are ready and layout is settled after astro:page-load
 export function onReady(cb: () => void): void {
-  // Create a fresh GSAP context for this page
   _ctx = gsap.context(() => {});
-
-  const run = () => {
-    // Double-rAF: ensures layout is settled before we read/write geometry
-    requestAnimationFrame(() => requestAnimationFrame(cb));
-  };
-
-  // Fonts or 300 ms — whichever comes first (avoid blocking on slow font loads)
   Promise.race([
     document.fonts.ready,
-    new Promise<void>(res => setTimeout(res, 300)),
-  ]).then(run);
+    new Promise<void>(r => setTimeout(r, 300)),
+  ]).then(() => requestAnimationFrame(() => requestAnimationFrame(cb)));
 }
 
+// Animate [data-anim="hero"] and [data-anim="scroll"] elements into view
 export function reveal(): void {
-  // Refresh after layout is stable
   ScrollTrigger.refresh();
 
   document.querySelectorAll<HTMLElement>('[data-anim="hero"]').forEach(el => {
     gsap.fromTo(el,
-      { opacity: 0, y: 18, willChange: 'opacity, transform' },
-      {
-        opacity: 1, y: 0,
-        duration: DUR.slow, ease: EASE,
-        delay: Number(el.dataset.delay ?? 0),
-        clearProps: 'willChange',
-      },
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: DUR.slow, ease: EASE,
+        delay: Number(el.dataset.delay ?? 0), clearProps: 'will-change' },
     );
   });
 
   ScrollTrigger.batch('[data-anim="scroll"]', {
     start: 'top 92%', once: true,
     onEnter: els => gsap.fromTo(els,
-      { opacity: 0, y: 24, willChange: 'opacity, transform' },
-      {
-        opacity: 1, y: 0,
-        duration: DUR.base, ease: EASE, stagger: 0.07,
-        clearProps: 'willChange',
-      },
+      { opacity: 0, y: 24 },
+      { opacity: 1, y: 0, duration: DUR.base, ease: EASE,
+        stagger: 0.07, clearProps: 'will-change' },
     ),
   });
 }
 
+// Stagger-reveal a set of elements when their trigger scrolls into view
 export function staggerReveal(selector: string, trigger: string, delay = 0, stagger = 0.08): void {
   const els  = document.querySelectorAll<HTMLElement>(selector);
   const trig = document.querySelector<HTMLElement>(trigger);
@@ -92,56 +60,50 @@ export function staggerReveal(selector: string, trigger: string, delay = 0, stag
   ScrollTrigger.create({
     trigger: trig, start: 'top 90%', once: true,
     onEnter: () => gsap.fromTo(els,
-      { opacity: 0, y: 20, willChange: 'opacity, transform' },
-      {
-        opacity: 1, y: 0,
-        duration: DUR.base, ease: EASE, stagger, delay,
-        clearProps: 'willChange',
-      },
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: DUR.base, ease: EASE,
+        stagger, delay, clearProps: 'will-change' },
     ),
   });
 }
 
+// Hero image entrance + scroll parallax
 export function heroParallax(selector: string, strength = 15): void {
   const img = document.querySelector<HTMLElement>(selector);
   if (!img) return;
 
-  if (!didMorph()) {
-    // Fresh load — animate in from hidden
-    gsap.fromTo(img,
-      { opacity: 0, scale: 1.2, willChange: 'opacity, transform' },
-      { opacity: 1, scale: 1.14, duration: 1.8, ease: 'power3.out', clearProps: 'willChange' },
-    );
-  } else {
-    // Arrived via VT morph — snap directly to parallax start state
+  if (_morphed) {
     gsap.set(img, { opacity: 1, scale: 1.14 });
+  } else {
+    gsap.fromTo(img,
+      { opacity: 0, scale: 1.2 },
+      { opacity: 1, scale: 1.14, duration: 1.8, ease: 'power3.out' },
+    );
   }
 
   ScrollTrigger.create({
-    trigger: document.documentElement, start: 'top top', end: 'bottom top',
-    scrub: 2,
+    trigger: document.documentElement, start: 'top top', end: 'bottom top', scrub: 2,
     onUpdate: st => gsap.set(img, { yPercent: -st.progress * strength }),
   });
 }
 
-/**
- * Animate image in — skipped when a VT morph already handled the entrance.
- */
+// Product image entrance — skipped when VT morph handled it
 export function imageEntrance(selector: string): void {
-  if (didMorph()) {
-    // Ensure the image is fully visible after VT
-    const el = document.querySelector<HTMLElement>(selector);
-    if (el) gsap.set(el, { opacity: 1, scale: 1, clearProps: 'opacity,scale' });
-    return;
-  }
   const el = document.querySelector<HTMLElement>(selector);
   if (!el) return;
+
+  if (_morphed) {
+    gsap.set(el, { opacity: 1, scale: 1 });
+    return;
+  }
+
   gsap.fromTo(el,
-    { opacity: 0, scale: 1.06, willChange: 'opacity, transform' },
-    { opacity: 1, scale: 1, duration: 1.4, ease: 'power3.out', clearProps: 'willChange' },
+    { opacity: 0, scale: 1.06 },
+    { opacity: 1, scale: 1, duration: 1.4, ease: 'power3.out' },
   );
 }
 
+// Parallax for lookbook spread images
 export function chapterParallax(): void {
   document.querySelectorAll<HTMLElement>('.spread-hero').forEach(hero => {
     const img = hero.querySelector<HTMLElement>('.spread-img');

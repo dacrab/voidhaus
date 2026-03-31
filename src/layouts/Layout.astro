@@ -23,9 +23,9 @@ const {
   solidNav    = false,
 } = Astro.props;
 
-const fullTitle  = title === SITE.name ? title : `${title} — ${SITE.name}`;
-const canonical  = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.vercel.app').href;
-const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site ?? 'https://voidhaus.vercel.app').href;
+const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.vercel.app').href;
+const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?? 'https://voidhaus.vercel.app').href;
 ---
 
 <!doctype html>
@@ -38,7 +38,7 @@ const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site 
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical"        href={canonical} />
     <link rel="sitemap"          href="/sitemap-index.xml" />
-    <Font cssVariable="--font-sans" preload />
+    <Font cssVariable="--font-sans"  preload />
     <Font cssVariable="--font-serif" preload />
     <ClientRouter />
 
@@ -51,7 +51,6 @@ const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site 
     <meta property="og:title"       content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image"       content={ogImage} />
-    <meta property="og:image:alt"   content={`${SITE.name} — ${description}`} />
     <meta property="og:url"         content={canonical} />
     <meta property="og:locale"      content="en_US" />
 
@@ -59,40 +58,38 @@ const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site 
     <meta name="twitter:title"       content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image"       content={ogImage} />
-    <meta name="twitter:image:alt"   content={`${SITE.name} — ${description}`} />
+
     <script type="application/ld+json" set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "ClothingStore",
-      "name": SITE.name,
-      "description": SITE.tagline,
-      "url": "https://voidhaus.vercel.app",
-      "logo": "https://voidhaus.vercel.app/favicon.svg",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Via della Spiga, 19",
-        "addressLocality": "Milan",
-        "postalCode": "20121",
-        "addressCountry": "IT"
+      '@context': 'https://schema.org',
+      '@type': 'ClothingStore',
+      name: SITE.name,
+      description: SITE.tagline,
+      url: 'https://voidhaus.vercel.app',
+      logo: 'https://voidhaus.vercel.app/favicon.svg',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Via della Spiga, 19',
+        addressLocality: 'Milan',
+        postalCode: '20121',
+        addressCountry: 'IT',
       },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "studio@voidhaus.com",
-        "contactType": "customer service"
+      contactPoint: {
+        '@type': 'ContactPoint',
+        email: 'studio@voidhaus.com',
+        contactType: 'customer service',
       },
-      "sameAs": []
     })} />
 
-    <!-- Remove no-js & restore banner-dismissed state before first paint to prevent FOUC -->
+    <!-- Runs before first paint: removes no-js, restores banner state -->
     <script is:inline>
       document.documentElement.classList.remove('no-js');
       try {
-        if (sessionStorage.getItem('vh-sale-dismissed') === '1') {
+        if (sessionStorage.getItem('vh-sale-dismissed') === '1')
           document.documentElement.classList.add('banner-dismissed');
-        }
       } catch (_) {}
     </script>
-
   </head>
+
   <body>
     <ForSale client:load />
     <Nav client:load solidNav={solidNav} />
@@ -108,8 +105,7 @@ const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site 
         const form  = e.target as HTMLFormElement;
         const input = form.querySelector<HTMLInputElement>('.nl-input');
         const btn   = form.querySelector<HTMLButtonElement>('.nl-btn');
-        if (!input || !btn) return;
-        if (!input.value.includes('@')) { input.focus(); return; }
+        if (!input || !btn || !input.value.includes('@')) { input?.focus(); return; }
         btn.textContent = 'Subscribed ✓';
         btn.style.opacity = '1';
         input.value    = '';
@@ -119,7 +115,6 @@ const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site 
     </script>
 
     <footer class="site-footer">
-      <!-- Newsletter strip -->
       <div class="newsletter wrap">
         <div class="nl-inner">
           <div class="nl-left">
@@ -140,7 +135,6 @@ const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site 
         </div>
       </div>
 
-      <!-- Bottom bar -->
       <div class="wrap footer-bottom">
         <div class="rule"></div>
         <div class="footer-inner">
@@ -160,12 +154,11 @@ const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site 
 <style>
   .site-footer { border-top: 1px solid var(--color-rule); margin-top: 5rem; }
 
-  /* Newsletter */
   .newsletter { padding-block: 3rem; border-bottom: 1px solid var(--color-rule); }
-  .nl-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
-  .nl-left  { display: flex; flex-direction: column; gap: 0.4rem; }
-  .nl-text  { font-size: 0.8125rem; font-variation-settings: 'wght' 300; color: var(--color-soft); max-width: 32ch; }
-  .nl-form  { display: flex; border: 1px solid var(--color-rule); flex-shrink: 0; }
+  .nl-inner   { display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+  .nl-left    { display: flex; flex-direction: column; gap: 0.4rem; }
+  .nl-text    { font-size: 0.8125rem; font-variation-settings: 'wght' 300; color: var(--color-soft); max-width: 32ch; }
+  .nl-form    { display: flex; border: 1px solid var(--color-rule); flex-shrink: 0; }
   .nl-input {
     background: none; border: none;
     color: var(--color-ink); font-family: var(--font-sans);
@@ -182,7 +175,6 @@ const ogImage    = image.startsWith('http') ? image : new URL(image, Astro.site 
   .nl-btn:hover { opacity: 1; background: var(--color-off); }
   @media (max-width: 640px) { .nl-form { width: 100%; } .nl-input { flex: 1; width: auto; } }
 
-  /* Footer bottom */
   .footer-bottom { padding-block: 1.5rem 2rem; }
   .footer-inner {
     display: flex; align-items: center; justify-content: space-between;
