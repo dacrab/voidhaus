@@ -1,10 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { Picture } from 'astro:assets';
 import PageHeader from '../../components/PageHeader.astro';
+import CtaStrip from '../../components/CtaStrip.astro';
 import { SITE } from '../../data/site';
+import { IMAGES } from '../../assets/images';
 ---
 
-<Layout title="Manifesto">
+<Layout title="Manifesto" solidNav={true}>
   <PageHeader label="Manifesto" title="We reject the legible." />
 
   <section class="statements wrap">
@@ -56,18 +59,20 @@ import { SITE } from '../../data/site';
   <!-- Atelier image -->
   <section class="atelier" data-anim="scroll">
     <div class="atelier-img-wrap">
-      <img
+      <Picture
         class="atelier-img"
-        src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1400&q=85&auto=format&fit=crop"
+        src={IMAGES['atelier']}
+        formats={['avif', 'webp']}
         alt="Voidhaus atelier"
-        loading="lazy" decoding="async"
-        width="1400" height="900"
+        loading="lazy"
+        decoding="async"
+        width={1400}
       />
       <div class="atelier-scrim"></div>
     </div>
-    <div class="atelier-grid wrap">
+    <div class="product-grid wrap">
       {SITE.ateliers.map((a, i) => (
-        <div class="at-item js-at-item" style={`--i:${i}`}>
+        <div class="at-item js-at-item" data-anim="stagger" style={`--i:${i}`}>
           <span class="label at-num">0{i + 1}</span>
           <span class="at-city">{a.city}</span>
           <span class="label at-role">{a.role}</span>
@@ -76,23 +81,18 @@ import { SITE } from '../../data/site';
     </div>
   </section>
 
-  <div class="cta-strip wrap" data-anim="scroll">
-    <div class="rule"></div>
-    <div class="cta-inner">
-      <span class="label op-35">Ready?</span>
-      <a href="/collection" class="label cta-link">View Collection →</a>
-    </div>
-    <div class="rule"></div>
-  </div>
+  <CtaStrip href="/collection" cta="View Collection →" />
 </Layout>
 
 <script>
 import { onReady, reveal, staggerReveal } from '../../lib/animate';
 
-onReady(() => {
-  reveal();
-  staggerReveal('.js-at-item', '.atelier-grid', 0.1, 0.07);
-});
+document.addEventListener('astro:page-load', () => {
+  onReady(() => {
+    reveal();
+    staggerReveal('.js-at-item', '.product-grid', 0.1, 0.07);
+  });
+}, { once: false });
 </script>
 
 <style>
@@ -156,16 +156,6 @@ onReady(() => {
 .atelier-img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
 .atelier-scrim { position: absolute; inset: 0; background: rgb(28 27 25 / 0.18); }
 
-.atelier-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--color-rule);
-  border-inline: 1px solid var(--color-rule);
-  border-bottom: 1px solid var(--color-rule);
-}
-@media (min-width: 768px) { .atelier-grid { grid-template-columns: repeat(4, 1fr); } }
-
 .at-item {
   background: var(--color-white);
   padding: 1.75rem 1.5rem;
@@ -185,12 +175,4 @@ onReady(() => {
 }
 .at-role { opacity: 0.45; }
 
-/* CTA */
-.cta-strip { padding-block: 1.5rem 4rem; }
-.cta-inner {
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 0.75rem; padding-block: 1.5rem;
-}
-.cta-link { opacity: 0.4; transition: opacity 0.2s; }
-.cta-link:hover { opacity: 1; }
 </style>

@@ -1,15 +1,36 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://voidhaus.vercel.app',
   output: 'static',
+
+  image: {
+    service: { entrypoint: 'astro/assets/services/sharp' },
+  },
+
+  fonts: [
+    {
+      provider: fontProviders.fontsource(),
+      name: 'DM Sans',
+      cssVariable: '--font-sans',
+      weights: [200, 300, 400, 500],
+      styles: ['normal'],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: 'Cormorant',
+      cssVariable: '--font-serif',
+      weights: [300, 400, 500],
+      styles: ['italic'],
+    },
+  ],
+
   integrations: [
     svelte(),
     sitemap({
-      // Exclude legal/utility pages from sitemap priority
       filter: page => !page.includes('/404'),
       changefreq: 'weekly',
       priority: 0.7,

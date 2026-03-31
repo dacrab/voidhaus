@@ -1,47 +1,56 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { Picture } from 'astro:assets';
 import PageHeader from '../../components/PageHeader.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import CtaStrip from '../../components/CtaStrip.astro';
 import { PRODUCTS } from '../../data/products';
+import { IMAGES } from '../../assets/images';
 
 const spreads = [
   {
     issue: '01',
     title: 'Weight',
     subtitle: 'On the architecture of outerwear',
-    img: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1600&q=85&auto=format&fit=crop',
+    img: IMAGES['coat-primary'],
+    heroSlug: 'obsidian-coat',
     products: PRODUCTS.filter(p => p.category === 'Outerwear'),
   },
   {
     issue: '02',
     title: 'Structure',
     subtitle: 'Tailoring, knitwear, the dressed body',
-    img: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1600&q=85&auto=format&fit=crop',
+    img: IMAGES['trousers-primary'],
+    heroSlug: 'ash-trousers',
     products: PRODUCTS.filter(p => ['Tailoring', 'Ready-to-wear', 'Knitwear', 'Tops'].includes(p.category)),
   },
   {
     issue: '03',
     title: 'Surface',
     subtitle: 'Leather, canvas, the carried object',
-    img: 'https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?w=1600&q=85&auto=format&fit=crop',
+    img: IMAGES['boots-primary'],
+    heroSlug: 'eclipse-boots',
     products: PRODUCTS.filter(p => ['Footwear', 'Accessories'].includes(p.category)),
   },
 ];
 ---
 
-<Layout title="Lookbook">
+<Layout title="Lookbook" solidNav={true}>
   <PageHeader label="SS 2026" title="Lookbook" aside="Three chapters" />
 
   {spreads.map((s, si) => (
     <section class="spread" id={`chapter-${s.issue}`}>
 
       <div class="spread-hero" data-anim="scroll">
-        <img
+        <Picture
           class="spread-img"
           src={s.img}
+          formats={['avif', 'webp']}
           alt={s.title}
           loading={si === 0 ? 'eager' : 'lazy'}
           decoding="async"
-          width="1600" height="1000"
+          width={1600}
+          transition:name={`product-img-${s.heroSlug}`}
         />
         <div class="spread-scrim"></div>
         <div class="spread-cap wrap">
@@ -51,28 +60,9 @@ const spreads = [
         </div>
       </div>
 
-      <div class={`spread-grid wrap js-sg-${si}`}>
-        {s.products.map((p, pi) => (
-          <article class={`sg-card js-sgc-${si}`} style={`--i:${pi}`}>
-            <a href={`/product/${p.slug}`}>
-              <div class="sg-img-wrap">
-                <img
-                  class="sg-img"
-                  src={p.img.replace(/w=\d+/, 'w=700')}
-                  alt={p.name}
-                  loading="lazy" decoding="async"
-                  width="700" height="933"
-                />
-              </div>
-              <div class="sg-info">
-                <div>
-                  <span class="label op-30">{p.num}</span>
-                  <span class="sg-name">{p.name}</span>
-                </div>
-                <span class="label muted">€ {p.price}</span>
-              </div>
-            </a>
-          </article>
+      <div class="product-grid wrap" id={`spread-${s.issue}`}>
+        {s.products.map((p) => (
+          <ProductCard {...p} imgWidth={700} />
         ))}
       </div>
 
@@ -83,30 +73,18 @@ const spreads = [
     </section>
   ))}
 
-  <div class="lb-end wrap" data-anim="scroll">
-    <div class="rule"></div>
-    <div class="lb-end-inner">
-      <span class="label op-35">SS 2026 — All pieces</span>
-      <a href="/collection" class="label lb-end-link">View Collection →</a>
-    </div>
-    <div class="rule"></div>
-  </div>
+  <CtaStrip label="SS 2026 — All pieces" href="/collection" cta="View Collection →" />
 </Layout>
 
 <script>
-import { onReady, reveal, staggerReveal, chapterParallax } from '../../lib/animate';
+import { onReady, reveal, chapterParallax } from '../../lib/animate';
 
-onReady(() => {
-  reveal();
-
-  // Per-chapter stagger
-  [0, 1, 2].forEach(i => {
-    staggerReveal(`.js-sgc-${i}`, `.js-sg-${i}`, 0.1, 0.08);
+document.addEventListener('astro:page-load', () => {
+  onReady(() => {
+    reveal();
+    chapterParallax();
   });
-
-  // Per-chapter parallax with counter-parallax on captions
-  chapterParallax();
-});
+}, { once: false });
 </script>
 
 <style>
@@ -151,61 +129,6 @@ onReady(() => {
 
 .spread-sub { color: rgb(255 255 255 / 0.45); }
 
-/* Product grid per chapter */
-.spread-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--color-rule);
-  border-inline: 1px solid var(--color-rule);
-  border-bottom: 1px solid var(--color-rule);
-}
-@media (min-width: 768px)  { .spread-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1280px) { .spread-grid { grid-template-columns: repeat(4, 1fr); } }
-
-.sg-card { background: var(--color-white); }
-.sg-card a { display: block; }
-
-.sg-img-wrap {
-  aspect-ratio: 3/4;
-  overflow: hidden;
-  background: var(--color-off);
-}
-.sg-img {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center top;
-  display: block;
-  transition: transform 0.9s var(--ease-img);
-}
-.sg-card a:hover .sg-img { transform: scale(1.03); }
-
-.sg-info {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 1rem 1rem 1.25rem;
-  gap: 0.5rem;
-  border-top: 1px solid var(--color-rule);
-}
-@media (min-width: 768px) { .sg-info { padding: 1.25rem 1.5rem 1.75rem; } }
-
-.sg-name {
-  display: block;
-  font-size: 0.8125rem;
-  font-variation-settings: 'wght' 300;
-  color: var(--color-ink);
-  margin-top: 0.2rem;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
 .spread-gap { padding-block: 5rem; }
 @media (min-width: 768px) { .spread-gap { padding-block: 7rem; } }
-
-.lb-end { padding-block: 2rem 4rem; }
-.lb-end-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 0.75rem; padding-block: 1.5rem;
-}
-.lb-end-link { opacity: 0.4; transition: opacity 0.2s; }
-.lb-end-link:hover { opacity: 1; }
 </style>

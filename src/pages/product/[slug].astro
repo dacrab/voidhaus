@@ -1,7 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { Picture, getImage } from 'astro:assets';
 import { PRODUCTS, SHARED_DETAILS } from '../../data/products';
 import SizeGuide from '../../components/SizeGuide.svelte';
+import { IMAGES } from '../../assets/images';
 
 export function getStaticPaths() {
   return PRODUCTS.map(p => ({ params: { slug: p.slug }, props: { product: p } }));
@@ -14,50 +16,55 @@ const details: [string, string][] = [
   ['Origin',   p.origin],
   ...SHARED_DETAILS,
 ];
+
+// Resolve optimised cart thumbnail URL at build time
+const cartImg = await getImage({ src: IMAGES[p.img], width: 200, height: 267, format: 'webp' });
 ---
 
-<Layout title={p.name} description={p.desc} type="product">
+<Layout title={p.name} description={p.desc} type="product" solidNav={true}>
   <div class="product-page">
 
     <!-- Sticky image (desktop) / stacked (mobile) -->
     <div class="product-images">
       <div class="img-primary">
-        <img
+        <Picture
           class="product-img js-main-img"
-          src={p.img}
+          src={IMAGES[p.img]}
+          formats={['avif', 'webp']}
           alt={p.name}
-          loading="eager"
-          decoding="async"
           fetchpriority="high"
-          width="1200" height="1600"
+          decoding="async"
+          width={1200}
+          transition:name={`product-img-${p.slug}`}
         />
       </div>
       <div class="img-secondary" aria-hidden="true">
-        <img
+        <Picture
           class="product-img"
-          src={p.img2}
+          src={IMAGES[p.img2]}
+          formats={['avif', 'webp']}
           alt=""
           loading="lazy"
           decoding="async"
-          width="900" height="1200"
+          width={900}
         />
       </div>
     </div>
 
     <!-- Info panel -->
     <div class="product-info">
-      <div class="info-top" data-anim='hero' data-delay='0'>
-        <a href="/collection" class="label back-link">← Collection</a>
+      <div class="info-top" data-anim="hero" data-delay="0">
+        <a href="/collection" class="label muted-link">← Collection</a>
         <span class="label op-30">{p.num}</span>
       </div>
 
-      <h1 class="product-name" data-anim='hero' data-delay='0.15'>
+      <h1 class="product-name" data-anim="hero" data-delay="0.15">
         {p.name}
       </h1>
 
-      <p class="product-desc" data-anim='scroll'>{p.desc}</p>
+      <p class="product-desc" data-anim="scroll">{p.desc}</p>
 
-      <dl class="details" data-anim='scroll'>
+      <dl class="details" data-anim="scroll">
         {details.map(([k, v]) => (
           <div class="detail-row">
             <dt class="label detail-key">{k}</dt>
@@ -84,7 +91,7 @@ const details: [string, string][] = [
         </div>
       </div>
 
-      <div class="cta-block" data-anim='scroll'>
+      <div class="cta-block" data-anim="scroll">
         <div class="price-row">
           <span class="product-price serif">€ {p.price}</span>
           <span class="label muted">Incl. VAT</span>
@@ -93,7 +100,7 @@ const details: [string, string][] = [
           class="add-btn"
           id="js-add"
           type="button"
-          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price, img: p.img, num: p.num })}
+          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price, img: cartImg.src, num: p.num })}
         >
           <span class="label add-text">Add to Selection</span>
         </button>
@@ -105,8 +112,8 @@ const details: [string, string][] = [
   <div class="p-nav wrap">
     <div class="rule"></div>
     <div class="p-nav-inner">
-      <a href="/collection" class="label p-nav-link">← All pieces</a>
-      <a href="/collection" class="label p-nav-link">Next →</a>
+      <a href="/collection" class="label muted-link">← All pieces</a>
+      <a href="/collection" class="label muted-link">Next →</a>
     </div>
     <div class="rule"></div>
   </div>
@@ -117,41 +124,43 @@ import { onReady, reveal, imageEntrance } from '../../lib/animate';
 import { initToggleGroup } from '../../lib/toggle';
 import gsap from 'gsap';
 
-onReady(() => {
-  // Image entrance
-  imageEntrance('.js-main-img');
+document.addEventListener('astro:page-load', () => {
+  onReady(() => {
+    // Image entrance (skipped if VT morph handled it)
+    imageEntrance('.js-main-img');
 
-  reveal();
+    reveal();
 
-  // Size toggle with aria
-  const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
-  initToggleGroup('.sz-btn', btn => {
-    szBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
-    btn.setAttribute('aria-pressed', 'true');
+    // Size toggle with aria
+    const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
+    initToggleGroup('.sz-btn', btn => {
+      szBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+    });
+
+    // Add to cart — re-query on every navigation so the element reference is fresh
+    const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
+    const addText = addBtn?.querySelector<HTMLElement>('.add-text');
+
+    addBtn?.addEventListener('click', () => {
+      if (!addText) return;
+
+      const product = JSON.parse(addBtn.dataset.product ?? '{}');
+      const size    = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
+
+      window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
+
+      // Buttery opacity-only feedback — no layout thrash
+      gsap.timeline()
+        .to(addText,  { opacity: 0, duration: 0.14, ease: 'power2.in' })
+        .set(addText, { textContent: 'Added ✓' })
+        .to(addText,  { opacity: 1, duration: 0.22, ease: 'power2.out' })
+        .to(addText,  { opacity: 0, duration: 0.14, delay: 1.8, ease: 'power2.in' })
+        .set(addText, { textContent: 'Add to Selection' })
+        .to(addText,  { opacity: 1, duration: 0.2, ease: 'power2.out' });
+    });
   });
-
-  // Add to cart
-  const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
-  const addText = addBtn?.querySelector<HTMLElement>('.add-text');
-
-  addBtn?.addEventListener('click', () => {
-    if (!addText) return;
-
-    const product  = JSON.parse(addBtn.dataset.product ?? '{}');
-    const size     = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
-
-    window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
-
-    // Opacity only — no y transform on text
-    gsap.timeline()
-      .to(addText,   { opacity: 0, duration: 0.15 })
-      .set(addText,  { textContent: 'Added ✓' })
-      .to(addText,   { opacity: 1, duration: 0.25, ease: 'power2.out' })
-      .to(addText,   { opacity: 0, duration: 0.15, delay: 1.8 })
-      .set(addText,  { textContent: 'Add to Selection' })
-      .to(addText,   { opacity: 1, duration: 0.2 });
-  });
-});
+}, { once: false });
 </script>
 
 <style>
@@ -163,8 +172,9 @@ onReady(() => {
   .product-page {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    min-height: calc(100svh - 5rem);
+    min-height: calc(100svh - var(--nav-h));
     align-items: start;
+    padding-top: var(--nav-h);
   }
 }
 
@@ -178,8 +188,8 @@ onReady(() => {
 @media (min-width: 768px) {
   .product-images {
     position: sticky;
-    top: 0;
-    height: 100svh;
+    top: var(--nav-h);
+    height: calc(100svh - var(--nav-h));
     overflow: hidden;
     background: none;
     gap: 0;
@@ -217,8 +227,8 @@ onReady(() => {
   .product-info {
     padding: 4rem 4rem 5rem;
     position: sticky;
-    top: 0;
-    height: 100svh;
+    top: var(--nav-h);
+    height: calc(100svh - var(--nav-h));
     overflow-y: auto;
     scrollbar-width: none;
     justify-content: center;
@@ -232,10 +242,7 @@ onReady(() => {
   align-items: center;
   justify-content: space-between;
 }
-.back-link { opacity: 0.4; transition: opacity 0.2s; }
-.back-link:hover { opacity: 1; }
 
-/* Title — opacity-only reveal */
 .product-name {
   display: block;
   font-family: var(--font-sans);
@@ -326,6 +333,4 @@ onReady(() => {
   justify-content: space-between;
   padding-block: 1.5rem;
 }
-.p-nav-link { opacity: 0.4; transition: opacity 0.2s; }
-.p-nav-link:hover { opacity: 1; }
 </style>

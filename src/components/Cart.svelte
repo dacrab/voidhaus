@@ -1,15 +1,18 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { cubicOut, cubicIn } from 'svelte/easing';
+  import { cubicOut } from 'svelte/easing';
   import { lockScroll, unlockScroll } from '../lib/scrollLock';
 
-  // Slide in from right (enter) / slide out to right (exit)
-  function slideRight(node: Element, { duration = 450, intro = true } = {}) {
+  function slideRight(node: Element, { duration = 400 } = {}) {
     return {
       duration,
-      easing: intro ? cubicOut : cubicIn,
-      css: (t: number) => `transform: translateX(${(1 - t) * 100}%);`,
+      easing: cubicOut,
+      // GPU-composited transform only — no opacity to avoid backdrop interaction
+      css: (t: number) => `
+        transform: translateX(${(1 - t) * 100}%);
+        will-change: transform;
+      `,
     };
   }
 
@@ -101,12 +104,12 @@
 <svelte:window onkeydown={trapFocus} />
 
 {#if open}
-  <!-- Backdrop — fade in/out -->
   <div
     class="backdrop"
+    style="--backdrop-z:400; background:rgb(28 27 25/0.4)"
     role="presentation"
     onclick={closeCart}
-    transition:fade={{ duration: 300 }}
+    transition:fade={{ duration: 350 }}
   ></div>
 
   <!-- Panel — slide in from right / slide out to right -->
@@ -117,12 +120,12 @@
     aria-modal="true"
     aria-label="Your selection"
     bind:this={panelEl}
-    transition:slideRight={{ duration: 450 }}
+    transition:slideRight={{ duration: 400 }}
   >
     <!-- Header -->
     <div class="cart-header">
       <span class="label">Selection ({items.length})</span>
-      <button class="label close-btn" onclick={closeCart} aria-label="Close selection">
+      <button class="label ghost-btn" onclick={closeCart} aria-label="Close selection">
         Close
       </button>
     </div>
@@ -145,10 +148,10 @@
               <div class="item-img-wrap">
                 <img
                   class="item-img"
-                  src={item.img.replace(/w=\d+/, 'w=200')}
+                  src={item.img}
                   alt={item.name}
                   width="200" height="267"
-                  loading="lazy" decoding="async"
+                  decoding="async"
                 />
               </div>
             </a>
@@ -160,7 +163,7 @@
                   <span class="label item-size">Size {item.size}</span>
                 </div>
                 <button
-                  class="label remove-btn"
+                  class="label ghost-btn"
                   onclick={() => remove(item.slug, item.size)}
                   aria-label={`Remove ${item.name}, size ${item.size}`}
                   title="Remove item"
@@ -191,14 +194,6 @@
 {/if}
 
 <style>
-  /* Backdrop — transition handled by Svelte fade() */
-  .backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgb(28 27 25 / 0.4);
-    z-index: 400;
-  }
-
   /* Panel — transition handled by Svelte slideRight() */
   .cart-panel {
     position: fixed;
@@ -210,7 +205,10 @@
     display: flex;
     flex-direction: column;
     border-left: 1px solid var(--color-rule);
+    /* Stable compositing layer — avoids paint during slide */
     will-change: transform;
+    /* Prevent subpixel rendering bleed at the left border */
+    backface-visibility: hidden;
   }
 
   /* Header */
@@ -220,13 +218,6 @@
     justify-content: space-between;
     padding: 1.5rem 1.5rem 1.25rem;
   }
-
-  .close-btn {
-    background: none; border: none;
-    color: var(--color-ink); opacity: 0.4;
-    transition: opacity 0.2s; padding: 0;
-  }
-  .close-btn:hover { opacity: 1; }
 
   /* Empty state */
   .cart-empty {
@@ -326,16 +317,6 @@
     text-transform: none;
     letter-spacing: 0.04em;
   }
-
-  /* Remove button — visible text, not just × */
-  .remove-btn {
-    background: none; border: none;
-    color: var(--color-ink); opacity: 0.3;
-    transition: opacity 0.2s; padding: 0;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-  .remove-btn:hover { opacity: 1; }
 
   .item-price { opacity: 0.5; }
 
