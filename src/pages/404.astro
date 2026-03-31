@@ -3,9 +3,9 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Not Found — VOIDHAUS" description="Page not found.">
-  <div class="not-found wrap">
+  <div class="nf wrap">
     <div class="nf-inner">
-      <span class="label muted nf-code">404</span>
+      <span class="label muted">404</span>
       <h1 class="nf-title serif">Not<br/><em>found.</em></h1>
       <p class="nf-body">
         This page doesn't exist — or has been removed.<br/>
@@ -16,76 +16,53 @@ import Layout from '../layouts/Layout.astro';
         <a href="/collection" class="label nf-link">Collection →</a>
       </div>
     </div>
-    <div class="nf-num" aria-hidden="true">404</div>
+    <div class="nf-bg" aria-hidden="true">404</div>
   </div>
 </Layout>
 
 <style>
-  .not-found {
+  .nf {
     position: relative;
     min-height: calc(100svh - 5rem);
-    display: flex;
-    align-items: center;
+    display: flex; align-items: center;
     overflow: hidden;
   }
 
   .nf-inner {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    padding-block: 8rem 5rem;
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    gap: 2rem; padding-block: 8rem 5rem;
   }
-
-  .nf-code { letter-spacing: 0.3em; }
 
   .nf-title {
     font-size: clamp(3.5rem, 10vw, 8rem);
-    font-style: italic;
-    font-variation-settings: 'wght' 400;
-    letter-spacing: -0.03em;
-    line-height: 0.95;
+    font-style: italic; font-variation-settings: 'wght' 400;
+    letter-spacing: -0.03em; line-height: 0.95;
     color: var(--color-ink);
   }
   .nf-title em { font-style: normal; color: var(--color-mid); }
 
   .nf-body {
-    font-size: 0.875rem;
-    font-variation-settings: 'wght' 300;
-    line-height: 1.85;
-    color: var(--color-soft);
-    max-width: 32ch;
+    font-size: 0.875rem; font-variation-settings: 'wght' 300;
+    line-height: 1.85; color: var(--color-soft); max-width: 32ch;
   }
 
   .nf-links {
-    display: flex;
-    gap: 2.5rem;
-    align-items: center;
-    padding-top: 1rem;
-    border-top: 1px solid var(--color-rule);
+    display: flex; gap: 2.5rem; align-items: center;
+    padding-top: 1rem; border-top: 1px solid var(--color-rule);
   }
 
-  .nf-link {
-    color: var(--color-ink);
-    opacity: 0.4;
-    transition: opacity 0.2s;
-  }
+  .nf-link { color: var(--color-ink); opacity: 0.4; transition: opacity 0.2s; }
   .nf-link:hover { opacity: 1; }
 
-  /* Watermark number */
-  .nf-num {
-    position: absolute;
-    right: -0.05em;
-    bottom: -0.15em;
+  .nf-bg {
+    position: absolute; right: -0.05em; bottom: -0.15em;
     font-family: var(--font-sans);
     font-size: clamp(12rem, 35vw, 32rem);
     font-variation-settings: 'wght' 200;
-    letter-spacing: -0.06em;
-    line-height: 1;
+    letter-spacing: -0.06em; line-height: 1;
     color: transparent;
     -webkit-text-stroke: 1px var(--color-rule);
-    pointer-events: none;
-    user-select: none;
+    pointer-events: none; user-select: none;
   }
 </style>
