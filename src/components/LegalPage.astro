@@ -12,7 +12,7 @@ interface Props {
 const { title, description, updated, sibling, sections } = Astro.props;
 ---
 
-<Layout title={`${title} — VOIDHAUS`} description={description}>
+<Layout title={title} description={description} solidNav={true}>
   <div class="legal-page wrap">
 
     <div class="legal-header page-top-spacing">
@@ -26,8 +26,8 @@ const { title, description, updated, sibling, sections } = Astro.props;
 
     <div class="legal-body">
       <div class="legal-nav">
-        <a href={sibling.href} class="label muted legal-sibling">{sibling.label} →</a>
-        <a href="/stockists"   class="label muted legal-sibling">Stockists →</a>
+        <a href={sibling.href} class="label muted muted-link">{sibling.label} →</a>
+        <a href="/stockists"   class="label muted muted-link">Stockists →</a>
       </div>
 
       {sections.map(s => (
@@ -77,8 +77,6 @@ onReady(() => reveal());
     border-bottom: 1px solid var(--color-rule);
   }
 
-  .legal-sibling { transition: opacity 0.2s; }
-  .legal-sibling:hover { opacity: 1 !important; }
 
   .legal-section {
     padding-block: 2.5rem;

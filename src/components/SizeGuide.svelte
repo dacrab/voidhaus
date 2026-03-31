@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
-  import { cubicOut, cubicIn } from 'svelte/easing';
+  import { cubicOut } from 'svelte/easing';
 
   let { category = 'Clothing' }: { category?: string } = $props();
 
@@ -27,11 +27,13 @@
 
   function panelTransition(node: Element) {
     return {
-      duration: 400,
+      duration: 380,
       easing: cubicOut,
+      // GPU-composited: opacity + transform only, no layout-triggering props
       css: (t: number) => `
         opacity: ${t};
-        transform: translateY(${(1 - t) * 0.75}rem);
+        transform: translateY(${(1 - t) * 0.75}rem) scale(${0.98 + t * 0.02});
+        will-change: opacity, transform;
       `,
     };
   }
@@ -47,9 +49,9 @@
 </button>
 
 {#if open}
-  <!-- Backdrop -->
   <div
-    class="sg-backdrop"
+    class="backdrop"
+    style="--backdrop-z:500; background:rgb(28 27 25/0.45)"
     role="presentation"
     onclick={() => open = false}
     transition:fade={{ duration: 250 }}
@@ -66,7 +68,7 @@
     <div class="sg-header">
       <h2 class="sg-title label">Size Guide</h2>
       <button
-        class="label sg-close muted"
+        class="label ghost-btn"
         onclick={() => open = false}
         aria-label="Close size guide"
       >
@@ -154,14 +156,6 @@
   }
   .sg-trigger:hover { opacity: 1 !important; border-bottom-color: var(--color-ink); }
 
-  /* Backdrop */
-  .sg-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgb(28 27 25 / 0.45);
-    z-index: 500;
-  }
-
   /* Panel — centered modal */
   .sg-panel {
     position: fixed;
@@ -188,13 +182,6 @@
   }
 
   .sg-title { color: var(--color-ink); }
-
-  .sg-close {
-    background: none; border: none;
-    color: var(--color-ink); opacity: 0.4;
-    transition: opacity 0.2s; padding: 0;
-  }
-  .sg-close:hover { opacity: 1; }
 
   .sg-body {
     overflow-y: auto;

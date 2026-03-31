@@ -1,42 +1,44 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
-  import { cubicOut, cubicIn } from 'svelte/easing';
+  import { cubicOut } from 'svelte/easing';
+  import { lockScroll, unlockScroll } from '../lib/scrollLock';
+
+  import { onMount } from 'svelte';
 
   let open    = $state(false);
-  let visible = $state(true); // banner strip visibility
+  // Start hidden; onMount checks the class set by the inline script before first paint.
+  // Because the Layout inline script runs synchronously before any hydration,
+  // banner-dismissed is already on <html> when Svelte hydrates — so this is
+  // effectively FOUC-free on the client.
+  let visible = $state(false);
+
+  onMount(() => {
+    // Read the flag set by the Layout inline script — synchronous, no flicker
+    visible = !document.documentElement.classList.contains('banner-dismissed');
+  });
 
   function panelTransition(node: Element) {
     return {
-      duration: 500,
+      duration: 460,
       easing: cubicOut,
+      // GPU-composited properties only
       css: (t: number) => `
         opacity: ${t};
-        transform: translateY(${(1 - t) * 1.5}rem);
+        transform: translateY(${(1 - t) * 1.25}rem);
+        will-change: opacity, transform;
       `,
     };
   }
 
   function dismiss() {
     visible = false;
-    // Remove the nav top offset so nav snaps back up
     document.documentElement.classList.add('banner-dismissed');
     try { sessionStorage.setItem('vh-sale-dismissed', '1'); } catch {}
   }
 
-  import { onMount } from 'svelte';
-  import { lockScroll, unlockScroll } from '../lib/scrollLock';
-
-  function openPanel() { open = true; lockScroll(); }
+  function openPanel()  { open = true;  lockScroll();   }
   function closePanel() { open = false; unlockScroll(); }
 
-  onMount(() => {
-    try {
-      if (sessionStorage.getItem('vh-sale-dismissed') === '1') {
-        visible = false;
-        document.documentElement.classList.add('banner-dismissed');
-      }
-    } catch {}
-  });
 </script>
 
 <!-- ── Top banner strip ───────────────────────────────────────────────── -->
@@ -54,10 +56,11 @@
 <!-- ── Full info panel ───────────────────────────────────────────────────── -->
 {#if open}
   <div
-    class="sale-backdrop"
+    class="backdrop"
+    style="--backdrop-z:600; background:rgb(28 27 25/0.5)"
     role="presentation"
     onclick={closePanel}
-    transition:fade={{ duration: 300 }}
+    transition:fade={{ duration: 320 }}
   ></div>
 
   <div
@@ -70,7 +73,7 @@
     <div class="panel-header">
       <span class="label panel-tag">Available</span>
       <button
-        class="label panel-close muted"
+        class="label ghost-btn"
         onclick={closePanel}
         aria-label="Close"
       >Close</button>
@@ -222,14 +225,6 @@
   }
   .strip-dismiss:hover { color: rgb(255 255 255 / 0.8); }
 
-  /* ── Backdrop ────────────────────────────────────────────────────────── */
-  .sale-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgb(28 27 25 / 0.5);
-    z-index: 600;
-  }
-
   /* ── Panel ───────────────────────────────────────────────────────────── */
   .sale-panel {
     position: fixed;
@@ -264,13 +259,6 @@
     color: #16a34a;
     letter-spacing: 0.18em;
   }
-
-  .panel-close {
-    background: none; border: none;
-    color: var(--color-ink); opacity: 0.4;
-    transition: opacity 0.2s; padding: 0;
-  }
-  .panel-close:hover { opacity: 1; }
 
   .panel-body {
     overflow-y: auto;

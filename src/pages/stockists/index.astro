@@ -37,7 +37,7 @@ const stockists = [
 ];
 ---
 
-<Layout title="Stockists — VOIDHAUS" description="Find Voidhaus at select retailers worldwide.">
+<Layout title="Stockists" description="Find Voidhaus at select retailers worldwide." solidNav={true}>
   <PageHeader label="Worldwide" title="Stockists" aside={`${stockists.reduce((t, r) => t + r.stores.length, 0)} stores`} />
 
   <div class="stockists wrap">
@@ -75,7 +75,10 @@ const stockists = [
 
 <script>
 import { onReady, reveal } from '../../lib/animate';
-onReady(() => { reveal(); });
+
+document.addEventListener('astro:page-load', () => {
+  onReady(() => { reveal(); });
+}, { once: false });
 </script>
 
 <style>
