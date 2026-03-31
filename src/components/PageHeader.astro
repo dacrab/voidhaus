@@ -7,37 +7,25 @@ interface Props {
 const { label, title, aside } = Astro.props;
 ---
 
-<div class="page-header wrap page-top-spacing">
+<div class="ph wrap page-top-spacing">
   <div class="ph-inner">
     <div class="ph-left">
-      {label && (
-        <span class="label muted ph-label" data-anim="hero" data-delay="0">
-          {label}
-        </span>
-      )}
+      {label && <span class="label muted" data-anim="hero" data-delay="0">{label}</span>}
       <h1 class="ph-title" data-anim="hero" data-delay="0.15">{title}</h1>
     </div>
-    {aside && (
-      <span class="label muted ph-aside" data-anim="hero" data-delay="0.25">
-        {aside}
-      </span>
-    )}
+    {aside && <span class="label muted ph-aside" data-anim="hero" data-delay="0.25">{aside}</span>}
   </div>
   <div class="rule"></div>
 </div>
 
 <style>
-  /* Uses --nav-h via .page-top-spacing */
-
   .ph-inner {
-    display: flex;
-    align-items: flex-end;
+    display: flex; align-items: flex-end;
     justify-content: space-between;
-    padding-bottom: 1.5rem;
-    gap: 1rem;
+    padding-bottom: 1.5rem; gap: 1rem;
   }
 
-  .ph-left  { display: flex; flex-direction: column; gap: 0.5rem; }
+  .ph-left { display: flex; flex-direction: column; gap: 0.5rem; }
 
   .ph-title {
     font-family: var(--font-sans);

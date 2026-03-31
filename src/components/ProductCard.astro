@@ -1,13 +1,13 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { IMAGES } from '../assets/images';
 
 interface Props {
-  slug:    string;
-  num:     string;
-  name:    string;
-  price:   string;
-  img:     string;
+  slug:      string;
+  num:       string;
+  name:      string;
+  price:     string;
+  img:       string;
   category?: string;
   imgWidth?: number;
 }
@@ -18,15 +18,14 @@ const { slug, num, name, price, img, category, imgWidth = 800 } = Astro.props;
 <article class="pc" data-category={category}>
   <a href={`/product/${slug}`}>
     <div class="pc-img-wrap">
-      <Image
+      <Picture
         class="pc-img"
         src={IMAGES[img]}
+        formats={['avif', 'webp']}
         alt={name}
         loading="lazy"
         decoding="async"
         width={imgWidth}
-        height={Math.round(imgWidth * 4 / 3)}
-        format="webp"
         transition:name={`product-img-${slug}`}
       />
     </div>
