@@ -120,7 +120,7 @@ const cartImg = await getImage({ src: IMAGES[p.img], width: 200, height: 267, fo
 </Layout>
 
 <script>
-import { onReady, imageEntrance, sequenceReveal } from '../../lib/animate';
+import { onReady, imageEntrance } from '../../lib/animate';
 import { initToggleGroup } from '../../lib/toggle';
 import gsap from 'gsap';
 
@@ -130,14 +130,22 @@ document.addEventListener('astro:page-load', () => {
     imageEntrance('.js-main-img');
 
     // Info panel — tight orchestrated sequence
-    sequenceReveal([
-      { selector: '.product-name', delay: 0.08,  y: 20 },
-      { selector: '.product-cat',  delay: 0.16,  y: 14 },
-      { selector: '.product-desc', delay: 0.24,  y: 14 },
-      { selector: '.product-details', delay: 0.34, y: 10 },
-      { selector: '.product-attr',    delay: 0.42, y: 10 },
-      { selector: '.add-btn',         delay: 0.52, y: 10 },
-    ]);
+    // Info panel — orchestrated timeline
+    const els = [
+      document.querySelector('.product-name'),
+      document.querySelector('.product-cat'),
+      document.querySelector('.product-desc'),
+      document.querySelector('.product-details'),
+      ...document.querySelectorAll('.product-attr'),
+      document.querySelector('.add-btn'),
+    ].filter(Boolean) as HTMLElement[];
+
+    gsap.set(els, { opacity: 0 });
+    gsap.fromTo(els,
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: 0.65, ease: 'expo.out',
+        stagger: 0.08, delay: 0.1, clearProps: 'will-change' },
+    );
 
     const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
     initToggleGroup('.sz-btn', btn => {

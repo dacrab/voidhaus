@@ -75,14 +75,20 @@ button     { cursor: pointer; font-family: inherit; }
    see the un-animated state. will-change pre-promotes to a compositor layer. */
 html:not(.no-js) [data-anim="hero"],
 html:not(.no-js) [data-anim="scroll"],
-html:not(.no-js) [data-anim="stagger"] {
+html:not(.no-js) [data-anim="stagger"],
+html:not(.no-js) .js-hero-season,
+html:not(.no-js) .js-hero-title,
+html:not(.no-js) .js-hero-cta {
   opacity: 0;
   will-change: opacity, transform;
 }
 
 /* Bypass all animation for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  html:not(.no-js) [data-anim] {
+  html:not(.no-js) [data-anim],
+  html:not(.no-js) .js-hero-season,
+  html:not(.no-js) .js-hero-title,
+  html:not(.no-js) .js-hero-cta {
     opacity: 1 !important;
     transform: none !important;
     will-change: auto;
