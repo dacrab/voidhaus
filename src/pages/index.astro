@@ -93,7 +93,8 @@ document.addEventListener('astro:page-load', () => {
 
 .hero-media { position: absolute; inset: 0; overflow: hidden; }
 
-.hero-img {
+.hero-img,
+.hero-img img {
   width: 100%; height: 100%;
   object-fit: cover; object-position: center 20%;
   display: block;
@@ -157,7 +158,7 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 768px) { .editorial { height: 85svh; margin-block: 7rem; } }
 
 .ed-media { position: absolute; inset: 0; }
-.ed-img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+.ed-img, .ed-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
 .ed-scrim {
   position: absolute; inset: 0;
   background: linear-gradient(135deg, rgb(28 27 25 / 0.72) 0%, rgb(28 27 25 / 0.2) 60%, transparent 100%);
