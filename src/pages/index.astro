@@ -26,9 +26,9 @@ const featured = PRODUCTS.slice(0, 4);
       <div class="hero-scrim"></div>
     </div>
     <div class="hero-body wrap">
-      <span class="label hero-season" data-anim="hero" data-delay="0.55">SS 2026</span>
-      <h1 class="hero-title">VOIDHAUS</h1>
-      <a href="/collection" class="label hero-cta" data-anim="hero" data-delay="0.72">
+      <span class="label hero-season js-hero-season">SS 2026</span>
+      <h1 class="hero-title js-hero-title">VOIDHAUS</h1>
+      <a href="/collection" class="label hero-cta js-hero-cta">
         New Collection →
       </a>
     </div>
@@ -38,6 +38,7 @@ const featured = PRODUCTS.slice(0, 4);
     <div class="products-head">
       <span class="label muted">SS 2026 — New Arrivals</span>
       <a href="/collection" class="label muted muted-link">All ({PRODUCTS.length}) →</a>
+      <div class="rule"></div>
     </div>
     <div class="product-grid">
       {featured.map(p => <ProductCard {...p} />)}
@@ -68,17 +69,42 @@ const featured = PRODUCTS.slice(0, 4);
 </Layout>
 
 <script>
-import { onReady, reveal, heroParallax, titleReveal, lineReveal, cardsCascade } from '../lib/animate';
+import { onReady, reveal, heroParallax, lineReveal, cardsCascade } from '../lib/animate';
+import gsap from 'gsap';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    // Hero: image → season label → title (skewY snap) → CTA
+    // Hero image first
     heroParallax('.js-hero-img');
-    titleReveal('.hero-title', 0.3);
-    reveal(); // handles [data-anim="hero"] for season + cta, [data-anim="scroll"] for editorial
 
-    // Products section: header rule draws in, then cards cascade
-    lineReveal('.products-head', 0.15);
+    // Hero text — tight orchestrated sequence, all from hidden
+    const season = document.querySelector<HTMLElement>('.js-hero-season');
+    const title  = document.querySelector<HTMLElement>('.js-hero-title');
+    const cta    = document.querySelector<HTMLElement>('.js-hero-cta');
+
+    gsap.set([season, title, cta], { opacity: 0 });
+
+    const tl = gsap.timeline({ delay: 0.2 });
+    tl.fromTo(season,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' },
+    )
+    .fromTo(title,
+      { opacity: 0, y: 36, skewY: 2 },
+      { opacity: 1, y: 0, skewY: 0, duration: 1.0, ease: 'expo.out', clearProps: 'skewY' },
+      '-=0.35',
+    )
+    .fromTo(cta,
+      { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' },
+      '-=0.5',
+    );
+
+    // Scroll-triggered elements (editorial)
+    reveal();
+
+    // Products section: rule draws in, cards cascade
+    lineReveal('.products-head .rule', 0.1);
     cardsCascade('.products .pc');
   });
 });
@@ -145,10 +171,11 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 768px) { .products { padding-block: 6rem 4rem; } }
 
 .products-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--color-rule);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  padding-bottom: 0;
+  gap: 1rem;
 }
+.products-head .rule { width: 100%; }
 
 /* Override grid to 4-col on desktop for home page featured strip */
 .products .product-grid {
