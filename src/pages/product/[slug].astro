@@ -126,31 +126,23 @@ import gsap from 'gsap';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    // Image entrance (skipped if VT morph handled it)
     imageEntrance('.js-main-img');
-
     reveal();
 
-    // Size toggle with aria
     const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
     initToggleGroup('.sz-btn', btn => {
       szBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
       btn.setAttribute('aria-pressed', 'true');
     });
 
-    // Add to cart — re-query on every navigation so the element reference is fresh
     const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
     const addText = addBtn?.querySelector<HTMLElement>('.add-text');
 
     addBtn?.addEventListener('click', () => {
       if (!addText) return;
-
       const product = JSON.parse(addBtn.dataset.product ?? '{}');
       const size    = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
-
       window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
-
-      // Buttery opacity-only feedback — no layout thrash
       gsap.timeline()
         .to(addText,  { opacity: 0, duration: 0.14, ease: 'power2.in' })
         .set(addText, { textContent: 'Added ✓' })
@@ -160,7 +152,7 @@ document.addEventListener('astro:page-load', () => {
         .to(addText,  { opacity: 1, duration: 0.2, ease: 'power2.out' });
     });
   });
-}, { once: false });
+});
 </script>
 
 <style>

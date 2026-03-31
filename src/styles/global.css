@@ -1,3 +1,4 @@
+/* ── Tokens ─────────────────────────────────────────────────────────────── */
 :root {
   --color-white:    #faf9f7;
   --color-off:      #f4f2ee;
@@ -17,36 +18,38 @@
   --nav-h: 4.25rem;
 }
 
+/* ── Reset ──────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+* { border-radius: 0 !important; }
 
 html {
-  background:               var(--color-white);
-  color:                    var(--color-ink);
-  font-family:              var(--font-sans);
-  font-size:                16px;
-  font-variation-settings:  'wght' 300;
-  line-height:              1.6;
-  letter-spacing:           0.01em;
-  -webkit-font-smoothing:   antialiased;
-  -moz-osx-font-smoothing:  grayscale;
+  background: var(--color-white);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-variation-settings: 'wght' 300;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body        { overflow-x: hidden; }
-a           { color: inherit; text-decoration: none; }
-img, video  { display: block; max-width: 100%; height: auto; }
-button      { cursor: pointer; font-family: inherit; }
-*           { border-radius: 0 !important; }
+body       { overflow-x: hidden; }
+a          { color: inherit; text-decoration: none; }
+img, video { display: block; max-width: 100%; height: auto; }
+button     { cursor: pointer; font-family: inherit; }
 
+/* ── Utility classes ────────────────────────────────────────────────────── */
 .label {
-  font-size:               0.625rem;
+  font-size: 0.625rem;
   font-variation-settings: 'wght' 400;
-  letter-spacing:          0.18em;
-  text-transform:          uppercase;
-  color:                   var(--color-soft);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-soft);
 }
 
 .serif {
-  font-family:             var(--font-serif);
+  font-family: var(--font-serif);
   font-variation-settings: 'wght' 400;
 }
 
@@ -54,10 +57,7 @@ button      { cursor: pointer; font-family: inherit; }
 .op-35 { opacity: 0.35; }
 .muted { opacity: 0.4; }
 
-.wrap {
-  width: 100%;
-  padding-inline: 1.5rem;
-}
+.wrap { width: 100%; padding-inline: 1.5rem; }
 @media (min-width: 640px)  { .wrap { padding-inline: 2.5rem; } }
 @media (min-width: 1024px) { .wrap { padding-inline: 4rem;   } }
 @media (min-width: 1280px) { .wrap { padding-inline: 6rem;   } }
@@ -67,35 +67,32 @@ button      { cursor: pointer; font-family: inherit; }
 .page-top-spacing { padding-top: calc(var(--nav-h) + 2rem); }
 @media (min-width: 768px) { .page-top-spacing { padding-top: calc(var(--nav-h) + 3.5rem); } }
 
-/* Hide animatable elements before JS runs to prevent FOUC.
-   The no-js class is removed synchronously by an inline script in <head>
-   so this rule takes effect before first paint on JS-enabled browsers. */
+/* ── FOUC guard ─────────────────────────────────────────────────────────── */
+/* Elements hidden until GSAP animates them in. The inline script removes
+   .no-js synchronously before first paint, so JS-enabled browsers never
+   see the un-animated state. will-change pre-promotes to a compositor layer. */
 html:not(.no-js) [data-anim="hero"],
 html:not(.no-js) [data-anim="scroll"],
 html:not(.no-js) [data-anim="stagger"] {
   opacity: 0;
-  /* Promote to own layer early so the GPU is ready when GSAP animates */
   will-change: opacity, transform;
 }
 
-/* Respect user motion preferences — disable all non-essential animation */
+/* Bypass all animation for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  html:not(.no-js) [data-anim="hero"],
-  html:not(.no-js) [data-anim="scroll"],
-  html:not(.no-js) [data-anim="stagger"] {
+  html:not(.no-js) [data-anim] {
     opacity: 1 !important;
     transform: none !important;
     will-change: auto;
   }
-
   ::view-transition-old(root),
-  ::view-transition-new(root) { animation-duration: 0.01ms !important; }
-
+  ::view-transition-new(root),
   ::view-transition-group(*) { animation-duration: 0.01ms !important; }
 }
 
-:focus { outline: none; }
-:focus-visible { outline: 1px solid var(--color-ink); outline-offset: 3px; }
+/* ── Focus ──────────────────────────────────────────────────────────────── */
+:focus                { outline: none; }
+:focus-visible        { outline: 1px solid var(--color-ink); outline-offset: 3px; }
 
 .skip-link {
   position: absolute; top: -100%; left: 1.5rem;
@@ -106,12 +103,13 @@ html:not(.no-js) [data-anim="stagger"] {
 }
 .skip-link:focus { top: 1rem; }
 
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 1px; }
 ::-webkit-scrollbar-track { background: var(--color-white); }
 ::-webkit-scrollbar-thumb { background: var(--color-rule); }
+::selection               { background: var(--color-ink); color: var(--color-white); }
 
-::selection { background: var(--color-ink); color: var(--color-white); }
-
+/* ── Shared component styles ────────────────────────────────────────────── */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -138,6 +136,7 @@ html:not(.no-js) [data-anim="stagger"] {
 }
 .card-cat { display: block; margin-top: 0.1rem; }
 
+/* Shared backdrop — z-index controlled per-component via --backdrop-z */
 .backdrop { position: fixed; inset: 0; z-index: var(--backdrop-z, 400); }
 
 .ghost-btn {
@@ -150,35 +149,23 @@ html:not(.no-js) [data-anim="stagger"] {
 .muted-link { opacity: 0.4; transition: opacity 0.2s; }
 .muted-link:hover { opacity: 1; }
 
-/* ── View Transitions ──────────────────────────────────────────────────── */
-
-/* Root page crossfade */
-::view-transition-old(root) {
-  animation: 0.22s ease both _vt-out;
-}
-::view-transition-new(root) {
-  animation: 0.42s var(--ease-out) both _vt-in;
-}
+/* ── View Transitions ───────────────────────────────────────────────────── */
+::view-transition-old(root) { animation: 0.22s ease both _vt-out; }
+::view-transition-new(root) { animation: 0.42s var(--ease-out) both _vt-in; }
 @keyframes _vt-out { to   { opacity: 0; } }
 @keyframes _vt-in  { from { opacity: 0; } }
 
-/* Named morph elements (images, etc.): let the browser interpolate geometry only.
-   No opacity crossfade — avoids the "ghost" double-image during morph. */
+/* Named morph pairs (product images): geometry only, no crossfade flash */
 ::view-transition-old(*):not(::view-transition-old(root)),
 ::view-transition-new(*):not(::view-transition-new(root)) {
   animation: none;
-  /* Keep the element fully opaque so there is no flash during geometry interpolation */
   opacity: 1 !important;
   mix-blend-mode: normal;
 }
 
-/* Smooth, slightly springy easing for all morph groups */
 ::view-transition-group(*) {
   animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   animation-duration: 0.48s;
 }
 
-/* Remove the default isolation that can create compositing layer artefacts */
-::view-transition-image-pair(*) {
-  isolation: auto;
-}
+::view-transition-image-pair(*) { isolation: auto; }
