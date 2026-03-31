@@ -77,12 +77,13 @@ const spreads = [
 </Layout>
 
 <script>
-import { onReady, reveal, chapterParallax } from '../../lib/animate';
+import { onReady, reveal, chapterParallax, lineReveal } from '../../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    reveal();
+    reveal(); // PageHeader title + label
     chapterParallax();
+    lineReveal('.ph .rule', 0.35);
   });
 });
 </script>

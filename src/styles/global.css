@@ -152,12 +152,24 @@ html:not(.no-js) [data-anim="stagger"] {
 .muted-link:hover { opacity: 1; }
 
 /* ── View Transitions ───────────────────────────────────────────────────── */
-::view-transition-old(root) { animation: 0.22s ease both _vt-out; }
-::view-transition-new(root) { animation: 0.42s var(--ease-out) both _vt-in; }
-@keyframes _vt-out { to   { opacity: 0; } }
-@keyframes _vt-in  { from { opacity: 0; } }
 
-/* Named morph pairs (product images): geometry only, no crossfade flash */
+/* Root page crossfade — old fades+lifts, new fades+rises */
+::view-transition-old(root) {
+  animation: 0.28s cubic-bezier(0.4, 0, 1, 1) both _vt-out;
+}
+::view-transition-new(root) {
+  animation: 0.52s cubic-bezier(0.0, 0, 0.2, 1) both _vt-in;
+}
+@keyframes _vt-out {
+  from { opacity: 1; transform: translateY(0);    }
+  to   { opacity: 0; transform: translateY(-1rem); }
+}
+@keyframes _vt-in {
+  from { opacity: 0; transform: translateY(1.5rem); }
+  to   { opacity: 1; transform: translateY(0);      }
+}
+
+/* Named morph pairs — geometry interpolation only, no crossfade ghost */
 ::view-transition-old(*):not(::view-transition-old(root)),
 ::view-transition-new(*):not(::view-transition-new(root)) {
   animation: none;
@@ -165,9 +177,18 @@ html:not(.no-js) [data-anim="stagger"] {
   mix-blend-mode: normal;
 }
 
+/* Morph group timing — slightly springy */
 ::view-transition-group(*) {
-  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  animation-duration: 0.48s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: 0.52s;
 }
 
 ::view-transition-image-pair(*) { isolation: auto; }
+
+/* Reduced motion — instant transitions, no movement */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) {
+    animation-duration: 0.01ms !important;
+  }
+  ::view-transition-group(*) { animation-duration: 0.01ms !important; }
+}

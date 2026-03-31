@@ -74,10 +74,14 @@ const stockists = [
 </Layout>
 
 <script>
-import { onReady, reveal } from '../../lib/animate';
+import { onReady, reveal, lineReveal, staggerReveal } from '../../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
-  onReady(() => { reveal(); });
+  onReady(() => {
+    reveal(); // PageHeader
+    lineReveal('.ph .rule', 0.3);
+    staggerReveal('.stockist-item', '.stockists-grid', 0, 0.06);
+  });
 });
 </script>
 
