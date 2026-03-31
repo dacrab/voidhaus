@@ -120,12 +120,13 @@
 <style>
   /* ── Bar ─────────────────────────────────────────────────────────── */
   .nav {
-    position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 300;
+    position: fixed; inset-block-start: var(--banner-h, 0px); inset-inline: 0; z-index: 300;
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
     padding-inline: 1.5rem; height: var(--nav-h);
     color: rgb(255 255 255 / 0.85);
     transition: background 0.35s ease, color 0.35s ease,
-                transform 0.3s ease, box-shadow 0.35s ease;
+                transform 0.3s ease, box-shadow 0.35s ease,
+                top 0.25s ease;
   }
   @media (min-width: 640px)  { .nav { padding-inline: 2.5rem; } }
   @media (min-width: 1024px) { .nav { padding-inline: 4rem; } }
@@ -137,7 +138,7 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
-  .nav.hidden { transform: translateY(-100%); pointer-events: none; }
+  .nav.hidden { transform: translateY(calc(-100% - var(--banner-h, 0px))); pointer-events: none; }
   .nav.open   { background: var(--color-white); color: var(--color-ink); box-shadow: none; transform: none; }
 
   /* ── Logo ────────────────────────────────────────────────────────── */

@@ -1,16 +1,24 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { lockScroll, unlockScroll } from '../lib/scrollLock';
 
-  let visible   = $state(false);
+  // The Layout inline script sets banner-dismissed on <html> synchronously
+  // before any paint. We read sessionStorage here — safe because ForSale
+  // is client:load (never SSR-rendered), so sessionStorage is always available.
+  let visible = $state(
+    typeof sessionStorage !== 'undefined'
+      ? sessionStorage.getItem('vh-sale-dismissed') !== '1'
+      : false
+  );
   let open      = $state(false);
   let panelEl   = $state<HTMLElement | undefined>();
   let prevFocus = $state<HTMLElement | null>(null);
 
-  onMount(() => {
-    visible = !document.documentElement.classList.contains('banner-dismissed');
+  // Sync --banner-h on :root so Nav and page-top-spacing can offset correctly
+  $effect(() => {
+    document.documentElement.style.setProperty('--banner-h', visible ? '2.4rem' : '0px');
   });
 
   function dismiss() {
@@ -157,6 +165,9 @@
 {/if}
 
 <style>
+  /* ── Hide strip before JS hydrates if already dismissed ─────────── */
+  :global(html.banner-dismissed) .strip { display: none !important; }
+
   /* ── Strip ───────────────────────────────────────────────────────── */
   .strip {
     position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 500;
