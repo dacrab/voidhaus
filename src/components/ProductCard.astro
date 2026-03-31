@@ -50,11 +50,12 @@ const { slug, num, name, price, img, category, imgWidth = 800 } = Astro.props;
     background: var(--color-off);
   }
 
-  .pc-img {
+  .pc-img,
+  .pc-img img {
     width: 100%; height: 100%;
     object-fit: cover; object-position: center top;
     display: block;
     transition: transform 0.9s var(--ease-img);
   }
-  .pc a:hover .pc-img { transform: scale(1.03); }
+  .pc a:hover .pc-img img { transform: scale(1.03); }
 </style>
