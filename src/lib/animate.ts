@@ -185,11 +185,3 @@ export function pullQuote(selector: string): void {
   });
 }
 
-// ── navEntrance — initial nav link reveal on first load ───────────────────────
-export function navEntrance(): void {
-  if (_morphed) return;
-  gsap.fromTo('.nav-link',
-    { opacity: 0, y: -6 },
-    { opacity: 1, y: 0, duration: D.sm, ease: E.expo, stagger: 0.06, delay: 0.6 },
-  );
-}
