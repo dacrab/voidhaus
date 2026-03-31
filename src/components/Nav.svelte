@@ -24,11 +24,6 @@
   onMount(() => {
     path = window.location.pathname;
 
-    // Animate nav links in on first load only
-    if (!document.documentElement.hasAttribute('data-astro-transition')) {
-      import('../lib/animate').then(({ navEntrance }) => navEntrance());
-    }
-
     const syncCart = () => {
       try { cartCount = JSON.parse(localStorage.getItem('vh-cart') ?? '[]').length; }
       catch { cartCount = 0; }
@@ -161,7 +156,20 @@
     color: inherit; opacity: 0.6;
     transition: opacity 0.2s;
     background: none; border: none; padding: 0;
+    /* Entrance — runs once on mount, CSS owns this entirely */
+    animation: nav-link-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+  /* Stagger via nth-child — no JS needed */
+  .nav-l .nav-link:nth-child(1) { animation-delay: 0.55s; }
+  .nav-l .nav-link:nth-child(2) { animation-delay: 0.62s; }
+  .nav-r .nav-link:nth-child(1) { animation-delay: 0.69s; }
+  .nav-r .nav-link:nth-child(2) { animation-delay: 0.76s; }
+
+  @keyframes nav-link-in {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 0.6; transform: translateY(0); }
+  }
+  /* Active/hover override — must win over animation fill */
   .nav-link:hover, .nav-link.active { opacity: 1; }
   .nav-link.active { position: relative; }
   .nav-link.active::after {
