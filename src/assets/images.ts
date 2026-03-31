@@ -1,3 +1,5 @@
+/// <reference types="astro/client" />
+
 const raw = import.meta.glob<{ default: ImageMetadata }>(
   './img/*.{jpg,jpeg,png,webp,avif}',
   { eager: true },
