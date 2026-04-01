@@ -13,7 +13,7 @@ export default defineConfig({
         onwarn(warning, warn) {
           // Svelte transition imports (fade, fly etc) are used in templates
           // but Vite's static analyser can't see them — suppress the false positive
-          if (warning.code === 'UNUSED_EXTERNAL_IMPORT' && warning.source?.includes('svelte')) return;
+          if (warning.code === 'UNUSED_EXTERNAL_IMPORT' && String(warning.id ?? '').includes('svelte')) return;
           warn(warning);
         },
       },
