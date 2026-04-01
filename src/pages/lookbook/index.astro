@@ -5,15 +5,35 @@ import PageHeader from '../../components/PageHeader.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import CtaStrip from '../../components/CtaStrip.astro';
 import { PRODUCTS } from '../../data/products';
-import { SPREADS } from '../../data/lookbook';
 import { SITE } from '../../data/site';
 import { IMAGES } from '../../assets/images';
 
-const spreads = SPREADS.map(s => ({
-  ...s,
-  img:      IMAGES[s.imgKey],
-  products: PRODUCTS.filter(p => s.categories.includes(p.category)),
-}));
+const spreads = [
+  {
+    issue:    '01',
+    title:    'Weight',
+    subtitle: 'On the architecture of outerwear',
+    img:      IMAGES['coat-primary'],
+    heroSlug: 'obsidian-coat',
+    products: PRODUCTS.filter(p => p.category === 'Outerwear'),
+  },
+  {
+    issue:    '02',
+    title:    'Structure',
+    subtitle: 'Tailoring, knitwear, the dressed body',
+    img:      IMAGES['trousers-primary'],
+    heroSlug: 'ash-trousers',
+    products: PRODUCTS.filter(p => ['Tailoring', 'Ready-to-wear', 'Knitwear', 'Tops'].includes(p.category)),
+  },
+  {
+    issue:    '03',
+    title:    'Surface',
+    subtitle: 'Leather, canvas, the carried object',
+    img:      IMAGES['boots-primary'],
+    heroSlug: 'eclipse-boots',
+    products: PRODUCTS.filter(p => ['Footwear', 'Accessories'].includes(p.category)),
+  },
+] as const;
 ---
 
 <Layout title="Lookbook" solidNav={true}>
