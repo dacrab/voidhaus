@@ -116,14 +116,13 @@ const details: [string, string][] = [
 </Layout>
 
 <script>
-import { onReady, imageEntrance } from '../../lib/animate';
+import { onPageLoad, imageEntrance } from '../../lib/animate';
 import { initToggleGroup } from '../../lib/toggle';
 import gsap from 'gsap';
 
-document.addEventListener('astro:page-load', () => {
-  onReady(() => {
-    // Image — morph-aware entrance
-    imageEntrance('.js-main-img');
+onPageLoad(() => {
+  // Image — morph-aware entrance
+  imageEntrance('.js-main-img');
 
     // Info panel — orchestrated reveal
     const els = [
@@ -152,8 +151,11 @@ document.addEventListener('astro:page-load', () => {
 
     addBtn?.addEventListener('click', () => {
       if (!addText) return;
-      const product = JSON.parse(addBtn.dataset.product ?? '{}');
-      const size    = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
+      const size = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
+      if (!size) { addBtn.setAttribute('aria-label', 'Please select a size'); return; }
+      let product: Record<string, string>;
+      try { product = JSON.parse(addBtn.dataset.product ?? '{}'); }
+      catch { return; }
       window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
       gsap.timeline()
         .to(addText,  { opacity: 0, duration: 0.13, ease: 'power2.in' })
@@ -163,7 +165,6 @@ document.addEventListener('astro:page-load', () => {
         .set(addText, { textContent: 'Add to Selection' })
         .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' });
     });
-  });
 });
 </script>
 
@@ -214,7 +215,6 @@ document.addEventListener('astro:page-load', () => {
 }
 @media (min-width: 768px) { .img-secondary { display: none; } }
 
-.product-img,
 .product-img img {
   width: 100%; height: 100%;
   object-fit: cover; object-position: center top;

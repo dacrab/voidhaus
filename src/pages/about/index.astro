@@ -67,12 +67,12 @@ import { IMAGES } from '../../assets/images';
         decoding="async"
         width={1400}
       />
-      <div class="atelier-scrim"></div>
+      <div class="atelier-scrim scrim"></div>
     </div>
     <div class="product-grid wrap">
       {SITE.ateliers.map((a, i) => (
         <div class="at-item" data-anim="stagger" style={`--i:${i}`}>
-          <span class="label op-30 at-num">0{i + 1}</span>
+          <span class="label op-30 at-num">{String(i + 1).padStart(2, '0')}</span>
           <span class="at-city">{a.city}</span>
           <span class="label op-45 at-role">{a.role}</span>
         </div>
@@ -84,15 +84,12 @@ import { IMAGES } from '../../assets/images';
 </Layout>
 
 <script>
-import { onReady, reveal, statementReveal, pullQuote, lineReveal } from '../../lib/animate';
+import { onPageLoad, pageReveal, statementReveal, pullQuote } from '../../lib/animate';
 
-document.addEventListener('astro:page-load', () => {
-  onReady(() => {
-    reveal(); // PageHeader
-    lineReveal('.ph .rule', 0.3);
-    statementReveal();
-    pullQuote('.pull-quote');
-  });
+onPageLoad(() => {
+  pageReveal();
+  statementReveal();
+  pullQuote('.pull-quote');
 });
 </script>
 
@@ -153,8 +150,8 @@ document.addEventListener('astro:page-load', () => {
 }
 @media (min-width: 768px) { .atelier-img-wrap { height: 65svh; } }
 
-.atelier-img, .atelier-img img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
-.atelier-scrim { position: absolute; inset: 0; background: rgb(28 27 25 / 0.18); }
+.atelier-img img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
+.atelier-scrim { background: rgb(28 27 25 / 0.18); }
 
 .at-item {
   background: var(--color-white);
