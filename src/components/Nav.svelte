@@ -11,7 +11,7 @@
   let path      = $state('');
   let open      = $state(false);
   let cartCount = $state(0);
-  let scrolled  = $state(solidNav);
+  let scrolled  = $state(false);
   let hidden    = $state(false);
 
   const links = [
@@ -35,6 +35,7 @@
     window.addEventListener('vh:cart-updated', syncCart);
 
     let lastY = 0;
+    scrolled = solidNav;
     const onScroll = () => {
       const y = window.scrollY;
       scrolled = solidNav || y > 40;
@@ -69,7 +70,7 @@
 
 <a href="#main" class="skip-link">Skip to content</a>
 
-<header class="nav" class:scrolled class:hidden class:open role="banner">
+<header class="nav" class:scrolled class:hidden class:open>
   <nav class="nav-l" aria-label="Primary navigation">
     {#each links.slice(0, 2) as { href, label }}
       <a {href} class="nav-link label" class:active={isActive(href)}
@@ -99,6 +100,7 @@
     role="dialog"
     aria-modal="true"
     aria-label="Navigation menu"
+    tabindex="-1"
     onkeydown={e => {
       if (e.key === 'Escape') { close(); return; }
       const menu = document.getElementById('nav-menu');

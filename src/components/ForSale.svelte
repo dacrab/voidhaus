@@ -39,6 +39,7 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="fs-title"
+    tabindex="-1"
     onkeydown={e => {
       if (e.key === 'Escape') { e.preventDefault(); open = false; return; }
       trapFocus(e.currentTarget as HTMLElement, e);
