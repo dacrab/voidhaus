@@ -23,9 +23,10 @@ const {
   solidNav    = false,
 } = Astro.props;
 
+const baseUrl   = Astro.site ?? new URL('https://voidhaus.vercel.app');
 const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://voidhaus.vercel.app').href;
-const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?? 'https://voidhaus.vercel.app').href;
+const canonical = new URL(Astro.url.pathname, baseUrl).href;
+const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).href;
 ---
 
 <!doctype html>
@@ -35,7 +36,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#faf9f7" />
     <link rel="icon"             href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
     <link rel="canonical"        href={canonical} />
     <link rel="sitemap"          href="/sitemap-index.xml" />
     <Font cssVariable="--font-sans"  preload />
@@ -65,7 +66,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
       name: SITE.name,
       description: SITE.tagline,
       url: canonical,
-      logo: new URL('/favicon.svg', Astro.site ?? canonical).href,
+      logo: new URL('/favicon.svg', baseUrl).href,
       address: {
         '@type': 'PostalAddress',
         streetAddress: SITE.address[0],

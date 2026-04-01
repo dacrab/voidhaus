@@ -11,7 +11,7 @@ const { label = 'Ready?', href, cta } = Astro.props;
   <div class="rule"></div>
   <div class="cta-inner">
     <span class="label op-35">{label}</span>
-    <a {href} class="label cta-link">{cta}</a>
+    <a {href} class="label muted-link">{cta}</a>
   </div>
   <div class="rule"></div>
 </div>
@@ -22,6 +22,4 @@ const { label = 'Ready?', href, cta } = Astro.props;
     display: flex; justify-content: space-between; align-items: center;
     flex-wrap: wrap; gap: 0.75rem; padding-block: 1.5rem;
   }
-  .cta-link { opacity: 0.4; transition: opacity 0.2s; }
-  .cta-link:hover { opacity: 1; }
 </style>

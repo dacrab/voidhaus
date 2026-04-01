@@ -5,6 +5,7 @@ import PageHeader from '../../components/PageHeader.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import CtaStrip from '../../components/CtaStrip.astro';
 import { PRODUCTS } from '../../data/products';
+import { SITE } from '../../data/site';
 import { IMAGES } from '../../assets/images';
 
 const spreads = [
@@ -36,7 +37,7 @@ const spreads = [
 ---
 
 <Layout title="Lookbook" solidNav={true}>
-  <PageHeader label="SS 2026" title="Lookbook" aside="Three chapters" />
+  <PageHeader label={SITE.season} title="Lookbook" aside="Three chapters" />
 
   {spreads.map((s, si) => (
     <section class="spread" id={`chapter-${s.issue}`}>
@@ -73,7 +74,7 @@ const spreads = [
     </section>
   ))}
 
-  <CtaStrip label="SS 2026 — All pieces" href="/collection" cta="View Collection →" />
+  <CtaStrip label={`${SITE.season} — All pieces`} href="/collection" cta="View Collection →" />
 </Layout>
 
 <script>

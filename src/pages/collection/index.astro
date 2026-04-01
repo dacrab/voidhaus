@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import { PRODUCTS, CATEGORIES } from '../../data/products';
+import { SITE } from '../../data/site';
 ---
 
 <Layout title="Collection" solidNav={true}>
@@ -10,7 +11,7 @@ import { PRODUCTS, CATEGORIES } from '../../data/products';
     <div class="coll-top-inner">
       <h1 class="coll-title" data-anim="hero" data-delay="0">Collection</h1>
       <span class="label muted coll-count" data-anim="hero" data-delay="0.15">
-        SS 2026 — {PRODUCTS.length} pieces
+        {SITE.season} — {PRODUCTS.length} pieces
       </span>
     </div>
 

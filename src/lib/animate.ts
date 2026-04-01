@@ -67,15 +67,6 @@ export function reveal(): void {
   });
 }
 
-export function titleReveal(selector: string, delay = 0): void {
-  const el = document.querySelector<HTMLElement>(selector);
-  if (!el) { if (import.meta.env.DEV) console.warn(`[animate] element not found: ${selector}`); return; }
-  gsap.fromTo(el,
-    { opacity: 0, y: 32, skewY: 1.5 },
-    { opacity: 1, y: 0, skewY: 0, duration: DUR.lg, ease: EASE.expo, delay, clearProps: 'will-change,skewY' },
-  );
-}
-
 export function staggerReveal(selector: string, trigger: string, delay = 0, stagger = 0.08): void {
   const els  = document.querySelectorAll<HTMLElement>(selector);
   const trig = document.querySelector<HTMLElement>(trigger);
