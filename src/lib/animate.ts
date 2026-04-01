@@ -1,8 +1,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger);
 gsap.config({ force3D: true });
 
 export const EASE = { out: 'power2.out', in: 'power2.in', io: 'power2.inOut', expo: 'expo.out', circ: 'circ.out' };

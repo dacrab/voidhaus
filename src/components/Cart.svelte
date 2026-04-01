@@ -8,7 +8,7 @@
   type CartItem = {
     slug:  string;
     name:  string;
-    price: string;
+    price: string; // formatted display string e.g. "3,200"
     size:  string;
     img:   string;
     num:   string;
@@ -22,7 +22,7 @@
   let prevFocus = $state<HTMLElement | null>(null);
 
   const total = $derived(
-    items.reduce((s, i) => s + parseFloat(i.price.replace(',', '')), 0)
+    items.reduce((s, i) => s + parseFloat(i.price.replace(/,/g, '')), 0)
       .toLocaleString('en-US', { minimumFractionDigits: 0 })
   );
 

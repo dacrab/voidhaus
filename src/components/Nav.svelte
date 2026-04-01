@@ -28,8 +28,12 @@
     document.addEventListener('astro:page-load', onPageLoad);
 
     const syncCart = () => {
-      try { cartCount = JSON.parse(localStorage.getItem('vh-cart') ?? '[]').length; }
-      catch { cartCount = 0; }
+      try {
+        const raw = localStorage.getItem('vh-cart');
+        cartCount = raw ? (JSON.parse(raw) as unknown[]).length : 0;
+      } catch {
+        cartCount = 0;
+      }
     };
     syncCart();
     window.addEventListener('vh:cart-updated', syncCart);

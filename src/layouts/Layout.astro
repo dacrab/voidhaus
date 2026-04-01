@@ -70,9 +70,8 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
       address: {
         '@type': 'PostalAddress',
         streetAddress: SITE.address[0],
-        addressLocality: 'Milan',
-        postalCode: '20121',
-        addressCountry: 'IT',
+        addressLocality:  SITE.address[1].split(',')[0].trim(),
+        addressCountry:   SITE.addressCountry,
       },
       contactPoint: {
         '@type': 'ContactPoint',
