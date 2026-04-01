@@ -3,8 +3,9 @@ export const SITE = {
   season: 'SS 2026',
   tagline: 'Dark luxury fashion. Twelve pieces. Four ateliers. One position.',
   email: {
-    studio: 'studio@voidhaus.com',
-    press:  'press@voidhaus.com',
+    studio:  'studio@voidhaus.com',
+    press:   'press@voidhaus.com',
+    enquiry: 'vkavouras@proton.me',
   },
   address: ['Via della Spiga, 19', '20121 Milan, Italy'],
   hours: 'Mon – Fri, 10:00 – 18:00 CET',

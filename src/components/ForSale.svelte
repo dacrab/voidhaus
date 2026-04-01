@@ -73,10 +73,10 @@
     <div class="rule"></div>
 
     <div class="panel-foot">
-      <a href={`mailto:${SITE.email.studio}`} class="enquire-btn label">
+      <a href={`mailto:${SITE.email.enquiry}`} class="enquire-btn label">
         Get in touch
       </a>
-      <span class="label muted">{SITE.email.studio}</span>
+      <span class="label muted">{SITE.email.enquiry}</span>
     </div>
   </div>
 {/if}
