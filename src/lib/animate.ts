@@ -22,7 +22,18 @@ export function onReady(cb: () => void): void {
     .then(() => requestAnimationFrame(() => requestAnimationFrame(cb)));
 }
 
+// Wraps the astro:page-load + onReady boilerplate every page uses
+export function onPageLoad(cb: () => void): void {
+  document.addEventListener('astro:page-load', () => onReady(cb));
+}
+
 export const morphed = () => _morphed;
+
+// reveal() + lineReveal on the PageHeader rule — called together on every page with a header
+export function pageReveal(lineDelay = 0.3): void {
+  reveal();
+  lineReveal('.ph .rule', lineDelay);
+}
 
 export function reveal(): void {
   ScrollTrigger.refresh();
@@ -31,7 +42,7 @@ export function reveal(): void {
     gsap.fromTo(el,
       { opacity: 0, y: 22 },
       { opacity: 1, y: 0, duration: D.md, ease: E.expo,
-        delay: Number(el.dataset.delay ?? 0), clearProps: 'will-change' },
+        delay: parseFloat(el.dataset.delay ?? '0') || 0, clearProps: 'will-change' },
     );
   });
 
@@ -46,7 +57,7 @@ export function reveal(): void {
 
 export function titleReveal(selector: string, delay = 0): void {
   const el = document.querySelector<HTMLElement>(selector);
-  if (!el) return;
+  if (!el) { if (import.meta.env.DEV) console.warn(`[animate] element not found: ${selector}`); return; }
   gsap.fromTo(el,
     { opacity: 0, y: 32, skewY: 1.5 },
     { opacity: 1, y: 0, skewY: 0, duration: D.lg, ease: E.expo, delay, clearProps: 'will-change,skewY' },

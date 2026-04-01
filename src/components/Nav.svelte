@@ -23,6 +23,8 @@
 
   onMount(() => {
     path = window.location.pathname;
+    const onPageLoad = () => { path = window.location.pathname; };
+    document.addEventListener('astro:page-load', onPageLoad);
 
     const syncCart = () => {
       try { cartCount = JSON.parse(localStorage.getItem('vh-cart') ?? '[]').length; }
@@ -41,6 +43,7 @@
     window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
+      document.removeEventListener('astro:page-load', onPageLoad);
       window.removeEventListener('vh:cart-updated', syncCart);
       window.removeEventListener('scroll', onScroll);
     };
@@ -94,8 +97,16 @@
     class="menu"
     role="dialog"
     aria-modal="true"
-    aria-label="Site navigation"
-    onkeydown={e => e.key === 'Escape' && close()}
+    aria-label="Navigation menu"
+    onkeydown={e => {
+      if (e.key === 'Escape') { close(); return; }
+      if (e.key === 'Tab') {
+        const els = [...(document.getElementById('nav-menu')?.querySelectorAll<HTMLElement>('a,button') ?? [])];
+        if (!els.length) return;
+        if (e.shiftKey && document.activeElement === els[0]) { e.preventDefault(); els[els.length - 1].focus(); }
+        else if (!e.shiftKey && document.activeElement === els[els.length - 1]) { e.preventDefault(); els[0].focus(); }
+      }
+    }}
     in:menuIn
     out:fade={{ duration: 200 }}
   >

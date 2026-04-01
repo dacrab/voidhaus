@@ -147,6 +147,16 @@ html:not(.no-js) .js-hero-cta {
 .muted-link { opacity: 0.4; transition: opacity 0.2s; }
 .muted-link:hover { opacity: 1; }
 
+/* Reusable full-bleed image cover — apply to the <img> or <picture> element */
+.img-cover {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+
+/* Overlay scrim base — extend with a background gradient in the component */
+.scrim { position: absolute; inset: 0; pointer-events: none; }
+
 /* Root page crossfade — old lifts out, new rises in */
 ::view-transition-old(root) {
   animation: 0.28s cubic-bezier(0.4, 0, 1, 1) both _vt-out;

@@ -52,7 +52,7 @@ const spreads = [
           width={1600}
           transition:name={`product-img-${s.heroSlug}`}
         />
-        <div class="spread-scrim"></div>
+        <div class="spread-scrim scrim"></div>
         <div class="spread-cap wrap">
           <span class="label spread-issue">Chapter {s.issue}</span>
           <h2 class="spread-title serif">{s.title}</h2>
@@ -77,14 +77,11 @@ const spreads = [
 </Layout>
 
 <script>
-import { onReady, reveal, chapterParallax, lineReveal } from '../../lib/animate';
+import { onPageLoad, pageReveal, chapterParallax } from '../../lib/animate';
 
-document.addEventListener('astro:page-load', () => {
-  onReady(() => {
-    reveal(); // PageHeader title + label
-    chapterParallax();
-    lineReveal('.ph .rule', 0.35);
-  });
+onPageLoad(() => {
+  pageReveal(0.35);
+  chapterParallax();
 });
 </script>
 
@@ -96,7 +93,6 @@ document.addEventListener('astro:page-load', () => {
 }
 @media (min-width: 768px) { .spread-hero { height: 90svh; } }
 
-.spread-img,
 .spread-img img {
   width: 100%; height: 100%;
   object-fit: cover; object-position: center;
@@ -104,7 +100,6 @@ document.addEventListener('astro:page-load', () => {
 }
 
 .spread-scrim {
-  position: absolute; inset: 0;
   background: linear-gradient(to bottom, transparent 40%, rgb(28 27 25 / 0.72) 100%);
 }
 

@@ -52,12 +52,13 @@
     class="sg-panel"
     role="dialog"
     aria-modal="true"
-    aria-label="Size guide"
+    aria-labelledby="sg-title"
+    onkeydown={e => e.key === 'Escape' && (open = false)}
     in:panelIn
     out:fade={{ duration: 180 }}
   >
     <div class="sg-head">
-      <h2 class="label sg-title">Size Guide</h2>
+      <h2 class="label sg-title" id="sg-title">Size Guide</h2>
       <button class="label ghost-btn" onclick={() => open = false} aria-label="Close size guide">Close</button>
     </div>
     <div class="rule"></div>
@@ -71,8 +72,8 @@
       {#if isFootwear}
         <table class="sg-table">
           <thead><tr>
-            <th class="label">EU</th><th class="label">UK</th>
-            <th class="label">US</th><th class="label">CM</th>
+            <th class="label" scope="col">EU</th><th class="label" scope="col">UK</th>
+            <th class="label" scope="col">US</th><th class="label" scope="col">CM</th>
           </tr></thead>
           <tbody>
             {#each shoes as r}
@@ -86,9 +87,9 @@
       {:else}
         <table class="sg-table">
           <thead><tr>
-            <th class="label">Size</th><th class="label">IT/EU</th>
-            <th class="label">FR</th><th class="label">UK</th>
-            <th class="label">US</th><th class="label">Chest</th><th class="label">Waist</th>
+            <th class="label" scope="col">Size</th><th class="label" scope="col">IT/EU</th>
+            <th class="label" scope="col">FR</th><th class="label" scope="col">UK</th>
+            <th class="label" scope="col">US</th><th class="label" scope="col">Chest</th><th class="label" scope="col">Waist</th>
           </tr></thead>
           <tbody>
             {#each clothing as r}
@@ -107,7 +108,7 @@
         <p class="sg-note">
           Voidhaus sizing runs true to our Italian pattern blocks.
           Outerwear is designed to layer — size up if wearing underneath.
-          Contact <a href="/contact" class="sg-link">studio@voidhaus.com</a> for styling advice.
+          Contact <a href="mailto:studio@voidhaus.com" class="sg-link">studio@voidhaus.com</a> for styling advice.
         </p>
       </div>
     </div>

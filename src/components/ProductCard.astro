@@ -16,7 +16,7 @@ const { slug, num, name, price, img, category, imgWidth = 800 } = Astro.props;
 ---
 
 <article class="pc" data-category={category}>
-  <a href={`/product/${slug}`}>
+  <a href={`/product/${slug}`} aria-label={`${name} — € ${price}`}>
     <div class="pc-img-wrap">
       <Picture
         class="pc-img"

@@ -25,12 +25,12 @@ const info = [
         <div class="field">
           <label class="label muted field-label" for="name">Name</label>
           <input class="field-inp" type="text" id="name" name="name"
-            placeholder="Your name" autocomplete="name" />
+            placeholder="Your name" autocomplete="name" required />
         </div>
         <div class="field">
           <label class="label muted field-label" for="email">Email</label>
           <input class="field-inp" type="email" id="email" name="email"
-            placeholder="your@email.com" autocomplete="email" />
+            placeholder="your@email.com" autocomplete="email" required />
         </div>
       </div>
 
@@ -38,11 +38,13 @@ const info = [
         <legend class="label muted">Subject</legend>
         <div class="chips">
           {subjects.map((s, i) => (
-            <button type="button" class:list={['chip', 'label', { active: i === 0 }]}>
+            <button type="button" class:list={['chip', 'label', { active: i === 0 }]}
+              data-subject={s}>
               {s}
             </button>
           ))}
         </div>
+        <input type="hidden" id="js-subject" name="subject" value={subjects[0]} />
       </fieldset>
 
       <div class="field">
@@ -75,29 +77,33 @@ const info = [
 </Layout>
 
 <script>
-import { onReady, reveal, lineReveal, sequenceReveal } from '../../lib/animate';
+import { onPageLoad, pageReveal, sequenceReveal } from '../../lib/animate';
 import { initToggleGroup } from '../../lib/toggle';
 import gsap from 'gsap';
 
-document.addEventListener('astro:page-load', () => {
-  onReady(() => {
-    reveal(); // PageHeader
-    lineReveal('.ph .rule', 0.3);
-    sequenceReveal([
-      { selector: '.contact-form',  delay: 0.2, y: 20 },
-      { selector: '.contact-info',  delay: 0.35, y: 16 },
-    ]);
-    initToggleGroup('.chip');
+onPageLoad(() => {
+  pageReveal();
+  sequenceReveal([
+    { selector: '.contact-form', delay: 0.2, y: 20 },
+    { selector: '.contact-info', delay: 0.35, y: 16 },
+  ]);
+  initToggleGroup('.chip', btn => {
+    const subject = document.getElementById('js-subject') as HTMLInputElement | null;
+    if (subject) subject.value = btn.dataset.subject ?? '';
+  });
 
-    document.getElementById('js-form')?.addEventListener('submit', e => {
-      e.preventDefault();
-      const text = document.querySelector<HTMLElement>('.submit-text');
-      if (!text) return;
-      gsap.timeline()
-        .to('#js-submit', { opacity: 0.5, duration: 0.13, ease: 'power2.in' })
-        .set(text, { textContent: 'Sent ✓' })
-        .to('#js-submit', { opacity: 1, duration: 0.22, ease: 'power2.out' });
-    });
+  document.getElementById('js-form')?.addEventListener('submit', e => {
+    e.preventDefault();
+    const form  = e.target as HTMLFormElement;
+    const email = (form.querySelector('#email') as HTMLInputElement)?.value ?? '';
+    const name  = (form.querySelector('#name')  as HTMLInputElement)?.value ?? '';
+    if (!name.trim() || !email.includes('@') || !email.includes('.')) return;
+    const text = document.querySelector<HTMLElement>('.submit-text');
+    if (!text) return;
+    gsap.timeline()
+      .to('#js-submit', { opacity: 0.5, duration: 0.13, ease: 'power2.in' })
+      .set(text, { textContent: 'Sent ✓' })
+      .to('#js-submit', { opacity: 1, duration: 0.22, ease: 'power2.out' });
   });
 });
 </script>

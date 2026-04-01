@@ -23,7 +23,7 @@ const featured = PRODUCTS.slice(0, 4);
         width={1800}
         transition:name="site-hero"
       />
-      <div class="hero-scrim"></div>
+      <div class="hero-scrim scrim"></div>
     </div>
     <div class="hero-body wrap">
       <span class="label hero-season js-hero-season">SS 2026</span>
@@ -56,7 +56,7 @@ const featured = PRODUCTS.slice(0, 4);
         decoding="async"
         width={1800}
       />
-      <div class="ed-scrim"></div>
+      <div class="ed-scrim scrim"></div>
     </div>
     <div class="ed-text wrap">
       <p class="serif ed-quote">"The most radical act<br/>is <em>silence.</em>"</p>
@@ -69,13 +69,12 @@ const featured = PRODUCTS.slice(0, 4);
 </Layout>
 
 <script>
-import { onReady, reveal, heroParallax, lineReveal, cardsCascade } from '../lib/animate';
+import { onPageLoad, reveal, heroParallax, lineReveal, cardsCascade } from '../lib/animate';
 import gsap from 'gsap';
 
-document.addEventListener('astro:page-load', () => {
-  onReady(() => {
-    // Hero image first
-    heroParallax('.js-hero-img');
+onPageLoad(() => {
+  // Hero image first
+  heroParallax('.js-hero-img');
 
     // Hero text — tight orchestrated sequence, all from hidden
     const season = document.querySelector<HTMLElement>('.js-hero-season');
@@ -100,13 +99,9 @@ document.addEventListener('astro:page-load', () => {
       '-=0.5',
     );
 
-    // Scroll-triggered elements (editorial)
     reveal();
-
-    // Products section: rule draws in, cards cascade
     lineReveal('.products-head .rule', 0.1);
     cardsCascade('.products .pc');
-  });
 });
 </script>
 
@@ -125,7 +120,6 @@ document.addEventListener('astro:page-load', () => {
 
 .hero-media { position: absolute; inset: 0; overflow: hidden; }
 
-.hero-img,
 .hero-img img {
   width: 100%; height: 100%;
   object-fit: cover; object-position: center 20%;
@@ -134,7 +128,6 @@ document.addEventListener('astro:page-load', () => {
 }
 
 .hero-scrim {
-  position: absolute; inset: 0;
   background:
     linear-gradient(to bottom, transparent 40%, rgb(28 27 25 / 0.7) 100%),
     linear-gradient(to top, transparent 85%, rgb(28 27 25 / 0.1) 100%);
@@ -190,9 +183,8 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 768px) { .editorial { height: 85svh; margin-block: 7rem; } }
 
 .ed-media { position: absolute; inset: 0; }
-.ed-img, .ed-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+.ed-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
 .ed-scrim {
-  position: absolute; inset: 0;
   background: linear-gradient(135deg, rgb(28 27 25 / 0.72) 0%, rgb(28 27 25 / 0.2) 60%, transparent 100%);
 }
 .ed-text {

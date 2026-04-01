@@ -42,11 +42,9 @@ const { title, description, updated, sibling, sections } = Astro.props;
 </Layout>
 
 <script>
-import { onReady, reveal } from '../lib/animate';
+import { onPageLoad, reveal } from '../lib/animate';
 
-document.addEventListener('astro:page-load', () => {
-  onReady(() => reveal());
-});
+onPageLoad(() => reveal());
 </script>
 
 <style>

@@ -63,18 +63,18 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
       '@type': 'ClothingStore',
       name: SITE.name,
       description: SITE.tagline,
-      url: 'https://voidhaus.vercel.app',
-      logo: 'https://voidhaus.vercel.app/favicon.svg',
+      url: canonical,
+      logo: new URL('/favicon.svg', Astro.site ?? canonical).href,
       address: {
         '@type': 'PostalAddress',
-        streetAddress: 'Via della Spiga, 19',
+        streetAddress: SITE.address[0],
         addressLocality: 'Milan',
         postalCode: '20121',
         addressCountry: 'IT',
       },
       contactPoint: {
         '@type': 'ContactPoint',
-        email: 'studio@voidhaus.com',
+        email: SITE.email.studio,
         contactType: 'customer service',
       },
     })} />
@@ -120,6 +120,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
               placeholder="your@email.com"
               autocomplete="email"
               aria-label="Email address for newsletter"
+              required
             />
             <button class="nl-btn label" type="submit">Subscribe</button>
           </form>
@@ -129,13 +130,13 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
       <div class="wrap footer-bottom">
         <div class="rule"></div>
         <div class="footer-inner">
-          <span class="label muted">© 2026 {SITE.name}</span>
+          <span class="label muted">© {new Date().getFullYear()} {SITE.name}</span>
           <nav class="footer-links" aria-label="Legal navigation">
             <a href="/stockists" class="label muted muted-link">Stockists</a>
             <a href="/privacy"   class="label muted muted-link">Privacy</a>
             <a href="/terms"     class="label muted muted-link">Terms</a>
           </nav>
-          <span class="label muted footer-cities">Milan · Antwerp · Florence · Tokyo</span>
+          <span class="label muted footer-cities">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
         </div>
       </div>
     </footer>

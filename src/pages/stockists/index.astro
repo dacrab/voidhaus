@@ -44,7 +44,7 @@ const stockists = [
     {stockists.map((region, ri) => (
       <div class="region" data-anim="scroll" style={`--delay:${ri * 0.1}s`}>
         <div class="region-header">
-          <span class="label op-30 region-num">0{ri + 1}</span>
+          <span class="label op-30 region-num">{String(ri + 1).padStart(2, '0')}</span>
           <h2 class="region-title">{region.region}</h2>
           <span class="label muted region-count">{region.stores.length} stores</span>
         </div>
@@ -74,14 +74,11 @@ const stockists = [
 </Layout>
 
 <script>
-import { onReady, reveal, lineReveal, staggerReveal } from '../../lib/animate';
+import { onPageLoad, pageReveal, staggerReveal } from '../../lib/animate';
 
-document.addEventListener('astro:page-load', () => {
-  onReady(() => {
-    reveal(); // PageHeader
-    lineReveal('.ph .rule', 0.3);
-    staggerReveal('.store', '.stores-grid', 0, 0.06);
-  });
+onPageLoad(() => {
+  pageReveal();
+  staggerReveal('.store', '.stores-grid', 0, 0.06);
 });
 </script>
 

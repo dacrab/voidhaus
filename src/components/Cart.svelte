@@ -52,7 +52,7 @@
 
   function trapFocus(e: KeyboardEvent) {
     if (!open || !panelEl) return;
-    if (e.key === 'Escape') { closeCart(); return; }
+    if (e.key === 'Escape') { e.preventDefault(); closeCart(); return; }
     if (e.key !== 'Tab') return;
     const els = panelEl.querySelectorAll<HTMLElement>(
       'button:not([disabled]),[href],input,[tabindex]:not([tabindex="-1"])'
@@ -67,15 +67,23 @@
 
   onMount(() => {
     load();
-    window.addEventListener('vh:open-cart', openCart);
-    window.addEventListener('vh:add-to-cart', (e: Event) => {
+
+    const onOpen = () => openCart();
+    const onAdd  = (e: Event) => {
       const item = (e as CustomEvent<CartItem>).detail;
       if (!items.find(i => i.slug === item.slug && i.size === item.size)) {
         items = [...items, item];
         save(); sync();
       }
       openCart();
-    });
+    };
+
+    window.addEventListener('vh:open-cart',    onOpen);
+    window.addEventListener('vh:add-to-cart',  onAdd);
+    return () => {
+      window.removeEventListener('vh:open-cart',   onOpen);
+      window.removeEventListener('vh:add-to-cart', onAdd);
+    };
   });
 
   function slideIn(node: Element) {
