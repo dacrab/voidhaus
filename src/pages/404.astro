@@ -12,8 +12,8 @@ import Layout from '../layouts/Layout.astro';
         The collection remains.
       </p>
       <div class="nf-links">
-        <a href="/" class="label nf-link">← Home</a>
-        <a href="/collection" class="label nf-link">Collection →</a>
+        <a href="/" class="label muted-link">← Home</a>
+        <a href="/collection" class="label muted-link">Collection →</a>
       </div>
     </div>
     <div class="nf-bg" aria-hidden="true">404</div>
@@ -51,9 +51,6 @@ import Layout from '../layouts/Layout.astro';
     display: flex; gap: 2.5rem; align-items: center;
     padding-top: 1rem; border-top: 1px solid var(--color-rule);
   }
-
-  .nf-link { color: var(--color-ink); opacity: 0.4; transition: opacity 0.2s; }
-  .nf-link:hover { opacity: 1; }
 
   .nf-bg {
     position: absolute; right: -0.05em; bottom: -0.15em;

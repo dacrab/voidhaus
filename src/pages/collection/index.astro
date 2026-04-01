@@ -14,7 +14,6 @@ import { PRODUCTS, CATEGORIES } from '../../data/products';
       </span>
     </div>
 
-    <!-- Filters inline with header -->
     <div class="filters" role="group" aria-label="Filter by category" data-anim="hero" data-delay="0.2">
       {CATEGORIES.map((f, i) => (
         <button
@@ -59,7 +58,7 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-/* Top bar — offset for fixed nav */
+/* Extra top padding accounts for the fixed nav height */
 .coll-top {
   padding-top: calc(var(--nav-h) + 3rem);
   padding-bottom: 0;
@@ -84,7 +83,6 @@ document.addEventListener('astro:page-load', () => {
   color: var(--color-ink);
 }
 
-/* Filters */
 .filters {
   display: flex;
   gap: 1.5rem;
@@ -101,7 +99,7 @@ document.addEventListener('astro:page-load', () => {
   transition: opacity 0.2s;
   white-space: nowrap; flex-shrink: 0; padding: 0;
 }
-.filter-btn:hover { opacity: 0.65; }
+.filter-btn:hover  { opacity: 0.65; }
 .filter-btn.active { opacity: 1; }
 
 </style>

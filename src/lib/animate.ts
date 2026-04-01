@@ -5,29 +5,25 @@ import { SplitText } from 'gsap/SplitText';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 gsap.config({ force3D: true });
 
-// ── Constants ────────────────────────────────────────────────────────────────
 const E  = { out: 'power2.out', in: 'power2.in', io: 'power2.inOut', expo: 'expo.out', circ: 'circ.out' };
 const D  = { xs: 0.3, sm: 0.5, md: 0.7, lg: 1.0, xl: 1.4 };
 
-// ── Page context — killed before each navigation ─────────────────────────────
-let _ctx: gsap.Context | null = null;
+// Kill all ScrollTriggers before each Astro page swap to prevent leaks
 let _morphed = false;
 
-document.addEventListener('astro:before-swap', () => { _ctx?.revert(); _ctx = null; });
+document.addEventListener('astro:before-swap', () => { ScrollTrigger.getAll().forEach(t => t.kill()); });
 document.addEventListener('astro:after-swap',  () => {
   _morphed = document.documentElement.hasAttribute('data-astro-transition');
 });
 
-// ── onReady — run after fonts + layout settle ────────────────────────────────
+// Double rAF ensures fonts and layout are settled before animating
 export function onReady(cb: () => void): void {
-  _ctx = gsap.context(() => {});
   Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
     .then(() => requestAnimationFrame(() => requestAnimationFrame(cb)));
 }
 
 export const morphed = () => _morphed;
 
-// ── reveal — hero + scroll batch ─────────────────────────────────────────────
 export function reveal(): void {
   ScrollTrigger.refresh();
 
@@ -48,7 +44,6 @@ export function reveal(): void {
   });
 }
 
-// ── titleReveal — large heading: opacity + y, optionally split by lines ───────
 export function titleReveal(selector: string, delay = 0): void {
   const el = document.querySelector<HTMLElement>(selector);
   if (!el) return;
@@ -58,7 +53,6 @@ export function titleReveal(selector: string, delay = 0): void {
   );
 }
 
-// ── staggerReveal — stagger a group of elements into view ─────────────────────
 export function staggerReveal(selector: string, trigger: string, delay = 0, stagger = 0.08): void {
   const els  = document.querySelectorAll<HTMLElement>(selector);
   const trig = document.querySelector<HTMLElement>(trigger);
@@ -73,7 +67,7 @@ export function staggerReveal(selector: string, trigger: string, delay = 0, stag
   });
 }
 
-// ── lineReveal — horizontal rule draws in left→right ─────────────────────────
+// Draws left→right; transformOrigin must stay 'left center'
 export function lineReveal(selector: string, delay = 0): void {
   document.querySelectorAll<HTMLElement>(selector).forEach(el => {
     gsap.fromTo(el,
@@ -83,7 +77,6 @@ export function lineReveal(selector: string, delay = 0): void {
   });
 }
 
-// ── sequenceReveal — animate an ordered list of elements with precise timing ──
 export function sequenceReveal(items: { selector: string; delay: number; y?: number }[]): void {
   items.forEach(({ selector, delay, y = 18 }) => {
     const el = document.querySelector<HTMLElement>(selector);
@@ -95,7 +88,6 @@ export function sequenceReveal(items: { selector: string; delay: number; y?: num
   });
 }
 
-// ── heroParallax — hero image entrance + scroll parallax ─────────────────────
 export function heroParallax(selector: string, strength = 14): void {
   const img = document.querySelector<HTMLElement>(selector);
   if (!img) return;
@@ -115,7 +107,6 @@ export function heroParallax(selector: string, strength = 14): void {
   });
 }
 
-// ── imageEntrance — product image fade+scale in ───────────────────────────────
 export function imageEntrance(selector: string): void {
   const el = document.querySelector<HTMLElement>(selector);
   if (!el) return;
@@ -126,10 +117,10 @@ export function imageEntrance(selector: string): void {
   );
 }
 
-// ── chapterParallax — lookbook spread parallax ────────────────────────────────
+// Lookbook spreads — each hero image parallaxes against its caption
 export function chapterParallax(): void {
   document.querySelectorAll<HTMLElement>('.spread-hero').forEach(hero => {
-    const img = hero.querySelector<HTMLElement>('.spread-img, .spread-img img');
+    const img = hero.querySelector<HTMLElement>('.spread-img');
     const cap = hero.querySelector<HTMLElement>('.spread-cap');
     if (!img) return;
     gsap.set(img, { scale: 1.16 });
@@ -143,7 +134,6 @@ export function chapterParallax(): void {
   });
 }
 
-// ── cardsCascade — stagger product cards with subtle scale ────────────────────
 export function cardsCascade(selector = '.pc'): void {
   const cards = document.querySelectorAll<HTMLElement>(selector);
   if (!cards.length) return;
@@ -156,7 +146,7 @@ export function cardsCascade(selector = '.pc'): void {
   );
 }
 
-// ── statementReveal — about-page numbered statements ─────────────────────────
+// About page — numbered statements animate number then body in sequence
 export function statementReveal(): void {
   document.querySelectorAll<HTMLElement>('[data-anim="statement"]').forEach(el => {
     const num  = el.querySelector<HTMLElement>('.stmt-num');
@@ -172,7 +162,6 @@ export function statementReveal(): void {
   });
 }
 
-// ── pullQuote — serif pull-quote word-stagger ─────────────────────────────────
 export function pullQuote(selector: string): void {
   const el = document.querySelector<HTMLElement>(selector);
   if (!el) return;

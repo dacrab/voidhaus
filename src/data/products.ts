@@ -154,7 +154,7 @@ export const PRODUCTS: Product[] = [
     desc:     'The heaviest thing in the room. Boiled wool from Scotland — cashmere lined. Layers over everything and still demands the final word.',
     sizes:    ['XS', 'S', 'M', 'L', 'XL'],
     img:      'dark-coat-primary',
-    img2:     'coat-primary',
+    img2:     'dark-coat-primary',
   },
   {
     slug:     'silk-slip',

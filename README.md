@@ -1,87 +1,84 @@
 # VOIDHAUS
 
-A complete, production-ready luxury fashion website — built to the standard of Rick Owens, Maison Margiela, The Row, and Lemaire.
+A minimal luxury fashion e-commerce site built with [Astro](https://astro.build) and [Svelte 5](https://svelte.dev). Static-generated, fast, and designed to be a solid foundation for a high-end fashion storefront.
 
-**Available for purchase.** Contact: vkavouras@proton.me
+## Stack
 
----
+- **[Astro 6](https://astro.build)** — static site generation, file-based routing, view transitions
+- **[Svelte 5](https://svelte.dev)** — interactive components (nav, cart, size guide)
+- **[GSAP](https://gsap.com)** — scroll-triggered and hero animations
+- **[TypeScript](https://www.typescriptlang.org)** — strict mode throughout
+- **[Fontsource](https://fontsource.org)** — self-hosted variable fonts (DM Sans + Cormorant)
+- **[Sharp](https://sharp.pixelplumbing.com)** — image optimisation (AVIF/WebP)
 
-## What's included
+## Features
 
-- **Home** — full-screen editorial hero, featured products, quote section
-- **Collection** — 12-piece catalog with category filters
-- **Product pages** — individual page for each piece with size guide
-- **Lookbook** — three editorial chapters with scroll parallax
-- **About / Manifesto** — brand story and atelier locations
-- **Contact** — form with subject selection
-- **Stockists** — 16 global retailers across three regions
-- **Privacy & Terms** — ready-to-use legal pages
-- **Custom 404** — on-brand error page
-- **Shopping cart** — slide-in panel, persists between visits
-- **Size guide** — clothing and footwear conversion tables
-- **Newsletter signup** — ready to connect to any email service
-
----
-
-## Design
-
-Every decision was benchmarked against how the world's most respected fashion houses present themselves online. The typography, spacing, interactions, and overall feel match the restraint and precision of luxury brand web design.
-
-- Warm off-white palette — never generic bright white
-- Two typefaces: a geometric sans and a high-contrast serif — used with discipline
-- Non-sticky navigation — luxury brands don't follow you down the page
-- Subtle image hover — barely perceptible zoom, not a flashy swap
-- Smooth page transitions — the site breathes between routes
-- Fully mobile-friendly — tested across all screen sizes
-
----
+- **12-piece product catalogue** — outerwear, tailoring, knitwear, footwear, accessories
+- **Shopping cart** — localStorage-backed, slide-in panel, focus-trapped
+- **Size guide** — modal with clothing and footwear sizing tables
+- **Lookbook** — editorially structured chapters with curated product groupings
+- **Stockists** — global retailer listings grouped by region
+- **GDPR-ready** — minimal cookies, full privacy and terms pages
+- **SEO** — schema.org `ClothingStore`, OpenGraph, Twitter cards, sitemap
+- **Accessible** — semantic HTML, focus management, `prefers-reduced-motion` respected
 
 ## Pages
 
 | Route | Description |
 |---|---|
-| `/` | Home |
-| `/collection` | Full product grid |
-| `/product/[slug]` | Product detail |
-| `/lookbook` | Editorial chapters |
-| `/about` | Brand manifesto |
-| `/contact` | Contact form |
-| `/stockists` | Store locations |
+| `/` | Hero landing with featured products |
+| `/collection` | Full product grid with category filters |
+| `/product/[slug]` | Product detail, specs, sizing, related items |
+| `/lookbook` | Three thematic editorial chapters |
+| `/about` | Brand manifesto and atelier locations |
+| `/contact` | Contact form with subject chips |
+| `/stockists` | Global retailers by region |
 | `/privacy` | Privacy policy |
 | `/terms` | Terms & conditions |
-| `/404` | Not found |
-
----
-
-## Tech
-
-Built with modern, well-supported tools — easy to maintain and extend.
-
-| | |
-|---|---|
-| **Framework** | Astro 6 — fast, SEO-friendly, easy to deploy |
-| **Interactivity** | Svelte 5 — lightweight, modern |
-| **Animations** | GSAP — smooth, professional-grade |
-| **Fonts** | DM Sans + Cormorant — self-hosted, no Google tracking |
-| **Deployment** | Vercel-ready — connect and go live in minutes |
-| **Package manager** | Bun |
-
----
 
 ## Getting started
 
+Requires **Node 22.12+** (or [Bun](https://bun.sh)).
+
 ```bash
-bun install
-bun run dev     # http://localhost:4321
-bun run build   # production build
+# install
+bun install   # or: npm install
+
+# dev server
+bun dev       # or: npm run dev
+
+# production build
+bun run build # or: npm run build
+
+# preview build locally
+bun preview   # or: npm run preview
 ```
 
----
+## Project structure
 
-## Purchasing
+```
+src/
+├── assets/         # image imports & metadata
+├── components/     # Astro + Svelte components
+├── data/           # products.ts, site.ts
+├── layouts/        # Layout.astro (shell, SEO, footer)
+├── lib/            # animation, scroll-lock, toggle utilities
+├── pages/          # file-based routes
+└── styles/         # global.css (design tokens, grid, animations)
+```
 
-This site is available for sale. Includes full source code and GitHub repository transfer.
+## Customising
 
-**Contact:** vkavouras@proton.me
+- **Brand / contact info** → `src/data/site.ts`
+- **Products** → `src/data/products.ts`
+- **Images** → `src/assets/img/` + `src/assets/images.ts`
+- **Colours & type** → CSS custom properties in `src/styles/global.css`
+- **Fonts** → swap Fontsource packages in `package.json` and update `astro.config.mjs`
 
-Serious inquiries only. Price negotiable.
+## Deployment
+
+The site outputs static files (`output: 'static'`) and is configured for **Vercel** out of the box. It will work equally well on Netlify, Cloudflare Pages, or any static host — just drop the `@astrojs/vercel` adapter from `astro.config.mjs` if needed.
+
+## Licence
+
+MIT

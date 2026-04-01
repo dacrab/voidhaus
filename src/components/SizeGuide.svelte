@@ -23,7 +23,7 @@
     { eu: '44', uk: '10',  us: '11',  cm: '28.0' },
   ];
 
-  const isFootwear = category === 'Footwear';
+  const isFootwear = $derived(category === 'Footwear');
 
   function panelIn(node: Element) {
     return {
@@ -42,8 +42,7 @@
 
 {#if open}
   <div
-    class="backdrop"
-    style="--backdrop-z:500; background:rgb(28 27 25/0.45)"
+    class="backdrop sg-backdrop"
     role="presentation"
     onclick={() => open = false}
     transition:fade={{ duration: 240 }}
@@ -116,6 +115,8 @@
 {/if}
 
 <style>
+  .sg-backdrop { --backdrop-z: 500; background: rgb(28 27 25 / 0.45); }
+
   .sg-btn {
     background: none; border: none;
     border-bottom: 1px solid var(--color-rule);

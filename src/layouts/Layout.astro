@@ -4,7 +4,6 @@ import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.svelte';
 import Cart from '../components/Cart.svelte';
-import ForSale from '../components/ForSale.svelte';
 import { SITE } from '../data/site';
 
 interface Props {
@@ -80,18 +79,10 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
       },
     })} />
 
-    <!-- Runs before first paint: removes no-js, restores banner state -->
-    <script is:inline>
-      document.documentElement.classList.remove('no-js');
-      try {
-        if (sessionStorage.getItem('vh-sale-dismissed') === '1')
-          document.documentElement.classList.add('banner-dismissed');
-      } catch (_) {}
-    </script>
+    <script is:inline>document.documentElement.classList.remove('no-js');</script>
   </head>
 
   <body>
-    <ForSale client:load />
     <Nav client:load solidNav={solidNav} />
     <Cart client:load />
 
@@ -107,7 +98,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
         const btn   = form.querySelector<HTMLButtonElement>('.nl-btn');
         if (!input || !btn || !input.value.includes('@')) { input?.focus(); return; }
         btn.textContent = 'Subscribed ✓';
-        btn.style.opacity = '1';
+        btn.classList.add('subscribed');
         input.value    = '';
         input.disabled = true;
         btn.disabled   = true;
@@ -172,7 +163,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
     color: var(--color-ink); opacity: 0.5; padding: 0.75rem 1rem;
     white-space: nowrap; transition: opacity 0.2s, background 0.2s;
   }
-  .nl-btn:hover { opacity: 1; background: var(--color-off); }
+  .nl-btn:hover, .nl-btn.subscribed { opacity: 1; background: var(--color-off); }
   @media (max-width: 640px) { .nl-form { width: 100%; } .nl-input { flex: 1; width: auto; } }
 
   .footer-bottom { padding-block: 1.5rem 2rem; }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { lockScroll, unlockScroll } from '../lib/scrollLock';
@@ -29,12 +29,14 @@
   function save()  { localStorage.setItem(KEY, JSON.stringify(items)); }
   function sync()  { window.dispatchEvent(new Event('vh:cart-updated')); }
 
-  async function openCart() {
+  function openCart() {
     prevFocus = document.activeElement as HTMLElement;
     open = true;
     lockScroll();
-    await tick();
-    panelEl?.querySelector<HTMLElement>('button,[href],[tabindex]')?.focus();
+    // Focus first interactive element after Svelte renders the panel
+    requestAnimationFrame(() => {
+      panelEl?.querySelector<HTMLElement>('button,[href],[tabindex]')?.focus();
+    });
   }
 
   function closeCart() {
@@ -131,12 +133,12 @@
                 <div>
                   <span class="label op-30">{item.num}</span>
                   <span class="item-name">{item.name}</span>
-                  <span class="label" style="opacity:.4;text-transform:none;letter-spacing:.04em">Size {item.size}</span>
+                  <span class="item-size label">Size {item.size}</span>
                 </div>
                 <button class="label ghost-btn" onclick={() => remove(item.slug, item.size)}
                   aria-label="Remove {item.name}, size {item.size}">Remove</button>
               </div>
-              <span class="label" style="opacity:.5">€ {item.price}</span>
+              <span class="item-price label">€ {item.price}</span>
             </div>
           </li>
           <div class="rule"></div>
@@ -148,7 +150,7 @@
           <span class="label muted">Estimated total</span>
           <span class="total serif">€ {total}</span>
         </div>
-        <p class="label muted" style="text-align:center">Complimentary worldwide shipping · Duty-free</p>
+        <p class="ship-note label muted">Complimentary worldwide shipping · Duty-free</p>
         <button class="checkout-btn label">Complete Selection</button>
       </div>
     {/if}
@@ -198,11 +200,10 @@
     gap: 1.25rem; padding: 1.25rem 1.5rem; align-items: start;
   }
 
-  .item-img-link { display: block; }
   .item-img-wrap { aspect-ratio: 3/4; overflow: hidden; background: var(--color-off); }
   .item-img {
     width: 100%; height: 100%;
-    object-fit: cover; object-position: center top; display: block;
+    object-fit: cover; object-position: center top;
     transition: opacity 0.3s;
   }
   .item-img-link:hover .item-img { opacity: 0.8; }
@@ -222,6 +223,10 @@
 
   .total-row  { display: flex; align-items: baseline; justify-content: space-between; padding-block: 0.5rem; }
   .total      { font-size: 1.5rem; font-style: italic; font-variation-settings: 'wght' 400; color: var(--color-ink); }
+
+  .item-size  { opacity: 0.4; text-transform: none; letter-spacing: 0.04em; }
+  .item-price { opacity: 0.5; }
+  .ship-note  { text-align: center; }
 
   .checkout-btn {
     width: 100%; background: var(--color-ink); color: var(--color-white);
