@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # npm / bun dependencies
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -10,18 +9,15 @@ updates:
       timezone: Europe/Athens
     open-pull-requests-limit: 10
     groups:
-      # Group all Astro-related updates together
       astro:
         patterns:
           - "astro"
           - "@astrojs/*"
-      # Group all dev tools
       dev-tools:
         patterns:
           - "typescript"
           - "bun-types"
 
-  # GitHub Actions
   - package-ecosystem: github-actions
     directory: /
     schedule:
