@@ -1,13 +1,20 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { lockScroll, unlockScroll } from '../lib/scrollLock';
   import { trapFocus } from '../lib/focusTrap';
   import { SITE } from '../data/site';
 
+  const STORAGE_KEY = 'vh-forsale-dismissed';
+
   let open      = $state(false);
-  let dismissed = $state(false);
+  let dismissed = $state(true); // hidden until mounted to avoid flash
   let prevFocus = $state<HTMLElement | null>(null);
+
+  onMount(() => {
+    dismissed = sessionStorage.getItem(STORAGE_KEY) === '1';
+  });
 
   function openModal() {
     prevFocus = document.activeElement as HTMLElement;
@@ -26,6 +33,7 @@
 
   function dismiss() {
     dismissed = true;
+    sessionStorage.setItem(STORAGE_KEY, '1');
     if (open) closeModal();
   }
 
