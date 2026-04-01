@@ -23,9 +23,8 @@
     { eu: '44', uk: '10',  us: '11',  cm: '28.0' },
   ];
 
-  const isFootwear = $derived(category === 'Footwear');
 
-  const panelIn = () => ({
+  const panelIn = (_node: Element) => ({
     duration: 360, easing: cubicOut,
     css: (t: number) => `opacity:${t};transform:translateY(${(1 - t) * 0.75}rem) scale(${0.98 + t * 0.02})`,
   });
@@ -67,7 +66,7 @@
         Measurements in centimetres.
       </p>
 
-      {#if isFootwear}
+      {#if category === 'Footwear'}
         <table class="sg-table">
           <thead><tr>
             <th class="label" scope="col">EU</th><th class="label" scope="col">UK</th>

@@ -37,19 +37,15 @@
     if (open) closeModal();
   }
 
-  function panelIn(node: Element) {
-    return {
-      duration: 400, easing: cubicOut,
-      css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 1.5}rem) scale(${0.98 + t * 0.02})`,
-    };
-  }
+  const panelIn = (_node: Element) => ({
+    duration: 400, easing: cubicOut,
+    css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 1.5}rem) scale(${0.98 + t * 0.02})`,
+  });
 
-  function stripIn(node: Element) {
-    return {
-      duration: 320, easing: cubicOut,
-      css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 100}%)`,
-    };
-  }
+  const stripIn = (_node: Element) => ({
+    duration: 320, easing: cubicOut,
+    css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 100}%)`,
+  });
 </script>
 
 <svelte:window onkeydown={e => { if (open && e.key === 'Escape') { e.preventDefault(); closeModal(); } }} />

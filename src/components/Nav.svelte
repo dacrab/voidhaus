@@ -54,18 +54,15 @@
   const isActive = (href: string) =>
     href === '/' ? path === '/' : path.startsWith(href);
 
-  function openCart()   { window.dispatchEvent(new Event('vh:open-cart')); }
   function toggleMenu() {
     if (open) { close(); } else { open = true; lockScroll(); }
   }
   function close()      { open = false; unlockScroll(); }
 
-  function menuIn(node: Element) {
-    return {
-      duration: 420, easing: cubicOut,
-      css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * -1.5}rem)`,
-    };
-  }
+  const menuIn = (_node: Element) => ({
+    duration: 420, easing: cubicOut,
+    css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * -1.5}rem)`,
+  });
 </script>
 
 <a href="#main" class="skip-link">Skip to content</a>
@@ -81,7 +78,7 @@
   <a href="/" class="nav-logo" aria-label="Voidhaus — home">VOIDHAUS</a>
 
   <div class="nav-r">
-    <button class="nav-link label nav-cart" onclick={openCart}
+    <button class="nav-link label nav-cart" onclick={() => window.dispatchEvent(new Event('vh:open-cart'))}
       aria-label="Open selection{cartCount > 0 ? `, ${cartCount} item${cartCount > 1 ? 's' : ''}` : ''}">
       Selection{#if cartCount > 0}<span class="badge" aria-hidden="true">{cartCount}</span>{/if}
     </button>
