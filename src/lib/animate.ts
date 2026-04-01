@@ -5,8 +5,8 @@ import { SplitText } from 'gsap/SplitText';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 gsap.config({ force3D: true });
 
-const E  = { out: 'power2.out', in: 'power2.in', io: 'power2.inOut', expo: 'expo.out', circ: 'circ.out' };
-const D  = { xs: 0.3, sm: 0.5, md: 0.7, lg: 1.0, xl: 1.4 };
+const EASE = { out: 'power2.out', in: 'power2.in', io: 'power2.inOut', expo: 'expo.out', circ: 'circ.out' };
+const DUR  = { xs: 0.3, sm: 0.5, md: 0.7, lg: 1.0, xl: 1.4 };
 
 // Kill all ScrollTriggers before each Astro page swap to prevent leaks
 let _morphed = false;
@@ -41,7 +41,7 @@ export function reveal(): void {
   document.querySelectorAll<HTMLElement>('[data-anim="hero"]').forEach(el => {
     gsap.fromTo(el,
       { opacity: 0, y: 22 },
-      { opacity: 1, y: 0, duration: D.md, ease: E.expo,
+      { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo,
         delay: parseFloat(el.dataset.delay ?? '0') || 0, clearProps: 'will-change' },
     );
   });
@@ -50,7 +50,7 @@ export function reveal(): void {
     start: 'top 90%', once: true,
     onEnter: els => gsap.fromTo(els,
       { opacity: 0, y: 28 },
-      { opacity: 1, y: 0, duration: D.md, ease: E.expo, stagger: 0.08, clearProps: 'will-change' },
+      { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.08, clearProps: 'will-change' },
     ),
   });
 }
@@ -60,7 +60,7 @@ export function titleReveal(selector: string, delay = 0): void {
   if (!el) { if (import.meta.env.DEV) console.warn(`[animate] element not found: ${selector}`); return; }
   gsap.fromTo(el,
     { opacity: 0, y: 32, skewY: 1.5 },
-    { opacity: 1, y: 0, skewY: 0, duration: D.lg, ease: E.expo, delay, clearProps: 'will-change,skewY' },
+    { opacity: 1, y: 0, skewY: 0, duration: DUR.lg, ease: EASE.expo, delay, clearProps: 'will-change,skewY' },
   );
 }
 
@@ -73,7 +73,7 @@ export function staggerReveal(selector: string, trigger: string, delay = 0, stag
     trigger: trig, start: 'top 88%', once: true,
     onEnter: () => gsap.fromTo(els,
       { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: D.md, ease: E.expo, stagger, delay, clearProps: 'will-change' },
+      { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger, delay, clearProps: 'will-change' },
     ),
   });
 }
@@ -83,7 +83,7 @@ export function lineReveal(selector: string, delay = 0): void {
   document.querySelectorAll<HTMLElement>(selector).forEach(el => {
     gsap.fromTo(el,
       { scaleX: 0, transformOrigin: 'left center' },
-      { scaleX: 1, duration: D.md, ease: E.expo, delay, clearProps: 'will-change' },
+      { scaleX: 1, duration: DUR.md, ease: EASE.expo, delay, clearProps: 'will-change' },
     );
   });
 }
@@ -94,7 +94,7 @@ export function sequenceReveal(items: { selector: string; delay: number; y?: num
     if (!el) return;
     gsap.fromTo(el,
       { opacity: 0, y },
-      { opacity: 1, y: 0, duration: D.md, ease: E.expo, delay, clearProps: 'will-change' },
+      { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, delay, clearProps: 'will-change' },
     );
   });
 }
@@ -108,7 +108,7 @@ export function heroParallax(selector: string, strength = 14): void {
   } else {
     gsap.fromTo(img,
       { opacity: 0, scale: 1.18 },
-      { opacity: 1, scale: 1.12, duration: D.xl + 0.4, ease: 'power3.out' },
+      { opacity: 1, scale: 1.12, duration: DUR.xl + 0.4, ease: 'power3.out' },
     );
   }
 
@@ -124,7 +124,7 @@ export function imageEntrance(selector: string): void {
   if (_morphed) { gsap.set(el, { opacity: 1, scale: 1 }); return; }
   gsap.fromTo(el,
     { opacity: 0, scale: 1.05 },
-    { opacity: 1, scale: 1, duration: D.lg + 0.2, ease: 'power3.out' },
+    { opacity: 1, scale: 1, duration: DUR.lg + 0.2, ease: 'power3.out' },
   );
 }
 
@@ -151,7 +151,7 @@ export function cardsCascade(selector = '.pc'): void {
   gsap.fromTo(cards,
     { opacity: 0, y: 32, scale: 0.98 },
     { opacity: 1, y: 0, scale: 1,
-      duration: D.md, ease: E.expo,
+      duration: DUR.md, ease: EASE.expo,
       stagger: { amount: 0.5, from: 'start' },
       clearProps: 'will-change,scale' },
   );
@@ -166,8 +166,8 @@ export function statementReveal(): void {
       trigger: el, start: 'top 88%', once: true,
       onEnter: () => {
         const tl = gsap.timeline();
-        if (num) tl.fromTo(num, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: D.sm, ease: E.expo }, 0);
-        tl.fromTo(body, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: D.md, ease: E.expo, stagger: 0.1 }, 0.05);
+        if (num) tl.fromTo(num, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: DUR.sm, ease: EASE.expo }, 0);
+        tl.fromTo(body, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.1 }, 0.05);
       },
     });
   });
@@ -180,7 +180,7 @@ export function pullQuote(selector: string): void {
     trigger: el, start: 'top 88%', once: true,
     onEnter: () => gsap.fromTo(el,
       { opacity: 0, y: 24, skewY: 1 },
-      { opacity: 1, y: 0, skewY: 0, duration: D.lg, ease: E.expo, clearProps: 'skewY' },
+      { opacity: 1, y: 0, skewY: 0, duration: DUR.lg, ease: EASE.expo, clearProps: 'skewY' },
     ),
   });
 }
