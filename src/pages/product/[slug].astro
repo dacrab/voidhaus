@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { Picture, getImage } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import { PRODUCTS, SHARED_DETAILS } from '../../data/products';
 import SizeGuide from '../../components/SizeGuide.svelte';
 import { IMAGES } from '../../assets/images';
@@ -17,14 +17,11 @@ const details: [string, string][] = [
   ...SHARED_DETAILS,
 ];
 
-// Resolve optimised cart thumbnail URL at build time
-const cartImg = await getImage({ src: IMAGES[p.img], width: 200, height: 267, format: 'webp' });
 ---
 
 <Layout title={p.name} description={p.desc} type="product" solidNav={true}>
   <div class="product-page">
 
-    <!-- Sticky image (desktop) / stacked (mobile) -->
     <div class="product-images">
       <div class="img-primary">
         <Picture
@@ -51,7 +48,6 @@ const cartImg = await getImage({ src: IMAGES[p.img], width: 200, height: 267, fo
       </div>
     </div>
 
-    <!-- Info panel -->
     <div class="product-info">
       <div class="info-top" data-anim="hero" data-delay="0">
         <a href="/collection" class="label muted-link">← Collection</a>
@@ -100,7 +96,7 @@ const cartImg = await getImage({ src: IMAGES[p.img], width: 200, height: 267, fo
           class="add-btn"
           id="js-add"
           type="button"
-          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price, img: cartImg.src, num: p.num })}
+          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price, img: IMAGES[p.img].src, num: p.num })}
         >
           <span class="label add-text">Add to Selection</span>
         </button>
@@ -129,15 +125,13 @@ document.addEventListener('astro:page-load', () => {
     // Image — morph-aware entrance
     imageEntrance('.js-main-img');
 
-    // Info panel — tight orchestrated sequence
-    // Info panel — orchestrated timeline
+    // Info panel — orchestrated reveal
     const els = [
       document.querySelector('.product-name'),
-      document.querySelector('.product-cat'),
       document.querySelector('.product-desc'),
-      document.querySelector('.product-details'),
-      ...document.querySelectorAll('.product-attr'),
-      document.querySelector('.add-btn'),
+      document.querySelector('.details'),
+      document.querySelector('.sizes'),
+      document.querySelector('.cta-block'),
     ].filter(Boolean) as HTMLElement[];
 
     gsap.set(els, { opacity: 0 });

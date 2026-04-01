@@ -4,6 +4,7 @@ import PageHeader from '../../components/PageHeader.astro';
 import { SITE } from '../../data/site';
 
 const subjects = ['General', 'Order', 'Press', 'Stockist'] as const;
+
 const info = [
   { key: 'Studio',  lines: SITE.address },
   { key: 'General', lines: [SITE.email.studio] },
@@ -18,23 +19,23 @@ const info = [
   <div class="contact-body wrap">
 
     <form class="contact-form" id="js-form" novalidate data-anim="scroll">
-      <span class="label form-lbl">Message</span>
+      <span class="label muted form-lbl">Message</span>
 
       <div class="field-row">
         <div class="field">
-          <label class="label field-label" for="name">Name</label>
+          <label class="label muted field-label" for="name">Name</label>
           <input class="field-inp" type="text" id="name" name="name"
             placeholder="Your name" autocomplete="name" />
         </div>
         <div class="field">
-          <label class="label field-label" for="email">Email</label>
+          <label class="label muted field-label" for="email">Email</label>
           <input class="field-inp" type="email" id="email" name="email"
             placeholder="your@email.com" autocomplete="email" />
         </div>
       </div>
 
       <fieldset class="field subject-field">
-        <legend class="label">Subject</legend>
+        <legend class="label muted">Subject</legend>
         <div class="chips">
           {subjects.map((s, i) => (
             <button type="button" class:list={['chip', 'label', { active: i === 0 }]}>
@@ -45,7 +46,7 @@ const info = [
       </fieldset>
 
       <div class="field">
-        <label class="label field-label" for="msg">Message</label>
+        <label class="label muted field-label" for="msg">Message</label>
         <textarea class="field-inp field-ta" id="msg" name="message"
           placeholder="Write here…" rows="5"></textarea>
       </div>
@@ -57,11 +58,11 @@ const info = [
     </form>
 
     <aside class="contact-info" data-anim="scroll">
-      <span class="label form-lbl">Information</span>
+      <span class="label muted form-lbl">Information</span>
       <dl class="info-list">
         {info.map(({ key, lines }) => (
           <div class="info-row">
-            <dt class="label info-key">{key}</dt>
+            <dt class="label op-35 info-key">{key}</dt>
             <dd class="info-vals">
               {lines.map(l => <span class="info-val">{l}</span>)}
             </dd>
@@ -84,7 +85,7 @@ document.addEventListener('astro:page-load', () => {
     lineReveal('.ph .rule', 0.3);
     sequenceReveal([
       { selector: '.contact-form',  delay: 0.2, y: 20 },
-      { selector: '.contact-aside', delay: 0.35, y: 16 },
+      { selector: '.contact-info',  delay: 0.35, y: 16 },
     ]);
     initToggleGroup('.chip');
 
@@ -113,7 +114,7 @@ document.addEventListener('astro:page-load', () => {
 }
 @media (min-width: 1280px) { .contact-body { grid-template-columns: 1fr 340px; } }
 
-.form-lbl { display: block; opacity: 0.4; margin-bottom: 2rem; }
+.form-lbl { display: block; margin-bottom: 2rem; }
 
 .contact-form { display: flex; flex-direction: column; gap: 2.25rem; }
 
@@ -123,8 +124,6 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 480px) { .field-row { grid-template-columns: 1fr 1fr; } }
 
 .field { display: flex; flex-direction: column; gap: 0.65rem; }
-.field-label { opacity: 0.4; }
-
 .field-inp {
   background: none; border: none;
   border-bottom: 1px solid var(--color-rule);
@@ -141,8 +140,6 @@ document.addEventListener('astro:page-load', () => {
 .field-ta { resize: none; }
 
 .subject-field { border: none; padding: 0; display: flex; flex-direction: column; gap: 0.65rem; }
-.subject-field legend { opacity: 0.4; }
-
 .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .chip {
   background: none; border: 1px solid var(--color-rule);
@@ -166,7 +163,6 @@ document.addEventListener('astro:page-load', () => {
   gap: 1rem; padding-block: 1.125rem;
   border-bottom: 1px solid var(--color-rule); align-items: start;
 }
-.info-key { opacity: 0.35; }
 .info-vals { display: flex; flex-direction: column; gap: 0.15rem; }
 .info-val {
   font-size: 0.8rem; font-variation-settings: 'wght' 300;

@@ -50,7 +50,9 @@
     href === '/' ? path === '/' : path.startsWith(href);
 
   function openCart()   { window.dispatchEvent(new Event('vh:open-cart')); }
-  function toggleMenu() { open ? close() : (open = true, lockScroll()); }
+  function toggleMenu() {
+    if (open) { close(); } else { open = true; lockScroll(); }
+  }
   function close()      { open = false; unlockScroll(); }
 
   function menuIn(node: Element) {
@@ -118,9 +120,8 @@
 {/if}
 
 <style>
-  /* ── Bar ─────────────────────────────────────────────────────────── */
   .nav {
-    position: fixed; inset-block-start: var(--banner-h, 0px); inset-inline: 0; z-index: 300;
+    position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 300;
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
     padding-inline: 1.5rem; height: var(--nav-h);
     color: rgb(255 255 255 / 0.85);
@@ -138,17 +139,15 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
-  .nav.hidden { transform: translateY(calc(-100% - var(--banner-h, 0px))); pointer-events: none; }
+  .nav.hidden { transform: translateY(-100%); pointer-events: none; }
   .nav.open   { background: var(--color-white); color: var(--color-ink); box-shadow: none; transform: none; }
 
-  /* ── Logo ────────────────────────────────────────────────────────── */
   .nav-logo {
     font-size: 0.8125rem; font-variation-settings: 'wght' 500;
     letter-spacing: 0.22em; text-transform: uppercase; color: inherit;
     grid-column: 2; justify-self: center;
   }
 
-  /* ── Left links ──────────────────────────────────────────────────── */
   .nav-l { display: none; gap: 2rem; grid-column: 1; }
   @media (min-width: 768px) { .nav-l { display: flex; } }
 
@@ -178,7 +177,6 @@
     height: 1px; background: currentColor;
   }
 
-  /* ── Right actions ───────────────────────────────────────────────── */
   .nav-r {
     display: flex; align-items: center;
     justify-content: flex-end; gap: 1.5rem; grid-column: 3;
@@ -191,13 +189,12 @@
     width: 1rem; height: 1rem;
     background: currentColor; color: var(--color-white);
     font-size: 0.5rem; font-variation-settings: 'wght' 500; letter-spacing: 0;
-    border-radius: 50% !important;
+    border-radius: 50%;
   }
   .nav:not(.scrolled):not(.open) .badge {
     background: rgb(255 255 255 / 0.85); color: var(--color-ink);
   }
 
-  /* ── Mobile menu ─────────────────────────────────────────────────── */
   .menu {
     position: fixed; inset: 0; z-index: 299;
     background: var(--color-white);
@@ -229,8 +226,8 @@
     animation-delay: calc(0.06s + var(--i) * 0.055s);
     transition: opacity 0.2s;
   }
-  .menu-link:hover  { opacity: 0.4 !important; }
-  .menu-link.active { opacity: 1   !important; }
+  .menu-link:hover  { opacity: 0.4; }
+  .menu-link.active { opacity: 1; }
 
   @keyframes link-in {
     from { opacity: 0; transform: translateY(0.5rem); }

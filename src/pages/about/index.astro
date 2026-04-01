@@ -13,7 +13,7 @@ import { IMAGES } from '../../assets/images';
   <section class="statements wrap">
 
     <div class="stmt" data-anim="statement">
-      <span class="label stmt-num">001</span>
+      <span class="label op-30 stmt-num">001</span>
       <div class="stmt-body">
         <p class="stmt-p">Voidhaus was not born from a desire to dress people. It was born from a frustration with fashion that performs humility while demanding admiration.</p>
         <p class="stmt-p">We care. Deeply. Obsessively. But not about you noticing.</p>
@@ -22,7 +22,7 @@ import { IMAGES } from '../../assets/images';
     <div class="rule"></div>
 
     <div class="stmt" data-anim="statement">
-      <span class="label stmt-num">002</span>
+      <span class="label op-30 stmt-num">002</span>
       <div class="stmt-body">
         <h2 class="stmt-h">The garment as architecture.</h2>
         <p class="stmt-p">We work from the structure outward. A coat must stand before it must move. Comfort is a result of precision, not an excuse for its absence.</p>
@@ -32,7 +32,7 @@ import { IMAGES } from '../../assets/images';
     <div class="rule"></div>
 
     <div class="stmt" data-anim="statement">
-      <span class="label stmt-num">003</span>
+      <span class="label op-30 stmt-num">003</span>
       <div class="stmt-body">
         <h2 class="stmt-h">On restraint.</h2>
         <p class="stmt-p">We produce twelve pieces per collection. Each garment is finished by hand. Each seam is checked by eye. We will never grow faster than our ability to care.</p>
@@ -46,7 +46,7 @@ import { IMAGES } from '../../assets/images';
     <div class="rule"></div>
 
     <div class="stmt" data-anim="statement">
-      <span class="label stmt-num">004</span>
+      <span class="label op-30 stmt-num">004</span>
       <div class="stmt-body">
         <h2 class="stmt-h">Who we dress.</h2>
         <p class="stmt-p">We do not design for a demographic. We design for a disposition. If you already know — you do not need us to tell you.</p>
@@ -56,7 +56,6 @@ import { IMAGES } from '../../assets/images';
 
   </section>
 
-  <!-- Atelier image -->
   <section class="atelier" data-anim="scroll">
     <div class="atelier-img-wrap">
       <Picture
@@ -72,10 +71,10 @@ import { IMAGES } from '../../assets/images';
     </div>
     <div class="product-grid wrap">
       {SITE.ateliers.map((a, i) => (
-        <div class="at-item js-at-item" data-anim="stagger" style={`--i:${i}`}>
-          <span class="label at-num">0{i + 1}</span>
+        <div class="at-item" data-anim="stagger" style={`--i:${i}`}>
+          <span class="label op-30 at-num">0{i + 1}</span>
           <span class="at-city">{a.city}</span>
-          <span class="label at-role">{a.role}</span>
+          <span class="label op-45 at-role">{a.role}</span>
         </div>
       ))}
     </div>
@@ -111,7 +110,7 @@ document.addEventListener('astro:page-load', () => {
   .stmt { grid-template-columns: 5rem 1fr; gap: 3rem; padding-block: 4rem; }
 }
 
-.stmt-num { opacity: 0.3; padding-top: 0.1rem; }
+.stmt-num { padding-top: 0.1rem; }
 
 .stmt-body { display: flex; flex-direction: column; gap: 1.25rem; max-width: 58ch; }
 
@@ -144,7 +143,6 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 768px) { .pull-quote { padding-block: 7rem; } }
 .pull-quote em { font-style: normal; color: var(--color-mid); }
 
-/* Atelier */
 .atelier { margin-bottom: 4rem; }
 @media (min-width: 768px) { .atelier { margin-bottom: 6rem; } }
 
@@ -167,7 +165,6 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 768px) { .at-item { padding: 2.25rem 2rem; } }
 .at-item:hover { background: var(--color-off); }
 
-.at-num { opacity: 0.3; }
 .at-city {
   font-family: var(--font-sans);
   font-size: clamp(1rem, 2.5vw, 1.5rem);
@@ -175,6 +172,4 @@ document.addEventListener('astro:page-load', () => {
   letter-spacing: -0.02em;
   color: var(--color-ink);
 }
-.at-role { opacity: 0.45; }
-
 </style>

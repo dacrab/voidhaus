@@ -44,7 +44,7 @@ const stockists = [
     {stockists.map((region, ri) => (
       <div class="region" data-anim="scroll" style={`--delay:${ri * 0.1}s`}>
         <div class="region-header">
-          <span class="label op-35 region-num">0{ri + 1}</span>
+          <span class="label op-30 region-num">0{ri + 1}</span>
           <h2 class="region-title">{region.region}</h2>
           <span class="label muted region-count">{region.stores.length} stores</span>
         </div>
@@ -80,7 +80,7 @@ document.addEventListener('astro:page-load', () => {
   onReady(() => {
     reveal(); // PageHeader
     lineReveal('.ph .rule', 0.3);
-    staggerReveal('.stockist-item', '.stockists-grid', 0, 0.06);
+    staggerReveal('.store', '.stores-grid', 0, 0.06);
   });
 });
 </script>
@@ -88,7 +88,6 @@ document.addEventListener('astro:page-load', () => {
 <style>
   .stockists { padding-bottom: 6rem; }
 
-  /* Region */
   .region { padding-block: 3.5rem 0; }
   @media (min-width: 768px) { .region { padding-block: 5rem 0; } }
 
@@ -110,7 +109,6 @@ document.addEventListener('astro:page-load', () => {
     flex: 1;
   }
 
-  /* Store grid */
   .stores-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -156,9 +154,6 @@ document.addEventListener('astro:page-load', () => {
     line-height: 1.5;
   }
 
-  .rule { margin-top: 0; }
-
-  /* CTA */
   .stockists-cta {
     padding-block: 4rem;
     display: flex;
