@@ -47,7 +47,7 @@ const spreads = [
           src={s.img}
           formats={['avif', 'webp']}
           alt={s.title}
-          loading={si === 0 ? 'eager' : 'lazy'}
+          loading={si === 0 ? undefined : 'lazy'}
           decoding="async"
           width={1600}
           transition:name={`product-img-${s.heroSlug}`}
