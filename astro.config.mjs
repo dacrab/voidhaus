@@ -7,6 +7,19 @@ export default defineConfig({
   site: 'https://voidhaus.vercel.app',
   output: 'static',
 
+  vite: {
+    build: {
+      rollupOptions: {
+        onwarn(warning, warn) {
+          // Svelte transition imports (fade, fly etc) are used in templates
+          // but Vite's static analyser can't see them — suppress the false positive
+          if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
+          warn(warning);
+        },
+      },
+    },
+  },
+
   image: {
     service: { entrypoint: 'astro/assets/services/sharp' },
   },
