@@ -1,67 +1,101 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
-  import { SITE } from '../data/site';
+  import { lockScroll, unlockScroll } from '../lib/scrollLock';
   import { trapFocus } from '../lib/focusTrap';
+  import { SITE } from '../data/site';
 
-  let open = $state(false);
+  let open      = $state(false);
+  let dismissed = $state(false);
+  let prevFocus = $state<HTMLElement | null>(null);
 
-  const panelIn = () => ({
-    duration: 340, easing: cubicOut,
-    css: (t: number) => `opacity:${t};transform:translateY(${(1 - t) * 0.5}rem) scale(${0.99 + t * 0.01})`,
-  });
+  function openModal() {
+    prevFocus = document.activeElement as HTMLElement;
+    open = true;
+    lockScroll();
+    requestAnimationFrame(() => {
+      document.getElementById('fs-panel')?.focus();
+    });
+  }
+
+  function closeModal() {
+    open = false;
+    unlockScroll();
+    prevFocus?.focus();
+  }
+
+  function dismiss() {
+    dismissed = true;
+    if (open) closeModal();
+  }
+
+  function panelIn(node: Element) {
+    return {
+      duration: 400, easing: cubicOut,
+      css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 1.5}rem) scale(${0.98 + t * 0.02})`,
+    };
+  }
+
+  function stripIn(node: Element) {
+    return {
+      duration: 320, easing: cubicOut,
+      css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 100}%)`,
+    };
+  }
 </script>
 
-<!-- Strip -->
-<button
-  class="strip label"
-  onclick={() => open = true}
-  aria-haspopup="dialog"
-  aria-expanded={open}
->
-  <span class="dot" aria-hidden="true"></span>
-  Available for your brand
-  <span class="strip-cta">Enquire →</span>
-</button>
+<svelte:window onkeydown={e => { if (open && e.key === 'Escape') { e.preventDefault(); closeModal(); } }} />
 
-<!-- Modal -->
+{#if !dismissed}
+  <!-- Strip -->
+  <div class="strip" in:stripIn>
+    <button class="strip-trigger" onclick={openModal} aria-haspopup="dialog" aria-expanded={open}>
+      <span class="dot" aria-hidden="true"></span>
+      <span class="label strip-label">Available for your brand</span>
+      <span class="label strip-cta">Enquire →</span>
+    </button>
+    <button class="label strip-dismiss" onclick={dismiss} aria-label="Dismiss">✕</button>
+  </div>
+{/if}
+
+<!-- Backdrop -->
 {#if open}
   <div
     class="backdrop"
-    style="--backdrop-z:600; background:rgb(28 27 25 / 0.5)"
+    style="--backdrop-z:600; background:rgb(28 27 25/0.45)"
     role="presentation"
-    onclick={() => open = false}
-    transition:fade={{ duration: 220 }}
+    onclick={closeModal}
+    transition:fade={{ duration: 280 }}
   ></div>
 
+  <!-- Panel -->
   <div
+    id="fs-panel"
     class="panel"
     role="dialog"
     aria-modal="true"
     aria-labelledby="fs-title"
     tabindex="-1"
     onkeydown={e => {
-      if (e.key === 'Escape') { e.preventDefault(); open = false; return; }
-      trapFocus(e.currentTarget as HTMLElement, e);
+      if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+      const panel = document.getElementById('fs-panel');
+      if (panel) trapFocus(panel, e);
     }}
     in:panelIn
-    out:fade={{ duration: 180 }}
+    out:fade={{ duration: 200 }}
   >
     <div class="panel-head">
       <span class="label muted" id="fs-title">Available</span>
-      <button class="ghost-btn close-btn" onclick={() => open = false} aria-label="Close">✕</button>
+      <button class="label ghost-btn" onclick={closeModal} aria-label="Close">Close</button>
     </div>
-
     <div class="rule"></div>
 
     <div class="panel-body">
       <p class="serif panel-title">This site is available<br/>for your brand.</p>
-
       <p class="panel-desc muted">
         A complete luxury digital presence — bespoke design, refined interactions,
         fully production-ready. Delivered in days, not months.
       </p>
-
       <ul class="features label">
         <li>Custom branding & colour system</li>
         <li>Full product catalogue</li>
@@ -74,9 +108,7 @@
     <div class="rule"></div>
 
     <div class="panel-foot">
-      <a href={`mailto:${SITE.email.enquiry}`} class="enquire-btn label">
-        Get in touch
-      </a>
+      <a href={`mailto:${SITE.email.enquiry}`} class="enquire-btn label">Get in touch</a>
       <span class="label muted">{SITE.email.enquiry}</span>
     </div>
   </div>
@@ -86,26 +118,37 @@
   /* ── Strip ───────────────────────────────────────────────────────────── */
   .strip {
     position: fixed; inset-inline: 0; bottom: 0; z-index: 500;
-    display: flex; align-items: center; justify-content: center; gap: 1rem;
-    padding: 0.75rem 1.5rem;
+    display: flex; align-items: stretch;
     background: var(--color-ink); color: var(--color-white);
-    border: none; cursor: pointer;
+  }
+
+  .strip-trigger {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    gap: 1rem; padding: 0.75rem 1.5rem;
+    background: none; border: none; color: inherit; cursor: pointer;
     transition: background 0.2s;
   }
-  .strip:hover { background: var(--color-ink-soft); }
+  .strip-trigger:hover { background: rgb(255 255 255 / 0.06); }
 
   .dot {
-    width: 0.4rem; height: 0.4rem;
+    width: 0.4rem; height: 0.4rem; flex-shrink: 0;
     background: #6ee7a0; border-radius: 50%;
     animation: pulse 2.4s ease-in-out infinite;
   }
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50%       { opacity: 0.35; }
+    50%       { opacity: 0.3; }
   }
 
-  .strip-cta { opacity: 0.5; margin-inline-start: 0.25rem; }
-  .strip:hover .strip-cta { opacity: 1; }
+  .strip-cta { opacity: 0.5; transition: opacity 0.2s; }
+  .strip-trigger:hover .strip-cta { opacity: 1; }
+
+  .strip-dismiss {
+    display: flex; align-items: center; padding-inline: 1.25rem;
+    background: none; border: none; border-left: 1px solid rgb(255 255 255 / 0.1);
+    color: inherit; opacity: 0.4; cursor: pointer; transition: opacity 0.2s;
+  }
+  .strip-dismiss:hover { opacity: 1; }
 
   /* ── Panel ───────────────────────────────────────────────────────────── */
   .panel {
@@ -117,6 +160,8 @@
     margin-inline: auto;
     border-radius: 0.75rem 0.75rem 0 0;
     display: flex; flex-direction: column;
+    will-change: transform, opacity;
+    outline: none;
   }
 
   .panel-head {
@@ -124,17 +169,14 @@
     padding: 1.25rem 1.5rem 1rem;
   }
 
-  .close-btn {
-    font-size: 0.75rem; opacity: 0.4;
-    padding: 0.25rem; line-height: 1;
+  .panel-body {
+    padding: 1.5rem;
+    display: flex; flex-direction: column; gap: 1.25rem;
   }
-
-  .panel-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
 
   .panel-title {
     font-size: clamp(1.5rem, 4vw, 2rem);
-    font-style: italic;
-    line-height: 1.2;
+    font-style: italic; line-height: 1.2;
     color: var(--color-ink);
   }
 
@@ -153,16 +195,13 @@
   }
 
   .enquire-btn {
-    display: inline-block;
-    padding: 0.65rem 1.5rem;
+    display: inline-block; padding: 0.65rem 1.5rem;
     background: var(--color-ink); color: var(--color-white);
-    text-decoration: none;
-    transition: background 0.2s;
-    letter-spacing: 0.18em;
+    text-decoration: none; transition: background 0.2s;
   }
   .enquire-btn:hover { background: var(--color-ink-soft); }
 
-  /* ── Responsive ──────────────────────────────────────────────────────── */
+  /* ── Desktop — float bottom-right ───────────────────────────────────── */
   @media (min-width: 640px) {
     .panel {
       inset-block: auto 1rem;
@@ -170,6 +209,6 @@
       border-radius: 0.75rem;
       margin-inline: 0;
     }
-    .strip { justify-content: start; padding-inline: 2rem; }
+    .strip-trigger { justify-content: flex-start; padding-inline-start: 2rem; }
   }
 </style>
