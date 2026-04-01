@@ -25,12 +25,10 @@
 
   const isFootwear = $derived(category === 'Footwear');
 
-  function panelIn(node: Element) {
-    return {
-      duration: 360, easing: cubicOut,
-      css: (t: number) => `opacity:${t};transform:translateY(${(1 - t) * 0.75}rem) scale(${0.98 + t * 0.02})`,
-    };
-  }
+  const panelIn = () => ({
+    duration: 360, easing: cubicOut,
+    css: (t: number) => `opacity:${t};transform:translateY(${(1 - t) * 0.75}rem) scale(${0.98 + t * 0.02})`,
+  });
 </script>
 
 <button

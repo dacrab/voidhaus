@@ -94,10 +94,9 @@ onPageLoad(() => {
 
   document.getElementById('js-form')?.addEventListener('submit', e => {
     e.preventDefault();
-    const form  = e.target as HTMLFormElement;
-    const email = (form.querySelector('#email') as HTMLInputElement)?.value ?? '';
-    const name  = (form.querySelector('#name')  as HTMLInputElement)?.value ?? '';
-    if (!name.trim() || !email.includes('@') || !email.includes('.')) return;
+    const form = e.target as HTMLFormElement;
+    if (!(form.querySelector('#name') as HTMLInputElement)?.value.trim()) return;
+    if (!(form.querySelector('#email') as HTMLInputElement)?.value.includes('@')) return;
     const text = document.querySelector<HTMLElement>('.submit-text');
     if (!text) return;
     gsap.timeline()

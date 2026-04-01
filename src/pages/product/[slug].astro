@@ -124,20 +124,10 @@ onPageLoad(() => {
   // Image — morph-aware entrance
   imageEntrance('.js-main-img');
 
-    // Info panel — orchestrated reveal
-    const els = [
-      document.querySelector('.product-name'),
-      document.querySelector('.product-desc'),
-      document.querySelector('.details'),
-      document.querySelector('.sizes'),
-      document.querySelector('.cta-block'),
-    ].filter(Boolean) as HTMLElement[];
-
-    gsap.set(els, { opacity: 0 });
-    gsap.fromTo(els,
+    gsap.fromTo(
+      ['.product-name', '.product-desc', '.details', '.sizes', '.cta-block'].map(s => document.querySelector(s)).filter(Boolean),
       { opacity: 0, y: 18 },
-      { opacity: 1, y: 0, duration: 0.65, ease: 'expo.out',
-        stagger: 0.08, delay: 0.1, clearProps: 'will-change' },
+      { opacity: 1, y: 0, duration: 0.65, ease: 'expo.out', stagger: 0.08, delay: 0.1, clearProps: 'will-change' },
     );
 
     const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
