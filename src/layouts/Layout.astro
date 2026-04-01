@@ -4,6 +4,7 @@ import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.svelte';
 import Cart from '../components/Cart.svelte';
+import ForSale from '../components/ForSale.svelte';
 import { SITE } from '../data/site';
 
 interface Props {
@@ -84,6 +85,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, Astro.site ?
 
   <body>
     <Nav client:load solidNav={solidNav} />
+    <ForSale client:load />
     <Cart client:load />
 
     <main id="main">
