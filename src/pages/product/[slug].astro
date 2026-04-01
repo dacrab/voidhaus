@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { Picture } from 'astro:assets';
-import { PRODUCTS, SHARED_DETAILS } from '../../data/products';
+import { PRODUCTS, SHARED_DETAILS, formatPrice } from '../../data/products';
 import SizeGuide from '../../components/SizeGuide.svelte';
 import { IMAGES } from '../../assets/images';
 
@@ -38,17 +38,19 @@ const next = PRODUCTS[idx + 1] ?? null;
           transition:name={`product-img-${p.slug}`}
         />
       </div>
-      <div class="img-secondary" aria-hidden="true">
-        <Picture
-          class="product-img"
-          src={IMAGES[p.img2]}
-          formats={['avif', 'webp']}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          width={900}
-        />
-      </div>
+      {p.img2 && (
+        <div class="img-secondary" aria-hidden="true">
+          <Picture
+            class="product-img"
+            src={IMAGES[p.img2]}
+            formats={['avif', 'webp']}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            width={900}
+          />
+        </div>
+      )}
     </div>
 
     <div class="product-info">
@@ -92,14 +94,14 @@ const next = PRODUCTS[idx + 1] ?? null;
 
       <div class="cta-block" data-anim="scroll">
         <div class="price-row">
-          <span class="product-price serif">€ {p.price}</span>
+          <span class="product-price serif">€ {formatPrice(p.price)}</span>
           <span class="label muted">Incl. VAT</span>
         </div>
         <button
           class="add-btn"
           id="js-add"
           type="button"
-          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price, img: IMAGES[p.img].src, num: p.num })}
+          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: formatPrice(p.price), img: IMAGES[p.img].src, num: p.num })}
         >
           <span class="label add-text">Add to Selection</span>
         </button>

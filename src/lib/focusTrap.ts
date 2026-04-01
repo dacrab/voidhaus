@@ -1,4 +1,5 @@
-const FOCUSABLE = 'a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
 export function trapFocus(container: HTMLElement, e: KeyboardEvent): void {
   if (e.key !== 'Tab') return;

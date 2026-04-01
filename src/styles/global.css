@@ -19,7 +19,8 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-* { border-radius: 0 !important; }
+/* Zero browser-default radii on interactive elements only — not globally */
+button, input, select, textarea, fieldset { border-radius: 0; }
 
 html {
   background: var(--color-white);

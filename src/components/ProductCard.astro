@@ -1,12 +1,13 @@
 ---
 import { Picture } from 'astro:assets';
 import { IMAGES } from '../assets/images';
+import { formatPrice } from '../data/products';
 
 interface Props {
   slug:      string;
   num:       string;
   name:      string;
-  price:     string;
+  price:     number;
   img:       string;
   category?: string;
   imgWidth?: number;
@@ -16,7 +17,7 @@ const { slug, num, name, price, img, category, imgWidth = 800 } = Astro.props;
 ---
 
 <article class="pc" data-category={category}>
-  <a href={`/product/${slug}`} aria-label={`${name} — € ${price}`}>
+  <a href={`/product/${slug}`} aria-label={`${name} — € ${formatPrice(price)}`}>
     <div class="pc-img-wrap">
       <Picture
         class="pc-img"
@@ -35,7 +36,7 @@ const { slug, num, name, price, img, category, imgWidth = 800 } = Astro.props;
         <span class="card-name">{name}</span>
         {category && <span class="label muted card-cat">{category}</span>}
       </div>
-      <span class="label muted">€ {price}</span>
+      <span class="label muted">€ {formatPrice(price)}</span>
     </div>
   </a>
 </article>
