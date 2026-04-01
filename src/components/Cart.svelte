@@ -68,7 +68,6 @@
   onMount(() => {
     load();
 
-    const onOpen = () => openCart();
     const onAdd  = (e: Event) => {
       const item = (e as CustomEvent<CartItem>).detail;
       if (!items.find(i => i.slug === item.slug && i.size === item.size)) {
@@ -78,20 +77,18 @@
       openCart();
     };
 
-    window.addEventListener('vh:open-cart',    onOpen);
-    window.addEventListener('vh:add-to-cart',  onAdd);
+    window.addEventListener('vh:open-cart',   openCart);
+    window.addEventListener('vh:add-to-cart', onAdd);
     return () => {
-      window.removeEventListener('vh:open-cart',   onOpen);
+      window.removeEventListener('vh:open-cart',   openCart);
       window.removeEventListener('vh:add-to-cart', onAdd);
     };
   });
 
-  function slideIn(node: Element) {
-    return {
-      duration: 400, easing: cubicOut,
-      css: (t: number) => `transform:translateX(${(1 - t) * 100}%)`,
-    };
-  }
+  const slideIn = (_node: Element) => ({
+    duration: 400, easing: cubicOut,
+    css: (t: number) => `transform:translateX(${(1 - t) * 100}%)`,
+  });
 </script>
 
 <svelte:window onkeydown={trapFocus} />
