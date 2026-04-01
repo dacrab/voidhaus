@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { lockScroll, unlockScroll } from '../lib/scrollLock';
+  import { trapFocus } from '../lib/focusTrap';
 
   interface Props { solidNav?: boolean; }
   let { solidNav = false }: Props = $props();
@@ -100,12 +101,8 @@
     aria-label="Navigation menu"
     onkeydown={e => {
       if (e.key === 'Escape') { close(); return; }
-      if (e.key === 'Tab') {
-        const els = [...(document.getElementById('nav-menu')?.querySelectorAll<HTMLElement>('a,button') ?? [])];
-        if (!els.length) return;
-        if (e.shiftKey && document.activeElement === els[0]) { e.preventDefault(); els[els.length - 1].focus(); }
-        else if (!e.shiftKey && document.activeElement === els[els.length - 1]) { e.preventDefault(); els[0].focus(); }
-      }
+      const menu = document.getElementById('nav-menu');
+      if (menu) trapFocus(menu, e);
     }}
     in:menuIn
     out:fade={{ duration: 200 }}
