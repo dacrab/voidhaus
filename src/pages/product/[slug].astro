@@ -17,6 +17,9 @@ const details: [string, string][] = [
   ...SHARED_DETAILS,
 ];
 
+const idx  = PRODUCTS.findIndex(x => x.slug === p.slug);
+const prev = PRODUCTS[idx - 1] ?? null;
+const next = PRODUCTS[idx + 1] ?? null;
 ---
 
 <Layout title={p.name} description={p.desc} type="product" solidNav={true}>
@@ -108,8 +111,12 @@ const details: [string, string][] = [
   <div class="p-nav wrap">
     <div class="rule"></div>
     <div class="p-nav-inner">
-      <a href="/collection" class="label muted-link">← All pieces</a>
-      <a href="/collection" class="label muted-link">Next →</a>
+      {prev
+        ? <a href={`/product/${prev.slug}`} class="label muted-link">← {prev.name}</a>
+        : <a href="/collection" class="label muted-link">← Collection</a>}
+      {next
+        ? <a href={`/product/${next.slug}`} class="label muted-link">{next.name} →</a>
+        : <a href="/collection" class="label muted-link">Collection →</a>}
     </div>
     <div class="rule"></div>
   </div>
@@ -138,25 +145,25 @@ onPageLoad(() => {
     btn.setAttribute('aria-pressed', 'true');
   });
 
-    const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
-    const addText = addBtn?.querySelector<HTMLElement>('.add-text');
+  const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
+  const addText = addBtn?.querySelector<HTMLElement>('.add-text');
 
-    addBtn?.addEventListener('click', () => {
-      if (!addText) return;
-      const size = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
-      if (!size) { addBtn.setAttribute('aria-label', 'Please select a size'); return; }
-      let product: Record<string, string>;
-      try { product = JSON.parse(addBtn.dataset.product ?? '{}'); }
-      catch { return; }
-      window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
-      gsap.timeline()
-        .to(addText,  { opacity: 0, duration: 0.13, ease: 'power2.in' })
-        .set(addText, { textContent: 'Added ✓' })
-        .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' })
-        .to(addText,  { opacity: 0, duration: 0.13, delay: 1.6, ease: 'power2.in' })
-        .set(addText, { textContent: 'Add to Selection' })
-        .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' });
-    });
+  addBtn?.addEventListener('click', () => {
+    if (!addText) return;
+    const size = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
+    if (!size) { addBtn.setAttribute('aria-label', 'Please select a size'); return; }
+    let product: Record<string, string>;
+    try { product = JSON.parse(addBtn.dataset.product ?? '{}'); }
+    catch { return; }
+    window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
+    gsap.timeline()
+      .to(addText,  { opacity: 0, duration: 0.13, ease: 'power2.in' })
+      .set(addText, { textContent: 'Added ✓' })
+      .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' })
+      .to(addText,  { opacity: 0, duration: 0.13, delay: 1.6, ease: 'power2.in' })
+      .set(addText, { textContent: 'Add to Selection' })
+      .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' });
+  });
 });
 </script>
 

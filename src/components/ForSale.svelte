@@ -48,8 +48,6 @@
   });
 </script>
 
-<svelte:window onkeydown={e => { if (open && e.key === 'Escape') { e.preventDefault(); closeModal(); } }} />
-
 {#if !dismissed}
   <!-- Strip -->
   <div class="strip" in:stripIn>
@@ -62,17 +60,14 @@
   </div>
 {/if}
 
-<!-- Backdrop -->
 {#if open}
   <div
-    class="backdrop"
-    style="--backdrop-z:600; background:rgb(28 27 25/0.45)"
+    class="backdrop fs-backdrop"
     role="presentation"
     onclick={closeModal}
     transition:fade={{ duration: 280 }}
   ></div>
 
-  <!-- Panel -->
   <div
     id="fs-panel"
     class="panel"
@@ -119,6 +114,8 @@
 {/if}
 
 <style>
+  .fs-backdrop { --backdrop-z: 600; background: rgb(28 27 25 / 0.45); }
+
   /* ── Strip ───────────────────────────────────────────────────────────── */
   .strip {
     position: fixed; inset-inline: 0; bottom: 0; z-index: 500;
@@ -162,7 +159,7 @@
     background: var(--color-white);
     max-width: 28rem;
     margin-inline: auto;
-    border-radius: 0.75rem 0.75rem 0 0;
+    border-radius: 0.75rem 0.75rem 0 0 !important; /* bottom-sheet shape — intentional */
     display: flex; flex-direction: column;
     will-change: transform, opacity;
     outline: none;
@@ -210,7 +207,7 @@
     .panel {
       inset-block: auto 1rem;
       inset-inline: auto 1.5rem;
-      border-radius: 0.75rem;
+      border-radius: 0.75rem !important; /* fully rounded on desktop */
       margin-inline: 0;
     }
     .strip-trigger { justify-content: flex-start; padding-inline-start: 2rem; }

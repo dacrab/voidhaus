@@ -42,9 +42,9 @@ const { title, description, updated, sibling, sections } = Astro.props;
 </Layout>
 
 <script>
-import { onPageLoad, reveal } from '../lib/animate';
+import { onPageLoad, pageReveal } from '../lib/animate';
 
-onPageLoad(() => reveal());
+onPageLoad(() => pageReveal());
 </script>
 
 <style>
@@ -98,7 +98,6 @@ onPageLoad(() => reveal());
   }
 
   .section-title {
-    font-family: var(--font-sans);
     font-size: 0.875rem;
     font-variation-settings: 'wght' 400;
     color: var(--color-ink);

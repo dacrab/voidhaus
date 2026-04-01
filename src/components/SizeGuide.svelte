@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
+  import { trapFocus } from '../lib/focusTrap';
 
   let { category = 'Clothing' }: { category?: string } = $props();
 
@@ -41,7 +42,7 @@
   <div
     class="backdrop sg-backdrop"
     role="presentation"
-    onclick={() => open = false}
+    onclick={() => (open = false)}
     transition:fade={{ duration: 240 }}
   ></div>
 
@@ -50,13 +51,17 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="sg-title"
-    onkeydown={e => e.key === 'Escape' && (open = false)}
+    tabindex="-1"
+    onkeydown={e => {
+      if (e.key === 'Escape') { open = false; return; }
+      trapFocus(e.currentTarget as HTMLElement, e);
+    }}
     in:panelIn
     out:fade={{ duration: 180 }}
   >
     <div class="sg-head">
       <h2 class="label sg-title" id="sg-title">Size Guide</h2>
-      <button class="label ghost-btn" onclick={() => open = false} aria-label="Close size guide">Close</button>
+      <button class="label ghost-btn" onclick={() => (open = false)} aria-label="Close size guide">Close</button>
     </div>
     <div class="rule"></div>
 

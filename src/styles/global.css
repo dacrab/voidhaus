@@ -84,9 +84,6 @@ html:not(.no-js) .js-hero-cta {
     transform: none !important;
     will-change: auto;
   }
-  ::view-transition-old(root),
-  ::view-transition-new(root),
-  ::view-transition-group(*) { animation-duration: 0.01ms !important; }
 }
 
 :focus-visible { outline: 1px solid var(--color-ink); outline-offset: 3px; }
@@ -188,5 +185,9 @@ html:not(.no-js) .js-hero-cta {
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root),
-  ::view-transition-group(*) { animation-duration: 0.01ms !important; }
+  ::view-transition-group(*),
+  html:not(.no-js) [data-anim],
+  html:not(.no-js) .js-hero-season,
+  html:not(.no-js) .js-hero-title,
+  html:not(.no-js) .js-hero-cta { animation-duration: 0.01ms !important; }
 }

@@ -106,6 +106,7 @@ onPageLoad(() => {
     flex: 1;
   }
 
+  /* Intentionally mirrors .product-grid from global.css — same inset-grid pattern */
   .stores-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -114,7 +115,7 @@ onPageLoad(() => {
     border-inline: 1px solid var(--color-rule);
     border-bottom: 1px solid var(--color-rule);
   }
-  @media (min-width: 768px) { .stores-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 768px)  { .stores-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 1280px) { .stores-grid { grid-template-columns: repeat(4, 1fr); } }
 
   .store {

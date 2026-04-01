@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { lockScroll, unlockScroll } from '../lib/scrollLock';
+  import { trapFocus } from '../lib/focusTrap';
 
   type CartItem = {
     slug:  string;
@@ -50,19 +51,10 @@
     save(); sync();
   }
 
-  function trapFocus(e: KeyboardEvent) {
+  function onKeydown(e: KeyboardEvent) {
     if (!open || !panelEl) return;
     if (e.key === 'Escape') { e.preventDefault(); closeCart(); return; }
-    if (e.key !== 'Tab') return;
-    const els = panelEl.querySelectorAll<HTMLElement>(
-      'button:not([disabled]),[href],input,[tabindex]:not([tabindex="-1"])'
-    );
-    if (!els.length) return;
-    if (e.shiftKey && document.activeElement === els[0]) {
-      e.preventDefault(); els[els.length - 1].focus();
-    } else if (!e.shiftKey && document.activeElement === els[els.length - 1]) {
-      e.preventDefault(); els[0].focus();
-    }
+    trapFocus(panelEl, e);
   }
 
   onMount(() => {
@@ -91,12 +83,11 @@
   });
 </script>
 
-<svelte:window onkeydown={trapFocus} />
+<svelte:window onkeydown={onKeydown} />
 
 {#if open}
   <div
-    class="backdrop"
-    style="--backdrop-z:400; background:rgb(28 27 25/0.4)"
+    class="backdrop cart-backdrop"
     role="presentation"
     onclick={closeCart}
     transition:fade={{ duration: 300 }}
@@ -163,6 +154,8 @@
 {/if}
 
 <style>
+  .cart-backdrop { --backdrop-z: 400; background: rgb(28 27 25 / 0.4); }
+
   .panel {
     position: fixed; inset-block: 0; inset-inline-end: 0;
     width: min(420px, 100vw);

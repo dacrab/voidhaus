@@ -54,18 +54,15 @@
   const isActive = (href: string) =>
     href === '/' ? path === '/' : path.startsWith(href);
 
-  function toggleMenu() {
-    if (open) { close(); } else { open = true; lockScroll(); }
-  }
-  function close()      { open = false; unlockScroll(); }
+  function openCart() { window.dispatchEvent(new Event('vh:open-cart')); }
+  function toggleMenu() { if (open) { close(); } else { open = true; lockScroll(); } }
+  function close() { open = false; unlockScroll(); }
 
   const menuIn = (_node: Element) => ({
     duration: 420, easing: cubicOut,
     css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * -1.5}rem)`,
   });
 </script>
-
-<a href="#main" class="skip-link">Skip to content</a>
 
 <header class="nav" class:scrolled class:hidden class:open>
   <nav class="nav-l" aria-label="Primary navigation">
@@ -78,7 +75,7 @@
   <a href="/" class="nav-logo" aria-label="Voidhaus — home">VOIDHAUS</a>
 
   <div class="nav-r">
-    <button class="nav-link label nav-cart" onclick={() => window.dispatchEvent(new Event('vh:open-cart'))}
+    <button class="nav-link label nav-cart" onclick={openCart}
       aria-label="Open selection{cartCount > 0 ? `, ${cartCount} item${cartCount > 1 ? 's' : ''}` : ''}">
       Selection{#if cartCount > 0}<span class="badge" aria-hidden="true">{cartCount}</span>{/if}
     </button>
@@ -133,8 +130,7 @@
     padding-inline: 1.5rem; height: var(--nav-h);
     color: rgb(255 255 255 / 0.85);
     transition: background 0.35s ease, color 0.35s ease,
-                transform 0.3s ease, box-shadow 0.35s ease,
-                top 0.25s ease;
+                transform 0.3s ease, box-shadow 0.35s ease;
   }
   @media (min-width: 640px)  { .nav { padding-inline: 2.5rem; } }
   @media (min-width: 1024px) { .nav { padding-inline: 4rem; } }
@@ -162,10 +158,8 @@
     color: inherit; opacity: 0.6;
     transition: opacity 0.2s;
     background: none; border: none; padding: 0;
-    /* Entrance — runs once on mount, CSS owns this entirely */
     animation: nav-link-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
-  /* Stagger via nth-child — no JS needed */
   .nav-l .nav-link:nth-child(1) { animation-delay: 0.55s; }
   .nav-l .nav-link:nth-child(2) { animation-delay: 0.62s; }
   .nav-r .nav-link:nth-child(1) { animation-delay: 0.69s; }
@@ -175,7 +169,6 @@
     from { opacity: 0; transform: translateY(-5px); }
     to   { opacity: 0.6; transform: translateY(0); }
   }
-  /* Active/hover override — must win over animation fill */
   .nav-link:hover, .nav-link.active { opacity: 1; }
   .nav-link.active { position: relative; }
   .nav-link.active::after {
@@ -196,7 +189,7 @@
     width: 1rem; height: 1rem;
     background: currentColor; color: var(--color-white);
     font-size: 0.5rem; font-variation-settings: 'wght' 500; letter-spacing: 0;
-    border-radius: 50%;
+    border-radius: 50% !important; /* pill badge — intentional exception to global reset */
   }
   .nav:not(.scrolled):not(.open) .badge {
     background: rgb(255 255 255 / 0.85); color: var(--color-ink);
