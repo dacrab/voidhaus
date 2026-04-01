@@ -5,8 +5,8 @@ import { SplitText } from 'gsap/SplitText';
 gsap.registerPlugin(ScrollTrigger, SplitText);
 gsap.config({ force3D: true });
 
-const EASE = { out: 'power2.out', in: 'power2.in', io: 'power2.inOut', expo: 'expo.out', circ: 'circ.out' };
-const DUR  = { xs: 0.3, sm: 0.5, md: 0.7, lg: 1.0, xl: 1.4 };
+export const EASE = { out: 'power2.out', in: 'power2.in', io: 'power2.inOut', expo: 'expo.out', circ: 'circ.out' };
+export const DUR  = { xs: 0.3, sm: 0.5, md: 0.7, lg: 1.0, xl: 1.4 };
 
 // Kill all ScrollTriggers before each Astro page swap to prevent leaks
 let _morphed = false;
@@ -38,6 +38,7 @@ export function pageReveal(lineDelay = 0.3): void {
 export function reveal(): void {
   ScrollTrigger.refresh();
 
+  // hero — immediate entrance, per-element delay from data-delay attribute
   document.querySelectorAll<HTMLElement>('[data-anim="hero"]').forEach(el => {
     gsap.fromTo(el,
       { opacity: 0, y: 22 },
@@ -46,11 +47,22 @@ export function reveal(): void {
     );
   });
 
+  // scroll — ScrollTrigger batch for below-fold elements
   ScrollTrigger.batch('[data-anim="scroll"]', {
     start: 'top 90%', once: true,
     onEnter: els => gsap.fromTo(els,
       { opacity: 0, y: 28 },
       { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.08, clearProps: 'will-change' },
+    ),
+  });
+
+  // stagger — grid items with --i CSS var for index-based delay
+  ScrollTrigger.batch('[data-anim="stagger"]', {
+    start: 'top 92%', once: true,
+    onEnter: els => gsap.fromTo(els,
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo,
+        stagger: 0.07, clearProps: 'will-change' },
     ),
   });
 }

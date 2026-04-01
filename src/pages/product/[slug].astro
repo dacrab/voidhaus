@@ -116,25 +116,27 @@ const details: [string, string][] = [
 </Layout>
 
 <script>
-import { onPageLoad, imageEntrance } from '../../lib/animate';
+import { onPageLoad, imageEntrance, DUR, EASE } from '../../lib/animate';
 import { initToggleGroup } from '../../lib/toggle';
 import gsap from 'gsap';
 
 onPageLoad(() => {
-  // Image — morph-aware entrance
+  // Image entrance (morph-aware) + info panel orchestrated together
   imageEntrance('.js-main-img');
 
-    gsap.fromTo(
-      ['.product-name', '.product-desc', '.details', '.sizes', '.cta-block'].map(s => document.querySelector(s)).filter(Boolean),
-      { opacity: 0, y: 18 },
-      { opacity: 1, y: 0, duration: 0.65, ease: 'expo.out', stagger: 0.08, delay: 0.1, clearProps: 'will-change' },
-    );
+  // Info panel starts after image begins settling (delay 0.3s matches image at ~30% through)
+  gsap.fromTo(
+    ['.product-name', '.product-desc', '.details', '.sizes', '.cta-block']
+      .map(s => document.querySelector(s)).filter(Boolean),
+    { opacity: 0, y: 18 },
+    { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.08, delay: 0.3, clearProps: 'will-change' },
+  );
 
-    const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
-    initToggleGroup('.sz-btn', btn => {
-      szBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
-      btn.setAttribute('aria-pressed', 'true');
-    });
+  const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
+  initToggleGroup('.sz-btn', btn => {
+    szBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
+    btn.setAttribute('aria-pressed', 'true');
+  });
 
     const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
     const addText = addBtn?.querySelector<HTMLElement>('.add-text');
