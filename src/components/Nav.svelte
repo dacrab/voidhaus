@@ -63,7 +63,7 @@
   function close() { open = false; unlockScroll(); }
 
   const menuIn = (_node: Element) => ({
-    duration: 420, easing: cubicOut,
+    duration: 400, easing: cubicOut, // --duration-slow
     css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * -1.5}rem)`,
   });
 </script>
@@ -131,16 +131,16 @@
   .nav {
     position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 300;
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-    padding-inline: 1.5rem; height: var(--nav-h);
-    color: rgb(255 255 255 / 0.85);
-    transition: background 0.35s ease, color 0.35s ease,
-                transform 0.3s ease, box-shadow 0.35s ease;
+    padding-inline: var(--space-lg); height: var(--nav-h);
+    color: var(--overlay-text-primary);
+    transition: background var(--duration-base) ease, color var(--duration-base) ease,
+                transform var(--duration-base) ease, box-shadow var(--duration-base) ease;
   }
-  @media (min-width: 640px)  { .nav { padding-inline: 2.5rem; } }
-  @media (min-width: 1024px) { .nav { padding-inline: 4rem; } }
+  @media (min-width: var(--breakpoint-sm))  { .nav { padding-inline: 2.5rem; } }
+  @media (min-width: var(--breakpoint-lg)) { .nav { padding-inline: var(--space-3xl); } }
 
   .nav.scrolled {
-    background: rgb(250 249 247 / 0.96);
+    background: var(--overlay-text-primary);
     color: var(--color-ink);
     box-shadow: 0 1px 0 var(--color-rule);
     backdrop-filter: blur(8px);
@@ -150,19 +150,19 @@
   .nav.open   { background: var(--color-white); color: var(--color-ink); box-shadow: none; transform: none; }
 
   .nav-logo {
-    font-size: 0.8125rem; font-variation-settings: 'wght' 500;
-    letter-spacing: 0.22em; text-transform: uppercase; color: inherit;
+    font-size: var(--text-sm); font-variation-settings: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-nav); text-transform: uppercase; color: inherit;
     grid-column: 2; justify-self: center;
   }
 
-  .nav-l { display: none; gap: 2rem; grid-column: 1; }
-  @media (min-width: 768px) { .nav-l { display: flex; } }
+  .nav-l { display: none; gap: var(--space-xl); grid-column: 1; }
+  @media (min-width: var(--breakpoint-md)) { .nav-l { display: flex; } }
 
   .nav-link {
-    color: inherit; opacity: 0.6;
-    transition: opacity 0.2s;
+    color: inherit; opacity: var(--opacity-hover);
+    transition: opacity var(--duration-fast);
     background: none; border: none; padding: 0;
-    animation: nav-link-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: nav-link-in 0.5s var(--ease-out) both;
   }
   .nav-l .nav-link:nth-child(1) { animation-delay: 0.55s; }
   .nav-l .nav-link:nth-child(2) { animation-delay: 0.62s; }
@@ -171,7 +171,7 @@
 
   @keyframes nav-link-in {
     from { opacity: 0; transform: translateY(-5px); }
-    to   { opacity: 0.6; transform: translateY(0); }
+    to   { opacity: var(--opacity-hover); transform: translateY(0); }
   }
   .nav-link:hover, .nav-link.active { opacity: 1; }
   .nav-link.active { position: relative; }
@@ -183,30 +183,30 @@
 
   .nav-r {
     display: flex; align-items: center;
-    justify-content: flex-end; gap: 1.5rem; grid-column: 3;
+    justify-content: flex-end; gap: var(--space-lg); grid-column: 3;
   }
   .nav-cart { display: flex; align-items: center; gap: 0.4rem; }
-  @media (max-width: 767px) { .nav-cart { display: none; } }
+  @media (max-width: calc(var(--breakpoint-md) - 1px)) { .nav-cart { display: none; } }
 
   .badge {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 1rem; height: 1rem;
+    width: var(--space-md); height: var(--space-md);
     background: currentColor; color: var(--color-white);
-    font-size: 0.5rem; font-variation-settings: 'wght' 500; letter-spacing: 0;
-    border-radius: 50% !important; /* pill badge — intentional exception to global reset */
+    font-size: var(--space-xs); font-variation-settings: var(--font-weight-semibold); letter-spacing: 0;
+    border-radius: var(--radius-full);
   }
   .nav:not(.scrolled):not(.open) .badge {
-    background: rgb(255 255 255 / 0.85); color: var(--color-ink);
+    background: var(--overlay-text-primary); color: var(--color-ink);
   }
 
   .menu {
     position: fixed; inset: 0; z-index: 299;
     background: var(--color-white);
     display: flex; flex-direction: column;
-    padding: 0 1.5rem 3rem;
+    padding: 0 var(--space-lg) var(--space-2xl);
     overflow-y: auto;
   }
-  @media (min-width: 640px) { .menu { padding-inline: 2.5rem; } }
+  @media (min-width: var(--breakpoint-sm)) { .menu { padding-inline: 2.5rem; } }
 
   .menu-head {
     display: flex; align-items: center; justify-content: space-between;
@@ -222,15 +222,15 @@
   .menu-link {
     font-family: var(--font-serif);
     font-size: clamp(2.25rem, 8vw, 3.5rem);
-    font-style: italic; font-variation-settings: 'wght' 400;
+    font-style: italic; font-variation-settings: var(--font-weight-medium);
     letter-spacing: -0.02em; color: var(--color-ink);
-    padding-block: 1rem; border-bottom: 1px solid var(--color-rule);
+    padding-block: var(--space-md); border-bottom: 1px solid var(--color-rule);
     opacity: 0;
     animation: link-in 0.5s var(--ease-out) both;
-    animation-delay: calc(0.06s + var(--i) * 0.055s);
-    transition: opacity 0.2s;
+    animation-delay: calc(0.06s + var(--i) * var(--stagger-fast));
+    transition: opacity var(--duration-fast);
   }
-  .menu-link:hover  { opacity: 0.4; }
+  .menu-link:hover  { opacity: var(--opacity-muted); }
   .menu-link.active { opacity: 1; }
 
   @keyframes link-in {
@@ -240,6 +240,6 @@
 
   .menu-foot {
     display: flex; align-items: center; justify-content: space-between;
-    padding-top: 2rem; border-top: 1px solid var(--color-rule); margin-top: 2rem;
+    padding-top: var(--space-xl); border-top: 1px solid var(--color-rule); margin-top: var(--space-xl);
   }
 </style>

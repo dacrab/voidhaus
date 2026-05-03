@@ -38,12 +38,12 @@
   }
 
   const panelIn = (_node: Element) => ({
-    duration: 400, easing: cubicOut,
+    duration: 400, easing: cubicOut, // --duration-slow
     css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 1.5}rem) scale(${0.98 + t * 0.02})`,
   });
 
   const stripIn = (_node: Element) => ({
-    duration: 320, easing: cubicOut,
+    duration: 300, easing: cubicOut, // --duration-base
     css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 100}%)`,
   });
 </script>
@@ -65,7 +65,7 @@
     class="backdrop fs-backdrop"
     role="presentation"
     onclick={closeModal}
-    transition:fade={{ duration: 280 }}
+    transition:fade={{ duration: 300 }}
   ></div>
 
   <div
@@ -81,7 +81,7 @@
       if (panel) trapFocus(panel, e);
     }}
     in:panelIn
-    out:fade={{ duration: 200 }}
+    out:fade={{ duration: dur.out }}
   >
     <div class="panel-head">
       <span class="label muted" id="fs-title">Available</span>
@@ -114,7 +114,7 @@
 {/if}
 
 <style>
-  .fs-backdrop { --backdrop-z: 600; background: rgb(28 27 25 / 0.45); }
+  .fs-backdrop { --backdrop-z: 600; background: var(--backdrop-modal); }
 
   /* ── Strip ───────────────────────────────────────────────────────────── */
   .strip {
@@ -125,29 +125,29 @@
 
   .strip-trigger {
     flex: 1; display: flex; align-items: center; justify-content: center;
-    gap: 1rem; padding: 0.75rem 1.5rem;
+    gap: var(--space-md); padding: var(--space-sm) var(--space-lg);
     background: none; border: none; color: inherit; cursor: pointer;
-    transition: background 0.2s;
+    transition: background var(--duration-fast);
   }
-  .strip-trigger:hover { background: rgb(255 255 255 / 0.06); }
+  .strip-trigger:hover { background: var(--scrim-dark-light); }
 
   .dot {
     width: 0.4rem; height: 0.4rem; flex-shrink: 0;
-    background: #6ee7a0; border-radius: 50%;
+    background: var(--color-accent); border-radius: var(--radius-full);
     animation: pulse 2.4s ease-in-out infinite;
   }
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50%       { opacity: 0.3; }
+    50%       { opacity: var(--opacity-disabled); }
   }
 
-  .strip-cta { opacity: 0.5; transition: opacity 0.2s; }
+  .strip-cta { opacity: var(--opacity-muted); transition: opacity var(--duration-fast); }
   .strip-trigger:hover .strip-cta { opacity: 1; }
 
   .strip-dismiss {
     display: flex; align-items: center; padding-inline: 1.25rem;
-    background: none; border: none; border-left: 1px solid rgb(255 255 255 / 0.1);
-    color: inherit; opacity: 0.4; cursor: pointer; transition: opacity 0.2s;
+    background: none; border: none; border-left: 1px solid var(--scrim-dark-light);
+    color: inherit; opacity: var(--opacity-muted); cursor: pointer; transition: opacity var(--duration-fast);
   }
   .strip-dismiss:hover { opacity: 1; }
 
@@ -159,7 +159,7 @@
     background: var(--color-white);
     max-width: 28rem;
     margin-inline: auto;
-    border-radius: 0.75rem 0.75rem 0 0 !important; /* bottom-sheet shape — intentional */
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     display: flex; flex-direction: column;
     will-change: transform, opacity;
     outline: none;
@@ -167,49 +167,49 @@
 
   .panel-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1.25rem 1.5rem 1rem;
+    padding: 1.25rem var(--space-lg) var(--space-md);
   }
 
   .panel-body {
-    padding: 1.5rem;
+    padding: var(--space-lg);
     display: flex; flex-direction: column; gap: 1.25rem;
   }
 
   .panel-title {
-    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-size: clamp(var(--text-xl), 4vw, var(--text-2xl));
     font-style: italic; line-height: 1.2;
     color: var(--color-ink);
   }
 
-  .panel-desc { font-size: 0.875rem; line-height: 1.65; }
+  .panel-desc { font-size: var(--text-base); line-height: 1.65; }
 
   .features {
     list-style: none;
     display: flex; flex-direction: column; gap: 0.6rem;
-    opacity: 0.55;
+    opacity: var(--opacity-secondary);
   }
-  .features li::before { content: '—'; margin-inline-end: 0.5rem; }
+  .features li::before { content: '—'; margin-inline-end: var(--space-xs); }
 
   .panel-foot {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem 1.5rem 1.25rem; gap: 1rem;
+    padding: var(--space-md) var(--space-lg) 1.25rem; gap: var(--space-md);
   }
 
   .enquire-btn {
-    display: inline-block; padding: 0.65rem 1.5rem;
+    display: inline-block; padding: 0.65rem var(--space-lg);
     background: var(--color-ink); color: var(--color-white);
-    text-decoration: none; transition: background 0.2s;
+    text-decoration: none; transition: background var(--duration-fast);
   }
   .enquire-btn:hover { background: var(--color-ink-soft); }
 
   /* ── Desktop — float bottom-right ───────────────────────────────────── */
-  @media (min-width: 640px) {
+  @media (min-width: var(--breakpoint-sm)) {
     .panel {
-      inset-block: auto 1rem;
-      inset-inline: auto 1.5rem;
-      border-radius: 0.75rem !important; /* fully rounded on desktop */
+      inset-block: auto var(--space-md);
+      inset-inline: auto var(--space-lg);
+      border-radius: var(--radius-lg);
       margin-inline: 0;
     }
-    .strip-trigger { justify-content: flex-start; padding-inline-start: 2rem; }
+    .strip-trigger { justify-content: flex-start; padding-inline-start: var(--space-xl); }
   }
 </style>

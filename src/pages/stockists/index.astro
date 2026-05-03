@@ -1,13 +1,66 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import PageHeader from '../../components/PageHeader.astro';
-import { STOCKISTS } from '../../data/stockists';
+
+type Store = {
+  city:    string;
+  name:    string;
+  address: string;
+  country: string;
+};
+
+type Region = {
+  region: string;
+  stores: Store[];
+};
+
+const STOCKISTS: Region[] = [
+  {
+    region: 'Europe',
+    stores: [
+      { city: 'Milan',     name: 'Antonia',             address: 'Via Cusani 5, 20121',         country: 'Italy'   },
+      { city: 'Milan',     name: '10 Corso Como',        address: 'Corso Como 10, 20154',         country: 'Italy'   },
+      { city: 'Paris',     name: 'Colette',              address: '213 Rue Saint-Honoré, 75001', country: 'France'  },
+      { city: 'Paris',     name: "L'Eclaireur",          address: '3 Rue des Rosiers, 75004',    country: 'France'  },
+      { city: 'London',    name: 'Dover Street Market',  address: '18-22 Haymarket, SW1Y 4DG',   country: 'UK'      },
+      { city: 'Antwerp',   name: 'Louis',                address: 'Lombardenvest 2, 2000',        country: 'Belgium' },
+      { city: 'Berlin',    name: 'Voo Store',            address: 'Oranienstr. 24, 10999',        country: 'Germany' },
+    ],
+  },
+  {
+    region: 'Americas',
+    stores: [
+      { city: 'New York',    name: 'Opening Ceremony', address: '35 Howard Street, NY 10013',  country: 'USA'    },
+      { city: 'New York',    name: 'Barneys New York',  address: '660 Madison Ave, NY 10065',   country: 'USA'    },
+      { city: 'Los Angeles', name: 'H.Lorenzo',         address: '8660 Sunset Blvd, CA 90069',  country: 'USA'    },
+      { city: 'Toronto',     name: 'Ssense',            address: '90 St Paul St W, H2Y 1Z1',    country: 'Canada' },
+    ],
+  },
+  {
+    region: 'Asia Pacific',
+    stores: [
+      { city: 'Tokyo',     name: 'United Arrows', address: '3-28-1 Jingumae, Shibuya',    country: 'Japan'     },
+      { city: 'Tokyo',     name: 'Isetan',        address: '3-14-1 Shinjuku, 160-0022',   country: 'Japan'     },
+      { city: 'Seoul',     name: 'Boon The Shop', address: '2F, 86 Cheongdam-dong',       country: 'Korea'     },
+      { city: 'Hong Kong', name: 'Lane Crawford', address: 'IFC Mall, 8 Finance Street',  country: 'HK'        },
+      { city: 'Sydney',    name: 'Incu',          address: '76 Oxford Street, Paddington', country: 'Australia' },
+    ],
+  },
+];
 
 const totalStores = STOCKISTS.reduce((t, r) => t + r.stores.length, 0);
 ---
 
 <Layout title="Stockists" description="Find Voidhaus at select retailers worldwide." solidNav={true}>
-  <PageHeader label="Worldwide" title="Stockists" aside={`${totalStores} stores`} />
+  <div class="ph wrap page-top-spacing">
+    <div class="ph-inner">
+      <div class="ph-left">
+        <span class="label muted" data-anim="hero" data-delay="0">Worldwide</span>
+        <h1 class="ph-title" data-anim="hero" data-delay="0.15">Stockists</h1>
+      </div>
+      <span class="label muted ph-aside" data-anim="hero" data-delay="0.25">{totalStores} stores</span>
+    </div>
+    <div class="rule"></div>
+  </div>
 
   <div class="stockists wrap">
     {STOCKISTS.map((region, ri) => (
@@ -43,16 +96,51 @@ const totalStores = STOCKISTS.reduce((t, r) => t + r.stores.length, 0);
 </Layout>
 
 <script>
-import { onPageLoad, pageReveal, staggerReveal } from '../../lib/animate';
+import { reveal, lineReveal, gsap, DUR, EASE } from '../../lib/animate';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-onPageLoad(() => {
-  pageReveal();
-  staggerReveal('.store', '.stores-grid', 0, 0.06);
+document.addEventListener('astro:page-load', () => {
+  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
+    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      reveal();
+      lineReveal('.ph .rule', 0.3);
+      
+      // Stagger reveal
+      const els  = document.querySelectorAll<HTMLElement>('.store');
+      const trig = document.querySelector<HTMLElement>('.stores-grid');
+      if (els.length && trig) {
+        ScrollTrigger.create({
+          trigger: trig, start: 'top 88%', once: true,
+          onEnter: () => gsap.fromTo(els,
+            { opacity: 0, y: 24 },
+            { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.06, clearProps: 'will-change' },
+          ),
+        });
+      }
+    })));
 });
 </script>
 
 <style>
-  .stockists { padding-bottom: 6rem; }
+  .ph-inner {
+    display: flex; align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: var(--space-lg); gap: var(--space-md);
+  }
+
+  .ph-left { display: flex; flex-direction: column; gap: var(--space-xs); }
+
+  .ph-title {
+    font-family: var(--font-sans);
+    font-size: var(--text-display-md);
+    font-variation-settings: var(--font-weight-light);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .ph-aside { align-self: flex-end; padding-bottom: 0.3rem; }
+
+  .stockists { padding-bottom: var(--space-4xl); }
 
   .region { padding-block: 3.5rem 0; }
   @media (min-width: 768px) { .region { padding-block: 5rem 0; } }
@@ -60,8 +148,8 @@ onPageLoad(() => {
   .region-header {
     display: flex;
     align-items: baseline;
-    gap: 1.5rem;
-    padding-bottom: 2rem;
+    gap: var(--space-lg);
+    padding-bottom: var(--space-xl);
     border-bottom: 1px solid var(--color-rule);
     margin-bottom: 0;
   }
@@ -69,7 +157,7 @@ onPageLoad(() => {
   .region-title {
     font-family: var(--font-sans);
     font-size: clamp(1.25rem, 3vw, 2rem);
-    font-variation-settings: 'wght' 300;
+    font-variation-settings: var(--font-weight-normal);
     letter-spacing: -0.02em;
     color: var(--color-ink);
     flex: 1;
@@ -89,34 +177,34 @@ onPageLoad(() => {
 
   .store {
     background: var(--color-white);
-    padding: 1.5rem 1.25rem;
+    padding: var(--space-lg) 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    transition: background 0.2s;
+    gap: var(--space-xs);
+    transition: background var(--duration-fast);
   }
-  @media (min-width: 768px) { .store { padding: 2rem 1.5rem; } }
+  @media (min-width: 768px) { .store { padding: var(--space-xl) var(--space-lg); } }
   .store:hover { background: var(--color-off); }
 
   .store-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: var(--space-xs);
     margin-bottom: 0.25rem;
   }
 
   .store-name {
     font-family: var(--font-sans);
-    font-size: 0.875rem;
-    font-variation-settings: 'wght' 400;
+    font-size: var(--text-base);
+    font-variation-settings: var(--font-weight-medium);
     color: var(--color-ink);
-    letter-spacing: 0.01em;
+    letter-spacing: var(--letter-spacing-tight);
   }
 
   .store-address {
     text-transform: none;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--letter-spacing-normal);
     line-height: 1.5;
   }
 
@@ -126,13 +214,18 @@ onPageLoad(() => {
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: var(--space-md);
     border-top: 1px solid var(--color-rule);
   }
 
   .cta-text {
-    font-size: 0.875rem;
-    font-variation-settings: 'wght' 300;
+    font-size: var(--text-base);
+    font-variation-settings: var(--font-weight-normal);
+    color: var(--color-soft);
+  }
+
+</style>
+s: var(--font-weight-normal);
     color: var(--color-soft);
   }
 

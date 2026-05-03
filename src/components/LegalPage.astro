@@ -42,25 +42,31 @@ const { title, description, updated, sibling, sections } = Astro.props;
 </Layout>
 
 <script>
-import { onPageLoad, pageReveal } from '../lib/animate';
+import { reveal, lineReveal } from '../lib/animate';
 
-onPageLoad(() => pageReveal());
+document.addEventListener('astro:page-load', () => {
+  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
+    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      reveal();
+      lineReveal('.ph .rule', 0.3);
+    })));
+});
 </script>
 
 <style>
-  .legal { padding-bottom: 6rem; }
+  .legal { padding-bottom: var(--space-4xl); }
 
   .legal-head { padding-bottom: 0; }
 
   .lh-top {
     display: flex; flex-direction: column;
-    gap: 0.75rem; padding-bottom: 1.5rem;
+    gap: var(--space-sm); padding-bottom: var(--space-lg);
   }
 
   .legal-title {
     font-family: var(--font-sans);
     font-size: clamp(1.75rem, 5vw, 3.5rem);
-    font-variation-settings: 'wght' 300;
+    font-variation-settings: var(--font-weight-normal);
     letter-spacing: -0.03em;
     line-height: 1;
   }
@@ -69,19 +75,19 @@ onPageLoad(() => pageReveal());
 
   .legal-body {
     display: grid;
-    padding-top: 3rem;
+    padding-top: var(--space-2xl);
   }
   @media (min-width: 900px) {
     .legal-body {
       grid-template-columns: 200px 1fr;
-      gap: 6rem;
+      gap: var(--space-4xl);
       align-items: start;
     }
   }
 
   .legal-nav {
-    display: flex; flex-direction: column; gap: 0.75rem;
-    padding-bottom: 3rem;
+    display: flex; flex-direction: column; gap: var(--space-sm);
+    padding-bottom: var(--space-2xl);
     position: sticky; top: calc(var(--nav-h) + 2rem);
   }
   @media (max-width: 899px) { .legal-nav { position: static; flex-direction: row; } }
@@ -89,7 +95,7 @@ onPageLoad(() => pageReveal());
   .legal-section {
     padding-block: 2rem;
     border-bottom: 1px solid var(--color-rule);
-    display: flex; flex-direction: column; gap: 0.75rem;
+    display: flex; flex-direction: column; gap: var(--space-sm);
   }
   .legal-section:first-of-type { border-top: 1px solid var(--color-rule); }
   @media (min-width: 900px) {
@@ -98,15 +104,15 @@ onPageLoad(() => pageReveal());
   }
 
   .section-title {
-    font-size: 0.875rem;
-    font-variation-settings: 'wght' 400;
+    font-size: var(--text-base);
+    font-variation-settings: var(--font-weight-medium);
     color: var(--color-ink);
     letter-spacing: 0;
   }
 
   .section-body {
-    font-size: 0.875rem;
-    font-variation-settings: 'wght' 300;
+    font-size: var(--text-base);
+    font-variation-settings: var(--font-weight-normal);
     line-height: 1.85;
     color: var(--color-soft);
     max-width: 60ch;

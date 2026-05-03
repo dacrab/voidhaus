@@ -2,7 +2,6 @@
 import Layout from '../layouts/Layout.astro';
 import { Picture } from 'astro:assets';
 import ProductCard from '../components/ProductCard.astro';
-import CtaStrip from '../components/CtaStrip.astro';
 import { PRODUCTS } from '../data/products';
 import { IMAGES } from '../assets/images';
 
@@ -64,44 +63,69 @@ const featured = PRODUCTS.slice(0, 4);
     </div>
   </section>
 
-  <CtaStrip label="Press & Inquiries" href="/contact" cta="studio@voidhaus.com →" />
+  <div class="cta wrap" data-anim="scroll">
+    <div class="rule"></div>
+    <div class="cta-inner">
+      <span class="label op-35">Press & Inquiries</span>
+      <a href="/contact" class="label muted-link">studio@voidhaus.com →</a>
+    </div>
+    <div class="rule"></div>
+  </div>
 
 </Layout>
 
 <script>
-import { onPageLoad, reveal, heroParallax, lineReveal, cardsCascade } from '../lib/animate';
-import gsap from 'gsap';
+import { reveal, lineReveal, cardsCascade, gsap, DUR, EASE } from '../lib/animate';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-onPageLoad(() => {
-  // Hero image first
-  heroParallax('.js-hero-img');
+document.addEventListener('astro:page-load', () => {
+  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
+    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      // Hero image parallax
+      const img = document.querySelector<HTMLElement>('.js-hero-img');
+      const morphed = document.documentElement.hasAttribute('data-astro-transition');
+      if (img) {
+        if (morphed) {
+          gsap.set(img, { opacity: 1, scale: 1.12 });
+        } else {
+          gsap.fromTo(img,
+            { opacity: 0, scale: 1.18 },
+            { opacity: 1, scale: 1.12, duration: DUR.hero + 0.4, ease: 'power3.out' },
+          );
+        }
+        ScrollTrigger.create({
+          trigger: document.documentElement, start: 'top top', end: 'bottom top', scrub: 2,
+          onUpdate: st => gsap.set(img, { yPercent: -st.progress * 14 }),
+        });
+      }
 
-    // Hero text — tight orchestrated sequence, all from hidden
-    const season = document.querySelector<HTMLElement>('.js-hero-season');
-    const title  = document.querySelector<HTMLElement>('.js-hero-title');
-    const cta    = document.querySelector<HTMLElement>('.js-hero-cta');
+      // Hero text — tight orchestrated sequence, all from hidden
+      const season = document.querySelector<HTMLElement>('.js-hero-season');
+      const title  = document.querySelector<HTMLElement>('.js-hero-title');
+      const cta    = document.querySelector<HTMLElement>('.js-hero-cta');
 
-    gsap.set([season, title, cta], { opacity: 0 });
+      gsap.set([season, title, cta], { opacity: 0 });
 
-    const tl = gsap.timeline({ delay: 0.2 });
-    tl.fromTo(season,
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' },
-    )
-    .fromTo(title,
-      { opacity: 0, y: 36, skewY: 2 },
-      { opacity: 1, y: 0, skewY: 0, duration: 1.0, ease: 'expo.out', clearProps: 'skewY' },
-      '-=0.35',
-    )
-    .fromTo(cta,
-      { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' },
-      '-=0.5',
-    );
+      const tl = gsap.timeline({ delay: 0.2 });
+      tl.fromTo(season,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: DUR.slower, ease: 'expo.out' },
+      )
+      .fromTo(title,
+        { opacity: 0, y: 36, skewY: 2 },
+        { opacity: 1, y: 0, skewY: 0, duration: DUR.hero, ease: 'expo.out', clearProps: 'skewY' },
+        '-=0.35',
+      )
+      .fromTo(cta,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' },
+        '-=0.5',
+      );
 
-    reveal();
-    lineReveal('.products-head .rule', 0.1);
-    cardsCascade('.products .pc');
+      reveal();
+      lineReveal('.products-head .rule', 0.1);
+      cardsCascade('.products .pc');
+    })));
 });
 </script>
 
@@ -129,44 +153,44 @@ onPageLoad(() => {
 
 .hero-scrim {
   background:
-    linear-gradient(to bottom, transparent 40%, rgb(28 27 25 / 0.7) 100%),
-    linear-gradient(to top, transparent 85%, rgb(28 27 25 / 0.1) 100%);
+    linear-gradient(to bottom, transparent 40%, var(--scrim-dark-heavy) 100%),
+    linear-gradient(to top, transparent 85%, var(--scrim-dark-light) 100%);
 }
 
 .hero-body {
   position: relative; z-index: 1;
-  padding-bottom: 3rem;
+  padding-bottom: var(--space-2xl);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--space-lg);
 }
 
-.hero-season { color: rgb(255 255 255 / 0.55); }
+.hero-season { color: var(--overlay-text-secondary); }
 
 .hero-title {
   font-family: var(--font-sans);
   font-size: clamp(4rem, 14vw, 13rem);
-  font-variation-settings: 'wght' 200;
+  font-variation-settings: var(--font-weight-light);
   letter-spacing: -0.05em;
   line-height: 0.92;
-  color: rgb(255 255 255 / 0.92);
+  color: var(--overlay-text-primary);
 }
 
 .hero-cta {
-  color: rgb(255 255 255 / 0.55);
-  transition: color 0.2s;
+  color: var(--overlay-text-secondary);
+  transition: color var(--duration-fast);
   align-self: flex-start;
 }
 .hero-cta:hover { color: #fff; }
 
 /* ── Products ──────────────────────────────────────────────────────────── */
-.products { padding-block: 4rem 3rem; }
-@media (min-width: 768px) { .products { padding-block: 6rem 4rem; } }
+.products { padding-block: var(--space-3xl) var(--space-2xl); }
+@media (min-width: 768px) { .products { padding-block: var(--space-4xl) var(--space-3xl); } }
 
 .products-head {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
   padding-bottom: 0;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 /* Override grid to 4-col on desktop for home page featured strip */
@@ -185,21 +209,29 @@ onPageLoad(() => {
 .ed-media { position: absolute; inset: 0; }
 .ed-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
 .ed-scrim {
-  background: linear-gradient(135deg, rgb(28 27 25 / 0.72) 0%, rgb(28 27 25 / 0.2) 60%, transparent 100%);
+  background: linear-gradient(135deg, var(--scrim-dark-heavy) 0%, var(--scrim-dark-light) 60%, transparent 100%);
 }
 .ed-text {
   position: absolute; inset-block-end: 3rem; inset-inline: 0;
-  display: flex; flex-direction: column; gap: 1.5rem;
+  display: flex; flex-direction: column; gap: var(--space-lg);
 }
 @media (min-width: 768px) { .ed-text { inset-block-end: 4rem; max-width: 52%; } }
 
 .ed-quote {
   font-size: clamp(1.75rem, 5vw, 4rem);
   font-style: italic; line-height: 1.12; letter-spacing: -0.02em;
-  color: rgb(255 255 255 / 0.9);
+  color: var(--overlay-text-primary);
 }
-.ed-quote em { font-style: normal; color: rgb(255 255 255 / 0.4); }
-.ed-link { color: rgb(255 255 255 / 0.5); transition: color 0.2s; }
+.ed-quote em { font-style: normal; color: var(--overlay-text-muted); }
+.ed-link { color: var(--overlay-text-secondary); transition: color var(--duration-fast); }
 .ed-link:hover { color: #fff; }
 
+/* ── CTA Strip ─────────────────────────────────────────────────────────── */
+.cta { padding-block: var(--space-lg) var(--space-3xl); }
+.cta-inner {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: var(--space-sm); padding-block: var(--space-lg);
+}
+
 </style>
+>

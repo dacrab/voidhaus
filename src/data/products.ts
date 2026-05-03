@@ -14,10 +14,6 @@ export type Product = {
   img2?:    string;
 };
 
-export function formatPrice(price: number): string {
-  return price.toLocaleString('en-US', { minimumFractionDigits: 0 });
-}
-
 export const PRODUCTS: Product[] = [
   {
     slug:     'obsidian-coat',

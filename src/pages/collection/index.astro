@@ -36,46 +36,53 @@ import { SITE } from '../../data/site';
 </Layout>
 
 <script>
-import { onPageLoad, cardsCascade, lineReveal, reveal } from '../../lib/animate';
-import { initToggleGroup } from '../../lib/toggle';
-import gsap from 'gsap';
+import { cardsCascade, lineReveal, reveal, gsap } from '../../lib/animate';
 
-onPageLoad(() => {
-  reveal();
-  lineReveal('.coll-top .rule', 0.3);
-  cardsCascade('.pc');
+document.addEventListener('astro:page-load', () => {
+  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
+    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      reveal();
+      lineReveal('.coll-top .rule', 0.3);
+      cardsCascade('.pc');
 
-  const cards = document.querySelectorAll<HTMLElement>('.pc');
-  initToggleGroup('.filter-btn', btn => {
-    const f = btn.dataset.filter;
-    cards.forEach(card => {
-      const show = f === 'All' || card.dataset.category === f;
-      gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: 0.28, ease: 'power2.out' });
-    });
-  });
+      const cards = document.querySelectorAll<HTMLElement>('.pc');
+      const btns = document.querySelectorAll<HTMLElement>('.filter-btn');
+      
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const f = btn.dataset.filter;
+          cards.forEach(card => {
+            const show = f === 'All' || card.dataset.category === f;
+            gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: DUR.base, ease: 'power2.out' });
+          });
+        });
+      });
+    })));
 });
 </script>
 
 <style>
 /* Extra top padding accounts for the fixed nav height */
 .coll-top {
-  padding-top: calc(var(--nav-h) + 3rem);
+  padding-top: calc(var(--nav-h) + var(--space-2xl));
 }
-@media (min-width: 768px) { .coll-top { padding-top: calc(var(--nav-h) + 5rem); } }
+@media (min-width: 768px) { .coll-top { padding-top: calc(var(--nav-h) + var(--section-gap-md)); } }
 
 .coll-top-inner {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding-bottom: 1.5rem;
-  gap: 1rem;
+  padding-bottom: var(--space-lg);
+  gap: var(--space-md);
   flex-wrap: wrap;
 }
 
 .coll-title {
   font-family: var(--font-sans);
   font-size: clamp(1.75rem, 5vw, 3.5rem);
-  font-variation-settings: 'wght' 300;
+  font-variation-settings: var(--font-weight-normal);
   letter-spacing: -0.03em;
   line-height: 1;
   color: var(--color-ink);
@@ -83,21 +90,21 @@ onPageLoad(() => {
 
 .filters {
   display: flex;
-  gap: 1.5rem;
-  padding-bottom: 1rem;
+  gap: var(--space-lg);
+  padding-bottom: var(--space-md);
   overflow-x: auto;
   scrollbar-width: none;
 }
 .filters::-webkit-scrollbar { display: none; }
-@media (min-width: 768px) { .filters { gap: 2rem; } }
+@media (min-width: 768px) { .filters { gap: var(--space-xl); } }
 
 .filter-btn {
   background: none; border: none;
-  color: var(--color-ink); opacity: 0.3;
-  transition: opacity 0.2s;
+  color: var(--color-ink); opacity: var(--opacity-disabled);
+  transition: opacity var(--duration-fast);
   white-space: nowrap; flex-shrink: 0; padding: 0;
 }
-.filter-btn:hover  { opacity: 0.65; }
+.filter-btn:hover  { opacity: var(--opacity-hover); }
 .filter-btn.active { opacity: 1; }
 
 </style>

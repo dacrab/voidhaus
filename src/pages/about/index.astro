@@ -1,14 +1,20 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { Picture } from 'astro:assets';
-import PageHeader from '../../components/PageHeader.astro';
-import CtaStrip from '../../components/CtaStrip.astro';
 import { SITE } from '../../data/site';
 import { IMAGES } from '../../assets/images';
 ---
 
 <Layout title="Manifesto" solidNav={true}>
-  <PageHeader label="Manifesto" title="We reject the legible." />
+  <div class="ph wrap page-top-spacing">
+    <div class="ph-inner">
+      <div class="ph-left">
+        <span class="label muted" data-anim="hero" data-delay="0">Manifesto</span>
+        <h1 class="ph-title" data-anim="hero" data-delay="0.15">We reject the legible.</h1>
+      </div>
+    </div>
+    <div class="rule"></div>
+  </div>
 
   <section class="statements wrap">
 
@@ -80,30 +86,82 @@ import { IMAGES } from '../../assets/images';
     </div>
   </section>
 
-  <CtaStrip href="/collection" cta="View Collection →" />
+  <div class="cta wrap" data-anim="scroll">
+    <div class="rule"></div>
+    <div class="cta-inner">
+      <span class="label op-35">Ready?</span>
+      <a href="/collection" class="label muted-link">View Collection →</a>
+    </div>
+    <div class="rule"></div>
+  </div>
 </Layout>
 
 <script>
-import { onPageLoad, pageReveal, statementReveal, pullQuote } from '../../lib/animate';
+import { reveal, lineReveal, gsap, DUR, EASE } from '../../lib/animate';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-onPageLoad(() => {
-  pageReveal();
-  statementReveal();
-  pullQuote('.pull-quote');
+document.addEventListener('astro:page-load', () => {
+  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
+    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      reveal();
+      lineReveal('.ph .rule', 0.3);
+      
+      // Statement reveal
+      document.querySelectorAll<HTMLElement>('[data-anim="statement"]').forEach(el => {
+        const num  = el.querySelector<HTMLElement>('.stmt-num');
+        const body = el.querySelectorAll<HTMLElement>('.stmt-h, .stmt-p');
+        ScrollTrigger.create({
+          trigger: el, start: 'top 88%', once: true,
+          onEnter: () => {
+            const tl = gsap.timeline();
+            if (num) tl.fromTo(num, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: DUR.sm, ease: EASE.expo }, 0);
+            tl.fromTo(body, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.1 }, 0.05);
+          },
+        });
+      });
+      
+      // Pull quote
+      const el = document.querySelector<HTMLElement>('.pull-quote');
+      if (el) {
+        ScrollTrigger.create({
+          trigger: el, start: 'top 88%', once: true,
+          onEnter: () => gsap.fromTo(el,
+            { opacity: 0, y: 24, skewY: 1 },
+            { opacity: 1, y: 0, skewY: 0, duration: DUR.lg, ease: EASE.expo, clearProps: 'skewY' },
+          ),
+        });
+      }
+    })));
 });
 </script>
 
 <style>
-.statements { padding-bottom: 3rem; }
-@media (min-width: 768px) { .statements { padding-bottom: 5rem; } }
+.ph-inner {
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: var(--space-lg); gap: var(--space-md);
+}
+
+.ph-left { display: flex; flex-direction: column; gap: var(--space-xs); }
+
+.ph-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-display-md);
+  font-variation-settings: var(--font-weight-light);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.statements { padding-bottom: var(--space-2xl); }
+@media (min-width: 768px) { .statements { padding-bottom: var(--section-gap-md); } }
 
 .stmt {
   display: grid;
-  gap: 1rem;
-  padding-block: 2.5rem;
+  gap: var(--space-md);
+  padding-block: var(--space-xl);
 }
 @media (min-width: 640px) {
-  .stmt { grid-template-columns: 5rem 1fr; gap: 3rem; padding-block: 4rem; }
+  .stmt { grid-template-columns: 5rem 1fr; gap: var(--space-2xl); padding-block: var(--space-3xl); }
 }
 
 .stmt-num { padding-top: 0.1rem; }
@@ -113,15 +171,15 @@ onPageLoad(() => {
 .stmt-h {
   font-family: var(--font-sans);
   font-size: clamp(1.125rem, 2.5vw, 1.625rem);
-  font-variation-settings: 'wght' 300;
+  font-variation-settings: var(--font-weight-normal);
   letter-spacing: -0.02em;
   line-height: 1.2;
   color: var(--color-ink);
 }
 
 .stmt-p {
-  font-size: 0.875rem;
-  font-variation-settings: 'wght' 300;
+  font-size: var(--text-base);
+  font-variation-settings: var(--font-weight-normal);
   line-height: 1.9;
   color: var(--color-soft);
 }
@@ -139,8 +197,8 @@ onPageLoad(() => {
 @media (min-width: 768px) { .pull-quote { padding-block: 7rem; } }
 .pull-quote em { font-style: normal; color: var(--color-mid); }
 
-.atelier { margin-bottom: 4rem; }
-@media (min-width: 768px) { .atelier { margin-bottom: 6rem; } }
+.atelier { margin-bottom: var(--space-3xl); }
+@media (min-width: 768px) { .atelier { margin-bottom: var(--space-4xl); } }
 
 .atelier-img-wrap {
   position: relative;
@@ -150,13 +208,13 @@ onPageLoad(() => {
 @media (min-width: 768px) { .atelier-img-wrap { height: 65svh; } }
 
 .atelier-img img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
-.atelier-scrim { background: rgb(28 27 25 / 0.18); }
+.atelier-scrim { background: var(--scrim-dark-light); }
 
 .at-item {
   background: var(--color-white);
   padding: 1.75rem 1.5rem;
   display: flex; flex-direction: column; gap: 0.6rem;
-  transition: background 0.2s;
+  transition: background var(--duration-fast);
 }
 @media (min-width: 768px) { .at-item { padding: 2.25rem 2rem; } }
 .at-item:hover { background: var(--color-off); }
@@ -164,8 +222,15 @@ onPageLoad(() => {
 .at-city {
   font-family: var(--font-sans);
   font-size: clamp(1rem, 2.5vw, 1.5rem);
-  font-variation-settings: 'wght' 300;
+  font-variation-settings: var(--font-weight-normal);
   letter-spacing: -0.02em;
   color: var(--color-ink);
+}
+
+/* ── CTA Strip ─────────────────────────────────────────────────────────── */
+.cta { padding-block: var(--space-lg) var(--space-3xl); }
+.cta-inner {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: var(--space-sm); padding-block: var(--space-lg);
 }
 </style>
