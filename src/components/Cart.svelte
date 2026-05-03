@@ -1,91 +1,56 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { cubicOut } from 'svelte/easing';
-  import { lockScroll, unlockScroll } from '../lib/scrollLock';
-  import { trapFocus } from '../lib/focusTrap';
+  import { createModal, slideIn } from '../lib/modal';
+  import { getCart, saveCart, formatPrice, type CartItem } from '../lib/cart';
 
-  type CartItem = {
-    slug:  string;
-    name:  string;
-    price: string; // formatted display string e.g. "3,200"
-    size:  string;
-    img:   string;
-    num:   string;
-  };
+  const modal = createModal();
 
-  const KEY = 'vh-cart';
-
-  let open      = $state(false);
-  let items     = $state<CartItem[]>([]);
-  let panelEl   = $state<HTMLElement | undefined>();
-  let prevFocus = $state<HTMLElement | null>(null);
+  let open = $state(false);
+  let items = $state<CartItem[]>([]);
+  let panelEl = $state<HTMLElement | undefined>();
 
   const total = $derived(
-    items.reduce((s, i) => s + parseFloat(i.price.replace(/,/g, '')), 0)
-      .toLocaleString('en-US', { minimumFractionDigits: 0 })
+    formatPrice(items.reduce((s, i) => s + parseFloat(i.price.replace(/,/g, '')), 0))
   );
 
-  function load()  { try { items = JSON.parse(localStorage.getItem(KEY) ?? '[]'); } catch {} }
-  function save()  { localStorage.setItem(KEY, JSON.stringify(items)); }
-  function sync()  { window.dispatchEvent(new Event('vh:cart-updated')); }
-
   function openCart() {
-    prevFocus = document.activeElement as HTMLElement;
     open = true;
-    lockScroll();
-    // Focus first interactive element after Svelte renders the panel
-    requestAnimationFrame(() => {
-      panelEl?.querySelector<HTMLElement>('button,[href],[tabindex]')?.focus();
-    });
+    modal.open(panelEl);
   }
 
   function closeCart() {
     open = false;
-    unlockScroll();
-    prevFocus?.focus();
+    modal.close();
   }
 
   function remove(slug: string, size: string) {
     items = items.filter(i => !(i.slug === slug && i.size === size));
-    save(); sync();
+    saveCart(items);
   }
 
   function onKeydown(e: KeyboardEvent) {
-    if (!open || !panelEl) return;
-    if (e.key === 'Escape') { e.preventDefault(); closeCart(); return; }
-    trapFocus(panelEl, e);
+    if (open && modal.handleKeydown(panelEl, e)) closeCart();
   }
 
   onMount(() => {
-    load();
+    items = getCart();
 
-    const onAdd  = (e: Event) => {
+    const onAdd = (e: Event) => {
       const item = (e as CustomEvent<CartItem>).detail;
       if (!items.find(i => i.slug === item.slug && i.size === item.size)) {
         items = [...items, item];
-        save(); sync();
+        saveCart(items);
       }
       openCart();
     };
 
-    window.addEventListener('vh:open-cart',   openCart);
+    window.addEventListener('vh:open-cart', openCart);
     window.addEventListener('vh:add-to-cart', onAdd);
     return () => {
-      window.removeEventListener('vh:open-cart',   openCart);
+      window.removeEventListener('vh:open-cart', openCart);
       window.removeEventListener('vh:add-to-cart', onAdd);
     };
-  });
-
-  const slideIn = (_node: Element) => ({
-    duration: 400, easing: cubicOut, // --duration-slow
-    css: (t: number) => `transform:translateX(${(1 - t) * 100}%)`,
-  });
-
-  const dur = { fade: 300 };
-  $effect(() => {
-    const root = getComputedStyle(document.documentElement);
-    dur.fade = parseFloat(root.getPropertyValue('--duration-base')) * 1000;
   });
 </script>
 
@@ -207,7 +172,7 @@
   .item-img-wrap { aspect-ratio: 3/4; overflow: hidden; background: var(--color-off); }
   .item-img {
     width: 100%; height: 100%;
-    object-fit: cover; object-position: center top;
+    object-fit: cover; object-position: center;
     transition: opacity var(--duration-base);
   }
   .item-img-link:hover .item-img { opacity: var(--opacity-hover); }

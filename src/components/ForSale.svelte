@@ -2,33 +2,28 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
-  import { lockScroll, unlockScroll } from '../lib/scrollLock';
-  import { trapFocus } from '../lib/focusTrap';
+  import { createModal, panelIn } from '../lib/modal';
   import { SITE } from '../data/site';
 
   const STORAGE_KEY = 'vh-forsale-dismissed';
+  const modal = createModal();
 
-  let open      = $state(false);
-  let dismissed = $state(true); // hidden until mounted to avoid flash
-  let prevFocus = $state<HTMLElement | null>(null);
+  let open = $state(false);
+  let dismissed = $state(true);
 
   onMount(() => {
     dismissed = sessionStorage.getItem(STORAGE_KEY) === '1';
   });
 
   function openModal() {
-    prevFocus = document.activeElement as HTMLElement;
     open = true;
-    lockScroll();
-    requestAnimationFrame(() => {
-      document.getElementById('fs-panel')?.focus();
-    });
+    modal.open();
+    requestAnimationFrame(() => document.getElementById('fs-panel')?.focus());
   }
 
   function closeModal() {
     open = false;
-    unlockScroll();
-    prevFocus?.focus();
+    modal.close();
   }
 
   function dismiss() {
@@ -37,19 +32,22 @@
     if (open) closeModal();
   }
 
-  const panelIn = (_node: Element) => ({
-    duration: 400, easing: cubicOut, // --duration-slow
-    css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 1.5}rem) scale(${0.98 + t * 0.02})`,
-  });
+  function onKeydown(e: KeyboardEvent) {
+    if (open && e.key === 'Escape') {
+      e.preventDefault();
+      closeModal();
+    }
+  }
 
   const stripIn = (_node: Element) => ({
-    duration: 300, easing: cubicOut, // --duration-base
+    duration: 300, easing: cubicOut,
     css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * 100}%)`,
   });
 </script>
 
+<svelte:window onkeydown={onKeydown} />
+
 {#if !dismissed}
-  <!-- Strip -->
   <div class="strip" in:stripIn>
     <button class="strip-trigger" onclick={openModal} aria-haspopup="dialog" aria-expanded={open}>
       <span class="dot" aria-hidden="true"></span>
@@ -75,13 +73,8 @@
     aria-modal="true"
     aria-labelledby="fs-title"
     tabindex="-1"
-    onkeydown={e => {
-      if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
-      const panel = document.getElementById('fs-panel');
-      if (panel) trapFocus(panel, e);
-    }}
-    in:panelIn
-    out:fade={{ duration: dur.out }}
+    in:panelIn={{ y: 1.5, scale: true }}
+    out:fade={{ duration: 200 }}
   >
     <div class="panel-head">
       <span class="label muted" id="fs-title">Available</span>

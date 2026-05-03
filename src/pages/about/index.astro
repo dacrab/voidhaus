@@ -1,20 +1,14 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { Picture } from 'astro:assets';
+import PageHeader from '../../components/PageHeader.astro';
+import CTAStrip from '../../components/CTAStrip.astro';
 import { SITE } from '../../data/site';
 import { IMAGES } from '../../assets/images';
 ---
 
 <Layout title="Manifesto" solidNav={true}>
-  <div class="ph wrap page-top-spacing">
-    <div class="ph-inner">
-      <div class="ph-left">
-        <span class="label muted" data-anim="hero" data-delay="0">Manifesto</span>
-        <h1 class="ph-title" data-anim="hero" data-delay="0.15">We reject the legible.</h1>
-      </div>
-    </div>
-    <div class="rule"></div>
-  </div>
+  <PageHeader label="Manifesto" title="We reject the legible." />
 
   <section class="statements wrap">
 
@@ -86,25 +80,17 @@ import { IMAGES } from '../../assets/images';
     </div>
   </section>
 
-  <div class="cta wrap" data-anim="scroll">
-    <div class="rule"></div>
-    <div class="cta-inner">
-      <span class="label op-35">Ready?</span>
-      <a href="/collection" class="label muted-link">View Collection →</a>
-    </div>
-    <div class="rule"></div>
-  </div>
+  <CTAStrip label="Ready?" linkText="View Collection" href="/collection" />
 </Layout>
 
 <script>
-import { reveal, lineReveal, gsap, DUR, EASE } from '../../lib/animate';
+import { reveal, lineReveal, onReady, gsap, DUR, EASE } from '../../lib/animate';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {
-  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
-    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-      reveal();
-      lineReveal('.ph .rule', 0.3);
+  onReady(() => {
+    reveal();
+    lineReveal('.ph .rule', 0.3);
       
       // Statement reveal
       document.querySelectorAll<HTMLElement>('[data-anim="statement"]').forEach(el => {
@@ -131,29 +117,13 @@ document.addEventListener('astro:page-load', () => {
           ),
         });
       }
-    })));
+  });
 });
 </script>
 
 <style>
-.ph-inner {
-  display: flex; align-items: flex-end;
-  justify-content: space-between;
-  padding-bottom: var(--space-lg); gap: var(--space-md);
-}
-
-.ph-left { display: flex; flex-direction: column; gap: var(--space-xs); }
-
-.ph-title {
-  font-family: var(--font-sans);
-  font-size: var(--text-display-md);
-  font-variation-settings: var(--font-weight-light);
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
 .statements { padding-bottom: var(--space-2xl); }
-@media (min-width: 768px) { .statements { padding-bottom: var(--section-gap-md); } }
+@media (min-width: 768px) { .statements { padding-bottom: var(--space-3xl); } }
 
 .stmt {
   display: grid;
@@ -178,10 +148,10 @@ document.addEventListener('astro:page-load', () => {
 }
 
 .stmt-p {
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   font-variation-settings: var(--font-weight-normal);
-  line-height: 1.9;
-  color: var(--color-soft);
+  line-height: 1.8;
+  color: var(--color-ink-soft);
 }
 
 .pull-quote {
@@ -207,7 +177,14 @@ document.addEventListener('astro:page-load', () => {
 }
 @media (min-width: 768px) { .atelier-img-wrap { height: 65svh; } }
 
-.atelier-img img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; }
+.atelier-img,
+.atelier-img picture {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.atelier-img img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
 .atelier-scrim { background: var(--scrim-dark-light); }
 
 .at-item {
@@ -227,10 +204,4 @@ document.addEventListener('astro:page-load', () => {
   color: var(--color-ink);
 }
 
-/* ── CTA Strip ─────────────────────────────────────────────────────────── */
-.cta { padding-block: var(--space-lg) var(--space-3xl); }
-.cta-inner {
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: var(--space-sm); padding-block: var(--space-lg);
-}
 </style>

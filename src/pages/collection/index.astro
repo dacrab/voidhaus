@@ -36,39 +36,36 @@ import { SITE } from '../../data/site';
 </Layout>
 
 <script>
-import { cardsCascade, lineReveal, reveal, gsap } from '../../lib/animate';
+import { cardsCascade, lineReveal, reveal, gsap, DUR, onReady } from '../../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
-  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
-    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-      reveal();
-      lineReveal('.coll-top .rule', 0.3);
-      cardsCascade('.pc');
+  onReady(() => {
+    reveal();
+    lineReveal('.coll-top .rule', 0.3);
+    cardsCascade('.pc');
 
-      const cards = document.querySelectorAll<HTMLElement>('.pc');
-      const btns = document.querySelectorAll<HTMLElement>('.filter-btn');
-      
-      btns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          btns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const f = btn.dataset.filter;
-          cards.forEach(card => {
-            const show = f === 'All' || card.dataset.category === f;
-            gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: DUR.base, ease: 'power2.out' });
-          });
+    const cards = document.querySelectorAll<HTMLElement>('.pc');
+    const btns = document.querySelectorAll<HTMLElement>('.filter-btn');
+    
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.dataset.filter;
+        cards.forEach(card => {
+          const show = f === 'All' || card.dataset.category === f;
+          gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: DUR.base, ease: 'power2.out' });
         });
       });
-    })));
+    });
+  });
 });
 </script>
 
 <style>
 /* Extra top padding accounts for the fixed nav height */
-.coll-top {
-  padding-top: calc(var(--nav-h) + var(--space-2xl));
-}
-@media (min-width: 768px) { .coll-top { padding-top: calc(var(--nav-h) + var(--section-gap-md)); } }
+.coll-top { padding-top: calc(var(--nav-h) + var(--space-2xl)); }
+@media (min-width: 768px) { .coll-top { padding-top: calc(var(--nav-h) + var(--space-3xl)); } }
 
 .coll-top-inner {
   display: flex;
