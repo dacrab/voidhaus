@@ -146,25 +146,25 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
 </html>
 
 <style>
-  .site-footer { border-top: 1px solid var(--color-rule); margin-top: 5rem; }
+  .site-footer { border-top: 1px solid var(--color-rule); margin-top: var(--section-gap-md); }
 
-  .newsletter { padding-block: 3rem; border-bottom: 1px solid var(--color-rule); }
-  .nl-inner   { display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
-  .nl-left    { display: flex; flex-direction: column; gap: 0.4rem; }
-  .nl-text    { font-size: 0.8125rem; font-variation-settings: 'wght' 300; color: var(--color-soft); max-width: 32ch; }
+  .newsletter { padding-block: var(--space-2xl); border-bottom: 1px solid var(--color-rule); }
+  .nl-inner   { display: flex; align-items: center; justify-content: space-between; gap: var(--space-xl); flex-wrap: wrap; }
+  .nl-left    { display: flex; flex-direction: column; gap: var(--space-xs); }
+  .nl-text    { font-size: var(--text-sm); font-variation-settings: var(--font-weight-normal); color: var(--color-soft); max-width: 32ch; }
   .nl-form    { display: flex; border: 1px solid var(--color-rule); flex-shrink: 0; }
   .nl-input {
     background: none; border: none;
     color: var(--color-ink); font-family: var(--font-sans);
-    font-variation-settings: 'wght' 300;
+    font-variation-settings: var(--font-weight-normal);
     font-size: max(16px, 0.8125rem);
-    padding: 0.75rem 1rem; outline: none; width: 220px;
+    padding: var(--space-sm) var(--space-md); outline: none; width: 220px;
   }
   .nl-input::placeholder { color: var(--color-mid); }
   .nl-btn {
     background: none; border: none; border-left: 1px solid var(--color-rule);
-    color: var(--color-ink); opacity: 0.5; padding: 0.75rem 1rem;
-    white-space: nowrap; transition: opacity 0.2s, background 0.2s;
+    color: var(--color-ink); opacity: var(--opacity-secondary); padding: var(--space-sm) var(--space-md);
+    white-space: nowrap; transition: opacity var(--duration-fast), background var(--duration-fast);
   }
   .nl-btn:hover, .nl-btn.subscribed { opacity: 1; background: var(--color-off); }
   @media (max-width: 640px) { .nl-form { width: 100%; } .nl-input { flex: 1; width: auto; } }
@@ -172,9 +172,9 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   .footer-bottom { padding-block: 1.5rem 2rem; }
   .footer-inner {
     display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 0.75rem; padding-top: 1.5rem;
+    flex-wrap: wrap; gap: var(--space-sm); padding-top: var(--space-lg);
   }
-  .footer-links  { display: flex; gap: 1.5rem; align-items: center; }
+  .footer-links  { display: flex; gap: var(--space-lg); align-items: center; }
   .footer-cities { display: none; }
   @media (min-width: 640px) { .footer-cities { display: block; } }
 </style>

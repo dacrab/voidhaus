@@ -12,8 +12,4 @@ export const IMAGES: Record<string, ImageMetadata> = Object.fromEntries(
   ]),
 );
 
-export function getImage(key: string): ImageMetadata {
-  const img = IMAGES[key];
-  if (!img) throw new Error(`[images] not found: "${key}". Available: ${Object.keys(IMAGES).join(', ')}`);
-  return img;
-}
+

@@ -1,9 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { Picture } from 'astro:assets';
-import PageHeader from '../../components/PageHeader.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import CtaStrip from '../../components/CtaStrip.astro';
 import { PRODUCTS } from '../../data/products';
 import { SITE } from '../../data/site';
 import { IMAGES } from '../../assets/images';
@@ -37,7 +35,16 @@ const spreads = [
 ---
 
 <Layout title="Lookbook" solidNav={true}>
-  <PageHeader label={SITE.season} title="Lookbook" aside="Three chapters" />
+  <div class="ph wrap page-top-spacing">
+    <div class="ph-inner">
+      <div class="ph-left">
+        <span class="label muted" data-anim="hero" data-delay="0">{SITE.season}</span>
+        <h1 class="ph-title" data-anim="hero" data-delay="0.15">Lookbook</h1>
+      </div>
+      <span class="label muted ph-aside" data-anim="hero" data-delay="0.25">Three chapters</span>
+    </div>
+    <div class="rule"></div>
+  </div>
 
   {spreads.map((s, si) => (
     <section class="spread" id={`chapter-${s.issue}`}>
@@ -74,19 +81,63 @@ const spreads = [
     </section>
   ))}
 
-  <CtaStrip label={`${SITE.season} — All pieces`} href="/collection" cta="View Collection →" />
+  <div class="cta wrap" data-anim="scroll">
+    <div class="rule"></div>
+    <div class="cta-inner">
+      <span class="label op-35">{SITE.season} — All pieces</span>
+      <a href="/collection" class="label muted-link">View Collection →</a>
+    </div>
+    <div class="rule"></div>
+  </div>
 </Layout>
 
 <script>
-import { onPageLoad, pageReveal, chapterParallax } from '../../lib/animate';
+import { reveal, lineReveal, gsap } from '../../lib/animate';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-onPageLoad(() => {
-  pageReveal(0.35);
-  chapterParallax();
+document.addEventListener('astro:page-load', () => {
+  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
+    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      reveal();
+      lineReveal('.ph .rule', 0.35);
+      
+      // Chapter parallax
+      document.querySelectorAll<HTMLElement>('.spread-hero').forEach(hero => {
+        const img = hero.querySelector<HTMLElement>('.spread-img');
+        const cap = hero.querySelector<HTMLElement>('.spread-cap');
+        if (!img) return;
+        gsap.set(img, { scale: 1.16 });
+        ScrollTrigger.create({
+          trigger: hero, start: 'top bottom', end: 'bottom top', scrub: 1.8,
+          onUpdate: st => {
+            gsap.set(img, { yPercent: -14 * st.progress });
+            if (cap) gsap.set(cap, { yPercent: 4 * st.progress });
+          },
+        });
+      });
+    })));
 });
 </script>
 
 <style>
+.ph-inner {
+  display: flex; align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: var(--space-lg); gap: var(--space-md);
+}
+
+.ph-left { display: flex; flex-direction: column; gap: var(--space-xs); }
+
+.ph-title {
+  font-family: var(--font-sans);
+  font-size: var(--text-display-md);
+  font-variation-settings: var(--font-weight-light);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.ph-aside { align-self: flex-end; padding-bottom: 0.3rem; }
+
 .spread-hero {
   position: relative;
   height: 85svh; min-height: 440px;
@@ -101,7 +152,7 @@ onPageLoad(() => {
 }
 
 .spread-scrim {
-  background: linear-gradient(to bottom, transparent 40%, rgb(28 27 25 / 0.72) 100%);
+  background: linear-gradient(to bottom, transparent 40%, var(--scrim-dark-heavy) 100%);
 }
 
 .spread-cap {
@@ -110,23 +161,30 @@ onPageLoad(() => {
   inset-inline: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-sm);
 }
 @media (min-width: 768px) { .spread-cap { inset-block-end: 4.5rem; } }
 
-.spread-issue { color: rgb(255 255 255 / 0.4); }
+.spread-issue { color: var(--overlay-text-muted); }
 
 .spread-title {
   font-size: clamp(3rem, 10vw, 8rem);
   font-style: italic;
-  font-variation-settings: 'wght' 400;
+  font-variation-settings: var(--font-weight-medium);
   letter-spacing: -0.03em;
   line-height: 0.95;
-  color: rgb(255 255 255 / 0.92);
+  color: var(--overlay-text-primary);
 }
 
-.spread-sub { color: rgb(255 255 255 / 0.4); }
+.spread-sub { color: var(--overlay-text-muted); }
 
 .spread-gap { padding-block: 5rem; }
 @media (min-width: 768px) { .spread-gap { padding-block: 7rem; } }
+
+/* ── CTA Strip ─────────────────────────────────────────────────────────── */
+.cta { padding-block: var(--space-lg) var(--space-3xl); }
+.cta-inner {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: var(--space-sm); padding-block: var(--space-lg);
+}
 </style>

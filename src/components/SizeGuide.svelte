@@ -26,7 +26,7 @@
 
 
   const panelIn = (_node: Element) => ({
-    duration: 360, easing: cubicOut,
+    duration: 400, easing: cubicOut, // --duration-slow
     css: (t: number) => `opacity:${t};transform:translateY(${(1 - t) * 0.75}rem) scale(${0.98 + t * 0.02})`,
   });
 </script>
@@ -43,7 +43,7 @@
     class="backdrop sg-backdrop"
     role="presentation"
     onclick={() => (open = false)}
-    transition:fade={{ duration: 240 }}
+    transition:fade={{ duration: 300 }}
   ></div>
 
   <div
@@ -57,7 +57,7 @@
       trapFocus(e.currentTarget as HTMLElement, e);
     }}
     in:panelIn
-    out:fade={{ duration: 180 }}
+    out:fade={{ duration: 200 }}
   >
     <div class="sg-head">
       <h2 class="label sg-title" id="sg-title">Size Guide</h2>
@@ -118,18 +118,18 @@
 {/if}
 
 <style>
-  .sg-backdrop { --backdrop-z: 500; background: rgb(28 27 25 / 0.45); }
+  .sg-backdrop { --backdrop-z: 500; background: var(--backdrop-modal); }
 
   .sg-btn {
     background: none; border: none;
     border-bottom: 1px solid var(--color-rule);
     padding-bottom: 0.1rem;
-    transition: opacity 0.2s, border-color 0.2s;
+    transition: opacity var(--duration-fast), border-color var(--duration-fast);
   }
-  .sg-btn:hover { opacity: 1 !important; border-bottom-color: var(--color-ink); }
+  .sg-btn:hover { opacity: 1; border-bottom-color: var(--color-ink); }
 
   .sg-panel {
-    position: fixed; inset-inline: 1rem; top: 50%; translate: 0 -50%;
+    position: fixed; inset-inline: var(--space-md); top: 50%; translate: 0 -50%;
     max-width: 720px; margin-inline: auto;
     background: var(--color-white);
     z-index: 501;
@@ -137,45 +137,45 @@
     max-height: 85svh;
     border: 1px solid var(--color-rule);
   }
-  @media (min-width: 640px) { .sg-panel { inset-inline: 2rem; } }
+  @media (min-width: var(--breakpoint-sm)) { .sg-panel { inset-inline: var(--space-xl); } }
 
   .sg-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1.25rem 1.5rem 1rem; flex-shrink: 0;
+    padding: 1.25rem var(--space-lg) var(--space-md); flex-shrink: 0;
   }
   .sg-title { color: var(--color-ink); }
 
   .sg-body {
-    overflow-y: auto; padding: 1.5rem;
-    display: flex; flex-direction: column; gap: 2rem; flex: 1;
+    overflow-y: auto; padding: var(--space-lg);
+    display: flex; flex-direction: column; gap: var(--space-xl); flex: 1;
   }
 
   .sg-note {
-    font-size: 0.8125rem; font-variation-settings: 'wght' 300;
+    font-size: var(--text-sm); font-variation-settings: var(--font-weight-normal);
     line-height: 1.7; color: var(--color-soft);
   }
 
-  .sg-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; border: 1px solid var(--color-rule); }
+  .sg-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); border: 1px solid var(--color-rule); }
   .sg-table th {
-    text-align: left; padding: 0.75rem 1rem;
+    text-align: left; padding: var(--space-sm) var(--space-md);
     border-bottom: 1px solid var(--color-rule);
-    background: var(--color-off); font-size: 0.575rem; opacity: 0.5;
+    background: var(--color-off); font-size: var(--text-xs); opacity: var(--opacity-muted);
   }
   .sg-table td {
-    padding: 0.875rem 1rem; border-bottom: 1px solid var(--color-rule);
-    font-variation-settings: 'wght' 300; color: var(--color-soft);
+    padding: 0.875rem var(--space-md); border-bottom: 1px solid var(--color-rule);
+    font-variation-settings: var(--font-weight-normal); color: var(--color-soft);
   }
   .sg-table tr:last-child td { border-bottom: none; }
   .sg-table tr:hover td { background: var(--color-off); }
-  .td-main { font-variation-settings: 'wght' 400 !important; color: var(--color-ink) !important; }
+  .td-main { font-variation-settings: var(--font-weight-medium); color: var(--color-ink); }
 
   .sg-note-block {
-    display: flex; flex-direction: column; gap: 0.75rem;
-    padding-top: 1rem; border-top: 1px solid var(--color-rule);
+    display: flex; flex-direction: column; gap: var(--space-sm);
+    padding-top: var(--space-md); border-top: 1px solid var(--color-rule);
   }
   .sg-link {
     color: var(--color-ink); border-bottom: 1px solid var(--color-rule);
-    transition: border-color 0.2s;
+    transition: border-color var(--duration-fast);
   }
   .sg-link:hover { border-bottom-color: var(--color-ink); }
 </style>

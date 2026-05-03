@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { Picture } from 'astro:assets';
-import { PRODUCTS, SHARED_DETAILS, formatPrice } from '../../data/products';
+import { PRODUCTS, SHARED_DETAILS } from '../../data/products';
 import SizeGuide from '../../components/SizeGuide.svelte';
 import { IMAGES } from '../../assets/images';
 
@@ -94,14 +94,14 @@ const next = PRODUCTS[idx + 1] ?? null;
 
       <div class="cta-block" data-anim="scroll">
         <div class="price-row">
-          <span class="product-price serif">€ {formatPrice(p.price)}</span>
+          <span class="product-price serif">€ {p.price.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
           <span class="label muted">Incl. VAT</span>
         </div>
         <button
           class="add-btn"
           id="js-add"
           type="button"
-          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: formatPrice(p.price), img: IMAGES[p.img].src, num: p.num })}
+          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price.toLocaleString('en-US', { minimumFractionDigits: 0 }), img: IMAGES[p.img].src, num: p.num })}
         >
           <span class="label add-text">Add to Selection</span>
         </button>
@@ -125,47 +125,65 @@ const next = PRODUCTS[idx + 1] ?? null;
 </Layout>
 
 <script>
-import { onPageLoad, imageEntrance, DUR, EASE } from '../../lib/animate';
-import { initToggleGroup } from '../../lib/toggle';
-import gsap from 'gsap';
+import { DUR, EASE, gsap } from '../../lib/animate';
 
-onPageLoad(() => {
-  // Image entrance (morph-aware) + info panel orchestrated together
-  imageEntrance('.js-main-img');
+document.addEventListener('astro:page-load', () => {
+  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
+    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+      // Image entrance (morph-aware)
+      const el = document.querySelector<HTMLElement>('.js-main-img');
+      const morphed = document.documentElement.hasAttribute('data-astro-transition');
+      if (el) {
+        if (morphed) {
+          gsap.set(el, { opacity: 1, scale: 1 });
+        } else {
+          gsap.fromTo(el,
+            { opacity: 0, scale: 1.05 },
+            { opacity: 1, scale: 1, duration: DUR.lg + 0.2, ease: 'power3.out' },
+          );
+        }
+      }
 
-  // Info panel starts after image begins settling (delay 0.3s matches image at ~30% through)
-  gsap.fromTo(
-    ['.product-name', '.product-desc', '.details', '.sizes', '.cta-block']
-      .map(s => document.querySelector(s)).filter(Boolean),
-    { opacity: 0, y: 18 },
-    { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.08, delay: 0.3, clearProps: 'will-change' },
-  );
+      // Info panel starts after image begins settling (delay 0.3s matches image at ~30% through)
+      gsap.fromTo(
+        ['.product-name', '.product-desc', '.details', '.sizes', '.cta-block']
+          .map(s => document.querySelector(s)).filter(Boolean),
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.08, delay: 0.3, clearProps: 'will-change' },
+      );
 
-  const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
-  initToggleGroup('.sz-btn', btn => {
-    szBtns.forEach(b => b.setAttribute('aria-pressed', 'false'));
-    btn.setAttribute('aria-pressed', 'true');
-  });
+      const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
+      szBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          szBtns.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-pressed', 'false');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-pressed', 'true');
+        });
+      });
 
-  const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
-  const addText = addBtn?.querySelector<HTMLElement>('.add-text');
+      const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
+      const addText = addBtn?.querySelector<HTMLElement>('.add-text');
 
-  addBtn?.addEventListener('click', () => {
-    if (!addText) return;
-    const size = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
-    if (!size) { addBtn.setAttribute('aria-label', 'Please select a size'); return; }
-    let product: Record<string, string>;
-    try { product = JSON.parse(addBtn.dataset.product ?? '{}'); }
-    catch { return; }
-    window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
-    gsap.timeline()
-      .to(addText,  { opacity: 0, duration: 0.13, ease: 'power2.in' })
-      .set(addText, { textContent: 'Added ✓' })
-      .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' })
-      .to(addText,  { opacity: 0, duration: 0.13, delay: 1.6, ease: 'power2.in' })
-      .set(addText, { textContent: 'Add to Selection' })
-      .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' });
-  });
+      addBtn?.addEventListener('click', () => {
+        if (!addText) return;
+        const size = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
+        if (!size) { addBtn.setAttribute('aria-label', 'Please select a size'); return; }
+        let product: Record<string, string>;
+        try { product = JSON.parse(addBtn.dataset.product ?? '{}'); }
+        catch { return; }
+        window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
+        gsap.timeline()
+          .to(addText,  { opacity: 0, duration: 0.13, ease: 'power2.in' })
+          .set(addText, { textContent: 'Added ✓' })
+          .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' })
+          .to(addText,  { opacity: 0, duration: 0.13, delay: 1.6, ease: 'power2.in' })
+          .set(addText, { textContent: 'Add to Selection' })
+          .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' });
+      });
+    })));
 });
 </script>
 
@@ -224,14 +242,14 @@ onPageLoad(() => {
 
 /* Info */
 .product-info {
-  padding: 2.5rem 1.5rem 5rem;
+  padding: var(--space-xl) var(--space-lg) var(--section-gap-md);
   display: flex;
   flex-direction: column;
-  gap: 2.25rem;
+  gap: var(--space-xl);
 }
 @media (min-width: 768px) {
   .product-info {
-    padding: 4rem 4rem 5rem;
+    padding: var(--space-3xl) var(--space-3xl) var(--section-gap-md);
     position: sticky;
     top: var(--nav-h);
     height: calc(100svh - var(--nav-h));
@@ -241,7 +259,7 @@ onPageLoad(() => {
   }
   .product-info::-webkit-scrollbar { display: none; }
 }
-@media (min-width: 1280px) { .product-info { padding: 4rem 6rem 5rem; } }
+@media (min-width: 1280px) { .product-info { padding: var(--space-3xl) var(--space-4xl) var(--section-gap-md); } }
 
 .info-top {
   display: flex;
@@ -252,15 +270,15 @@ onPageLoad(() => {
 .product-name {
   font-family: var(--font-sans);
   font-size: clamp(1.75rem, 4.5vw, 3.25rem);
-  font-variation-settings: 'wght' 300;
+  font-variation-settings: var(--font-weight-normal);
   letter-spacing: -0.03em;
   line-height: 1.05;
   color: var(--color-ink);
 }
 
 .product-desc {
-  font-size: 0.875rem;
-  font-variation-settings: 'wght' 300;
+  font-size: var(--text-base);
+  font-variation-settings: var(--font-weight-normal);
   line-height: 1.85;
   color: var(--color-soft);
   max-width: 36ch;
@@ -273,10 +291,10 @@ onPageLoad(() => {
   align-items: center;
   padding-block: 0.875rem;
   border-bottom: 1px solid var(--color-rule);
-  gap: 1rem;
+  gap: var(--space-md);
 }
-.detail-key { opacity: 0.4; flex-shrink: 0; }
-.detail-val { color: var(--color-ink-soft); text-align: right; text-transform: none; letter-spacing: 0.02em; }
+.detail-key { opacity: var(--opacity-muted); flex-shrink: 0; }
+.detail-val { color: var(--color-ink-soft); text-align: right; text-transform: none; letter-spacing: var(--letter-spacing-normal); }
 
 .sizes { display: flex; flex-direction: column; gap: 0.875rem; }
 .sizes-header {
@@ -284,20 +302,20 @@ onPageLoad(() => {
   align-items: center;
   justify-content: space-between;
 }
-.sizes-lbl { opacity: 0.4; }
+.sizes-lbl { opacity: var(--opacity-muted); }
 .size-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
 .sz-btn {
   background: none;
   border: 1px solid var(--color-rule);
   color: var(--color-soft);
-  padding: 0.5rem 0.875rem;
-  transition: border-color 0.2s, color 0.2s;
+  padding: var(--space-xs) 0.875rem;
+  transition: border-color var(--duration-fast), color var(--duration-fast);
 }
 .sz-btn:hover  { border-color: var(--color-mid); color: var(--color-ink); }
 .sz-btn.active { border-color: var(--color-ink); color: var(--color-ink); }
 
-.cta-block { display: flex; flex-direction: column; gap: 1rem; }
+.cta-block { display: flex; flex-direction: column; gap: var(--space-md); }
 
 .price-row {
   display: flex;
@@ -310,7 +328,7 @@ onPageLoad(() => {
 .product-price {
   font-size: 1.75rem;
   font-style: italic;
-  font-variation-settings: 'wght' 400;
+  font-variation-settings: var(--font-weight-medium);
   letter-spacing: -0.01em;
   color: var(--color-ink);
 }
@@ -320,22 +338,25 @@ onPageLoad(() => {
   background: var(--color-ink);
   border: none;
   padding: 1.125rem 1.5rem;
-  transition: background 0.2s;
+  transition: background var(--duration-fast);
 }
 .add-btn:hover { background: var(--color-ink-soft); }
 .add-text {
   color: var(--color-white);
-  letter-spacing: 0.2em;
+  letter-spacing: var(--letter-spacing-button);
   display: block;
   text-align: center;
 }
 
-.ship-note { opacity: 0.35; display: block; text-align: center; }
+.ship-note { opacity: var(--opacity-disabled); display: block; text-align: center; }
 
 .p-nav { padding-block: 2.5rem; }
 .p-nav-inner {
   display: flex;
   justify-content: space-between;
   padding-block: 1.5rem;
+}
+</style>
+em;
 }
 </style>
