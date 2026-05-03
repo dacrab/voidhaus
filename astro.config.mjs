@@ -21,7 +21,9 @@ export default defineConfig({
   },
 
   image: {
-    service: { entrypoint: 'astro/assets/services/sharp' },
+    service: import.meta.env.DEV 
+      ? { entrypoint: 'astro/assets/services/noop' }
+      : { entrypoint: 'astro/assets/services/sharp' },
   },
 
   fonts: [

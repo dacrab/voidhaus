@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { SITE } from '../../data/site';
 
 const subjects = ['General', 'Order', 'Press', 'Stockist'] as const;
@@ -13,15 +14,7 @@ const info = [
 ---
 
 <Layout title="Contact" solidNav={true}>
-  <div class="ph wrap page-top-spacing">
-    <div class="ph-inner">
-      <div class="ph-left">
-        <span class="label muted" data-anim="hero" data-delay="0">Contact</span>
-        <h1 class="ph-title" data-anim="hero" data-delay="0.15">Let's speak.</h1>
-      </div>
-    </div>
-    <div class="rule"></div>
-  </div>
+  <PageHeader label="Contact" title="Let's speak." />
 
   <div class="contact-body wrap">
 
@@ -84,72 +77,46 @@ const info = [
 </Layout>
 
 <script>
-import { reveal, lineReveal, gsap, DUR, EASE } from '../../lib/animate';
+import { reveal, lineReveal, gsap, DUR, EASE, onReady } from '../../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
-  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
-    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-      reveal();
-      lineReveal('.ph .rule', 0.3);
-      
-      // Sequence reveal
-      [
-        { selector: '.contact-form', delay: 0.2, y: 20 },
-        { selector: '.contact-info', delay: 0.35, y: 16 },
-      ].forEach(({ selector, delay, y }) => {
-        const el = document.querySelector<HTMLElement>(selector);
-        if (el) {
-          gsap.fromTo(el,
-            { opacity: 0, y },
-            { opacity: 1, y: 0, duration: DUR.slower, ease: EASE.expo, delay, clearProps: 'will-change' },
-          );
-        }
-      });
-  
-      const chips = document.querySelectorAll<HTMLElement>('.chip');
-      chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-          chips.forEach(c => c.classList.remove('active'));
-          chip.classList.add('active');
-          const subject = document.getElementById('js-subject') as HTMLInputElement | null;
-          if (subject) subject.value = chip.dataset.subject ?? '';
-        });
-      });
+  onReady(() => {
+    reveal();
+    lineReveal('.ph .rule', 0.3);
+    
+    const form = document.querySelector<HTMLElement>('.contact-form');
+    const info = document.querySelector<HTMLElement>('.contact-info');
+    if (form) gsap.fromTo(form, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: DUR.slower, ease: EASE.expo, delay: 0.2 });
+    if (info) gsap.fromTo(info, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: DUR.slower, ease: EASE.expo, delay: 0.35 });
 
-      document.getElementById('js-form')?.addEventListener('submit', e => {
-        e.preventDefault();
-        const form  = e.target as HTMLFormElement;
-        const name  = form.querySelector<HTMLInputElement>('#name');
-        const email = form.querySelector<HTMLInputElement>('#email');
-        if (!name?.value.trim() || !email?.value.includes('@')) return;
-        const text = document.querySelector<HTMLElement>('.submit-text');
-        if (!text) return;
-        gsap.timeline()
-          .to('#js-submit', { opacity: 'var(--opacity-secondary)', duration: DUR.instant, ease: 'power2.in' })
-          .set(text, { textContent: 'Sent ✓' })
-          .to('#js-submit', { opacity: 1, duration: DUR.fast, ease: 'power2.out' });
+    const chips = document.querySelectorAll<HTMLElement>('.chip');
+    const subject = document.getElementById('js-subject') as HTMLInputElement | null;
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        if (subject) subject.value = chip.dataset.subject ?? '';
       });
-    })));
+    });
+
+    document.getElementById('js-form')?.addEventListener('submit', e => {
+      e.preventDefault();
+      const form = e.target as HTMLFormElement;
+      const name = form.querySelector<HTMLInputElement>('#name');
+      const email = form.querySelector<HTMLInputElement>('#email');
+      if (!name?.value.trim() || !email?.value.includes('@')) return;
+      const text = document.querySelector<HTMLElement>('.submit-text');
+      if (!text) return;
+      gsap.timeline()
+        .to('#js-submit', { opacity: 'var(--opacity-secondary)', duration: 0.13, ease: 'power2.in' })
+        .set(text, { textContent: 'Sent ✓' })
+        .to('#js-submit', { opacity: 1, duration: 0.2, ease: 'power2.out' });
+    });
+  });
 });
 </script>
 
 <style>
-.ph-inner {
-  display: flex; align-items: flex-end;
-  justify-content: space-between;
-  padding-bottom: var(--space-lg); gap: var(--space-md);
-}
-
-.ph-left { display: flex; flex-direction: column; gap: var(--space-xs); }
-
-.ph-title {
-  font-family: var(--font-sans);
-  font-size: var(--text-display-md);
-  font-variation-settings: var(--font-weight-light);
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
 .contact-body {
   display: grid;
   grid-template-columns: 1fr;
@@ -157,7 +124,7 @@ document.addEventListener('astro:page-load', () => {
   padding-bottom: var(--space-4xl);
 }
 @media (min-width: 900px) {
-  .contact-body { grid-template-columns: 1fr 300px; gap: var(--section-gap-lg); align-items: start; }
+  .contact-body { grid-template-columns: 1fr 300px; gap: var(--space-4xl); align-items: start; }
 }
 @media (min-width: 1280px) { .contact-body { grid-template-columns: 1fr 340px; } }
 
@@ -214,7 +181,5 @@ document.addEventListener('astro:page-load', () => {
 .info-val {
   font-size: var(--text-sm); font-variation-settings: var(--font-weight-normal);
   color: var(--color-ink-soft); line-height: 1.6;
-}
-</style>
 }
 </style>

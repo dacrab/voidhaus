@@ -96,28 +96,26 @@ const totalStores = STOCKISTS.reduce((t, r) => t + r.stores.length, 0);
 </Layout>
 
 <script>
-import { reveal, lineReveal, gsap, DUR, EASE } from '../../lib/animate';
+import { reveal, lineReveal, gsap, DUR, EASE, onReady } from '../../lib/animate';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {
-  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
-    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-      reveal();
-      lineReveal('.ph .rule', 0.3);
-      
-      // Stagger reveal
-      const els  = document.querySelectorAll<HTMLElement>('.store');
-      const trig = document.querySelector<HTMLElement>('.stores-grid');
-      if (els.length && trig) {
-        ScrollTrigger.create({
-          trigger: trig, start: 'top 88%', once: true,
-          onEnter: () => gsap.fromTo(els,
-            { opacity: 0, y: 24 },
-            { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.06, clearProps: 'will-change' },
-          ),
-        });
-      }
-    })));
+  onReady(() => {
+    reveal();
+    lineReveal('.ph .rule', 0.3);
+    
+    const els = document.querySelectorAll<HTMLElement>('.store');
+    const trig = document.querySelector<HTMLElement>('.stores-grid');
+    if (els.length && trig) {
+      ScrollTrigger.create({
+        trigger: trig, start: 'top 88%', once: true,
+        onEnter: () => gsap.fromTo(els,
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.06 },
+        ),
+      });
+    }
+  });
 });
 </script>
 
@@ -223,10 +221,4 @@ document.addEventListener('astro:page-load', () => {
     font-variation-settings: var(--font-weight-normal);
     color: var(--color-soft);
   }
-
-</style>
-s: var(--font-weight-normal);
-    color: var(--color-soft);
-  }
-
 </style>

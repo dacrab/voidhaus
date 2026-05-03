@@ -1,40 +1,35 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { cubicOut } from 'svelte/easing';
-  import { lockScroll, unlockScroll } from '../lib/scrollLock';
-  import { trapFocus } from '../lib/focusTrap';
+  import { createModal, panelIn } from '../lib/modal';
+  import { getCart } from '../lib/cart';
 
   interface Props { solidNav?: boolean; }
   let { solidNav = false }: Props = $props();
 
-  let path      = $state('');
-  let open      = $state(false);
+  const modal = createModal();
+
+  let path = $state('');
+  let open = $state(false);
   let cartCount = $state(0);
-  let scrolled  = $state(false);
-  let hidden    = $state(false);
+  let scrolled = $state(false);
+  let hidden = $state(false);
 
   const links = [
-    { href: '/collection', label: 'Collection' },
-    { href: '/lookbook',   label: 'Lookbook'   },
-    { href: '/about',      label: 'Manifesto'  },
-    { href: '/stockists',  label: 'Stockists'  },
-    { href: '/contact',    label: 'Contact'    },
+    { href: '/collection', label: 'Curated Collection' },
+    { href: '/lookbook', label: 'Lookbook' },
+    { href: '/about', label: 'Manifesto' },
+    { href: '/stockists', label: 'Stockists' },
+    { href: '/contact', label: 'Contact' },
   ];
 
   onMount(() => {
     path = window.location.pathname;
-    const onPageLoad = () => { path = window.location.pathname; };
-    document.addEventListener('astro:page-load', onPageLoad);
+    document.addEventListener('astro:page-load', () => {
+      path = window.location.pathname;
+    });
 
-    const syncCart = () => {
-      try {
-        const raw = localStorage.getItem('vh-cart');
-        cartCount = raw ? (JSON.parse(raw) as unknown[]).length : 0;
-      } catch {
-        cartCount = 0;
-      }
-    };
+    const syncCart = () => { cartCount = getCart().length; };
     syncCart();
     window.addEventListener('vh:cart-updated', syncCart);
 
@@ -43,36 +38,46 @@
     const onScroll = () => {
       const y = window.scrollY;
       scrolled = solidNav || y > 40;
-      hidden   = y > lastY && y > 120 && !open;
-      lastY    = y;
+      hidden = y > lastY && y > 120 && !open;
+      lastY = y;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-
-    return () => {
-      document.removeEventListener('astro:page-load', onPageLoad);
-      window.removeEventListener('vh:cart-updated', syncCart);
-      window.removeEventListener('scroll', onScroll);
-    };
   });
-
-  const isActive = (href: string) =>
-    href === '/' ? path === '/' : path.startsWith(href);
 
   function openCart() { window.dispatchEvent(new Event('vh:open-cart')); }
-  function toggleMenu() { if (open) { close(); } else { open = true; lockScroll(); } }
-  function close() { open = false; unlockScroll(); }
+  
+  function toggleMenu() {
+    if (open) {
+      open = false;
+      modal.close();
+    } else {
+      open = true;
+      modal.open();
+    }
+  }
 
-  const menuIn = (_node: Element) => ({
-    duration: 400, easing: cubicOut, // --duration-slow
-    css: (t: number) => `opacity:${t}; transform:translateY(${(1 - t) * -1.5}rem)`,
-  });
+  function handleNavClick() {
+    open = false;
+    modal.close();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function onKeydown(e: KeyboardEvent) {
+    if (open && e.key === 'Escape') {
+      open = false;
+      modal.close();
+    }
+  }
 </script>
+
+<svelte:window onkeydown={onKeydown} />
 
 <header class="nav" class:scrolled class:hidden class:open>
   <nav class="nav-l" aria-label="Primary navigation">
     {#each links.slice(0, 2) as { href, label }}
-      <a {href} class="nav-link label" class:active={isActive(href)}
-         aria-current={isActive(href) ? 'page' : undefined}>{label}</a>
+      {@const active = href === '/' ? path === '/' : path.startsWith(href)}
+      <a {href} class="nav-link label" class:active
+         aria-current={active ? 'page' : undefined}>{label}</a>
     {/each}
   </nav>
 
@@ -99,30 +104,26 @@
     aria-modal="true"
     aria-label="Navigation menu"
     tabindex="-1"
-    onkeydown={e => {
-      if (e.key === 'Escape') { close(); return; }
-      const menu = document.getElementById('nav-menu');
-      if (menu) trapFocus(menu, e);
-    }}
-    in:menuIn
+    in:panelIn
     out:fade={{ duration: 200 }}
   >
     <div class="menu-head">
-      <a href="/" class="nav-logo" onclick={close}>VOIDHAUS</a>
-      <button class="label ghost-btn" onclick={close} aria-label="Close menu">Close</button>
+      <a href="/" class="nav-logo" onclick={handleNavClick}>VOIDHAUS</a>
+      <button class="label ghost-btn" onclick={toggleMenu} aria-label="Close menu">Close</button>
     </div>
 
     <nav class="menu-links" aria-label="Mobile navigation">
       {#each links as { href, label }, i}
-        <a {href} class="menu-link serif" class:active={isActive(href)}
-           aria-current={isActive(href) ? 'page' : undefined}
-           style="--i:{i}" onclick={close}>{label}</a>
+        {@const active = href === '/' ? path === '/' : path.startsWith(href)}
+        <a {href} class="menu-link serif" class:active
+           aria-current={active ? 'page' : undefined}
+           style="--i:{i}" onclick={handleNavClick}>{label}</a>
       {/each}
     </nav>
 
     <div class="menu-foot">
       <span class="label op-35">SS 2026</span>
-      <button class="label ghost-btn" onclick={() => { close(); openCart(); }}>Selection →</button>
+      <button class="label ghost-btn" onclick={() => { toggleMenu(); openCart(); }}>Selection →</button>
     </div>
   </div>
 {/if}

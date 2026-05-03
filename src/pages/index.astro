@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { Picture } from 'astro:assets';
 import ProductCard from '../components/ProductCard.astro';
+import CTAStrip from '../components/CTAStrip.astro';
 import { PRODUCTS } from '../data/products';
 import { IMAGES } from '../assets/images';
 
@@ -11,20 +12,18 @@ const featured = PRODUCTS.slice(0, 4);
 <Layout>
 
   <section class="hero">
-    <div class="hero-media">
-      <Picture
-        class="hero-img js-hero-img"
-        src={IMAGES['hero']}
-        formats={['avif', 'webp']}
-        alt="VOIDHAUS SS 2026"
-        fetchpriority="high"
-        decoding="async"
-        width={1800}
-        transition:name="site-hero"
-      />
-      <div class="hero-scrim scrim"></div>
-    </div>
-    <div class="hero-body wrap">
+    <Picture
+      class="hero-img js-hero-img"
+      src={IMAGES['hero']}
+      formats={['avif', 'webp']}
+      alt="VOIDHAUS SS 2026"
+      fetchpriority="high"
+      decoding="async"
+      width={1800}
+      transition:name="site-hero"
+    />
+    <div class="hero-scrim"></div>
+    <div class="hero-content wrap">
       <span class="label hero-season js-hero-season">SS 2026</span>
       <h1 class="hero-title js-hero-title">VOIDHAUS</h1>
       <a href="/collection" class="label hero-cta js-hero-cta">
@@ -63,69 +62,70 @@ const featured = PRODUCTS.slice(0, 4);
     </div>
   </section>
 
-  <div class="cta wrap" data-anim="scroll">
-    <div class="rule"></div>
-    <div class="cta-inner">
-      <span class="label op-35">Press & Inquiries</span>
-      <a href="/contact" class="label muted-link">studio@voidhaus.com →</a>
-    </div>
-    <div class="rule"></div>
-  </div>
+  <CTAStrip label="Press & Inquiries" linkText="studio@voidhaus.com" href="/contact" />
 
 </Layout>
 
 <script>
-import { reveal, lineReveal, cardsCascade, gsap, DUR, EASE } from '../lib/animate';
+import { reveal, lineReveal, cardsCascade, onReady, gsap, DUR, EASE } from '../lib/animate';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {
-  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
-    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-      // Hero image parallax
+  onReady(() => {
+    const morphed = document.documentElement.hasAttribute('data-astro-transition');
+      
+      // Hero image - fade in with subtle scale and parallax
       const img = document.querySelector<HTMLElement>('.js-hero-img');
-      const morphed = document.documentElement.hasAttribute('data-astro-transition');
       if (img) {
         if (morphed) {
-          gsap.set(img, { opacity: 1, scale: 1.12 });
+          gsap.set(img, { opacity: 1, scale: 1.1 });
         } else {
           gsap.fromTo(img,
-            { opacity: 0, scale: 1.18 },
-            { opacity: 1, scale: 1.12, duration: DUR.hero + 0.4, ease: 'power3.out' },
+            { opacity: 0, scale: 1.15 },
+            { opacity: 1, scale: 1.1, duration: 1.4, ease: 'power3.out' },
           );
         }
         ScrollTrigger.create({
-          trigger: document.documentElement, start: 'top top', end: 'bottom top', scrub: 2,
-          onUpdate: st => gsap.set(img, { yPercent: -st.progress * 14 }),
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.5,
+          onUpdate: st => gsap.set(img, { yPercent: st.progress * -12 }),
         });
       }
 
-      // Hero text — tight orchestrated sequence, all from hidden
+      // Hero text - orchestrated sequence
       const season = document.querySelector<HTMLElement>('.js-hero-season');
-      const title  = document.querySelector<HTMLElement>('.js-hero-title');
-      const cta    = document.querySelector<HTMLElement>('.js-hero-cta');
+      const title = document.querySelector<HTMLElement>('.js-hero-title');
+      const cta = document.querySelector<HTMLElement>('.js-hero-cta');
 
-      gsap.set([season, title, cta], { opacity: 0 });
+      if (!morphed) {
+        gsap.set([season, title, cta], { opacity: 0 });
+        
+        const tl = gsap.timeline({ delay: 0.3 });
+        tl.fromTo(season,
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' },
+        )
+        .fromTo(title,
+          { opacity: 0, y: 40, skewY: 2 },
+          { opacity: 1, y: 0, skewY: 0, duration: 1.2, ease: 'expo.out', clearProps: 'skewY' },
+          '-=0.4',
+        )
+        .fromTo(cta,
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' },
+          '-=0.6',
+        );
+      }
 
-      const tl = gsap.timeline({ delay: 0.2 });
-      tl.fromTo(season,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: DUR.slower, ease: 'expo.out' },
-      )
-      .fromTo(title,
-        { opacity: 0, y: 36, skewY: 2 },
-        { opacity: 1, y: 0, skewY: 0, duration: DUR.hero, ease: 'expo.out', clearProps: 'skewY' },
-        '-=0.35',
-      )
-      .fromTo(cta,
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' },
-        '-=0.5',
-      );
-
-      reveal();
-      lineReveal('.products-head .rule', 0.1);
+      // Products section
+      lineReveal('.products-head .rule', 0.2);
       cardsCascade('.products .pc');
-    })));
+
+      // Scroll-triggered sections
+      reveal();
+  });
 });
 </script>
 
@@ -133,32 +133,45 @@ document.addEventListener('astro:page-load', () => {
 /* ── Hero ──────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
+  width: 100vw;
   height: 100svh;
   min-height: 560px;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  align-items: flex-end;
   overflow: hidden;
-  margin-block-start: 0;
 }
 
-.hero-media { position: absolute; inset: 0; overflow: hidden; }
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
 
+.hero-img picture,
 .hero-img img {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center 20%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
   display: block;
   transform-origin: center center;
 }
 
 .hero-scrim {
+  position: absolute;
+  inset: 0;
   background:
     linear-gradient(to bottom, transparent 40%, var(--scrim-dark-heavy) 100%),
     linear-gradient(to top, transparent 85%, var(--scrim-dark-light) 100%);
+  pointer-events: none;
 }
 
-.hero-body {
-  position: relative; z-index: 1;
+.hero-content {
+  position: relative;
+  z-index: 1;
   padding-bottom: var(--space-2xl);
   display: flex;
   flex-direction: column;
@@ -193,11 +206,11 @@ document.addEventListener('astro:page-load', () => {
   gap: var(--space-md);
 }
 
-/* Override grid to 4-col on desktop for home page featured strip */
+/* Override grid to 3-col on desktop for home page featured strip */
 .products .product-grid {
   grid-template-columns: repeat(2, 1fr);
 }
-@media (min-width: 768px) { .products .product-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 768px) { .products .product-grid { grid-template-columns: repeat(3, 1fr); } }
 
 /* ── Editorial ─────────────────────────────────────────────────────────── */
 .editorial {
@@ -207,7 +220,13 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 768px) { .editorial { height: 85svh; margin-block: 7rem; } }
 
 .ed-media { position: absolute; inset: 0; }
-.ed-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+.ed-img,
+.ed-img picture {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.ed-img img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
 .ed-scrim {
   background: linear-gradient(135deg, var(--scrim-dark-heavy) 0%, var(--scrim-dark-light) 60%, transparent 100%);
 }
@@ -215,7 +234,7 @@ document.addEventListener('astro:page-load', () => {
   position: absolute; inset-block-end: 3rem; inset-inline: 0;
   display: flex; flex-direction: column; gap: var(--space-lg);
 }
-@media (min-width: 768px) { .ed-text { inset-block-end: 4rem; max-width: 52%; } }
+@media (min-width: 768px) { .ed-text { inset-block-end: 4rem; max-width: 45%; inset-inline-start: 0; inset-inline-end: auto; } }
 
 .ed-quote {
   font-size: clamp(1.75rem, 5vw, 4rem);
@@ -226,12 +245,6 @@ document.addEventListener('astro:page-load', () => {
 .ed-link { color: var(--overlay-text-secondary); transition: color var(--duration-fast); }
 .ed-link:hover { color: #fff; }
 
-/* ── CTA Strip ─────────────────────────────────────────────────────────── */
-.cta { padding-block: var(--space-lg) var(--space-3xl); }
-.cta-inner {
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: var(--space-sm); padding-block: var(--space-lg);
-}
 
 </style>
 >

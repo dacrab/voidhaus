@@ -1,10 +1,10 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
-  import { cubicOut } from 'svelte/easing';
-  import { trapFocus } from '../lib/focusTrap';
+  import { createModal, panelIn } from '../lib/modal';
 
   let { category = 'Clothing' }: { category?: string } = $props();
 
+  const modal = createModal();
   let open = $state(false);
 
   const clothing = [
@@ -24,25 +24,32 @@
     { eu: '44', uk: '10',  us: '11',  cm: '28.0' },
   ];
 
+  function openModal() {
+    open = true;
+    modal.open();
+  }
 
-  const panelIn = (_node: Element) => ({
-    duration: 400, easing: cubicOut, // --duration-slow
-    css: (t: number) => `opacity:${t};transform:translateY(${(1 - t) * 0.75}rem) scale(${0.98 + t * 0.02})`,
-  });
+  function closeModal() {
+    open = false;
+    modal.close();
+  }
+
+  function onKeydown(e: KeyboardEvent) {
+    if (open && e.key === 'Escape') closeModal();
+  }
 </script>
 
-<button
-  class="sg-btn label muted"
-  onclick={() => open = true}
-  type="button"
-  aria-haspopup="dialog"
->Size Guide</button>
+<svelte:window onkeydown={onKeydown} />
+
+<button class="sg-btn label muted" onclick={openModal} type="button" aria-haspopup="dialog">
+  Size Guide
+</button>
 
 {#if open}
   <div
     class="backdrop sg-backdrop"
     role="presentation"
-    onclick={() => (open = false)}
+    onclick={closeModal}
     transition:fade={{ duration: 300 }}
   ></div>
 
@@ -52,16 +59,12 @@
     aria-modal="true"
     aria-labelledby="sg-title"
     tabindex="-1"
-    onkeydown={e => {
-      if (e.key === 'Escape') { open = false; return; }
-      trapFocus(e.currentTarget as HTMLElement, e);
-    }}
-    in:panelIn
+    in:panelIn={{ y: 0.75, scale: true }}
     out:fade={{ duration: 200 }}
   >
     <div class="sg-head">
       <h2 class="label sg-title" id="sg-title">Size Guide</h2>
-      <button class="label ghost-btn" onclick={() => (open = false)} aria-label="Close size guide">Close</button>
+      <button class="label ghost-btn" onclick={closeModal} aria-label="Close size guide">Close</button>
     </div>
     <div class="rule"></div>
 
