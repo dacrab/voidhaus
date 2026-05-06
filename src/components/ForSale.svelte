@@ -196,7 +196,7 @@
   .enquire-btn:hover { background: var(--color-ink-soft); }
 
   /* ── Desktop — float bottom-right ───────────────────────────────────── */
-  @media (min-width: var(--breakpoint-sm)) {
+  @media (min-width: 640px) {
     .panel {
       inset-block: auto var(--space-md);
       inset-inline: auto var(--space-lg);

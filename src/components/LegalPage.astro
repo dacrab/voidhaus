@@ -42,14 +42,10 @@ const { title, description, updated, sibling, sections } = Astro.props;
 </Layout>
 
 <script>
-import { reveal, lineReveal } from '../lib/animate';
+import { initPage, onReady } from '../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
-  Promise.race([document.fonts.ready, new Promise<void>(r => setTimeout(r, 300))])
-    .then(() => requestAnimationFrame(() => requestAnimationFrame(() => {
-      reveal();
-      lineReveal('.ph .rule', 0.3);
-    })));
+  onReady(() => { initPage(); });
 });
 </script>
 

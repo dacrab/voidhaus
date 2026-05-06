@@ -96,48 +96,16 @@ const totalStores = STOCKISTS.reduce((t, r) => t + r.stores.length, 0);
 </Layout>
 
 <script>
-import { reveal, lineReveal, gsap, DUR, EASE, onReady } from '../../lib/animate';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { initPage, onReady } from '../../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    reveal();
-    lineReveal('.ph .rule', 0.3);
-    
-    const els = document.querySelectorAll<HTMLElement>('.store');
-    const trig = document.querySelector<HTMLElement>('.stores-grid');
-    if (els.length && trig) {
-      ScrollTrigger.create({
-        trigger: trig, start: 'top 88%', once: true,
-        onEnter: () => gsap.fromTo(els,
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.06 },
-        ),
-      });
-    }
+    initPage('.ph .rule');
   });
 });
 </script>
 
 <style>
-  .ph-inner {
-    display: flex; align-items: flex-end;
-    justify-content: space-between;
-    padding-bottom: var(--space-lg); gap: var(--space-md);
-  }
-
-  .ph-left { display: flex; flex-direction: column; gap: var(--space-xs); }
-
-  .ph-title {
-    font-family: var(--font-sans);
-    font-size: var(--text-display-md);
-    font-variation-settings: var(--font-weight-light);
-    letter-spacing: -0.04em;
-    line-height: 1;
-  }
-
-  .ph-aside { align-self: flex-end; padding-bottom: 0.3rem; }
-
   .stockists { padding-bottom: var(--space-4xl); }
 
   .region { padding-block: 3.5rem 0; }

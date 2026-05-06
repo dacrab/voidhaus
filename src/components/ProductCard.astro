@@ -1,6 +1,7 @@
 ---
 import { Picture } from 'astro:assets';
 import { IMAGES } from '../assets/images';
+import type { Product } from '../data/products';
 
 interface Props {
   slug:      string;
@@ -8,18 +9,19 @@ interface Props {
   name:      string;
   price:     number;
   img:       string;
+  img2?:     string;
   category?: string;
   imgWidth?: number;
 }
 
-const { slug, num, name, price, img, category, imgWidth = 800 } = Astro.props;
+const { slug, num, name, price, img, img2, category, imgWidth = 800 } = Astro.props;
 ---
 
 <article class="pc" data-category={category}>
   <a href={`/product/${slug}`} aria-label={`${name} — € ${price.toLocaleString('en-US', { minimumFractionDigits: 0 })}`}>
     <div class="pc-img-wrap">
       <Picture
-        class="pc-img"
+        class="pc-img pc-img-primary"
         src={IMAGES[img]}
         formats={['avif', 'webp']}
         alt={name}
@@ -28,6 +30,18 @@ const { slug, num, name, price, img, category, imgWidth = 800 } = Astro.props;
         width={imgWidth}
         transition:name={`product-img-${slug}`}
       />
+      {img2 && IMAGES[img2] && (
+        <Picture
+          class="pc-img pc-img-alt"
+          src={IMAGES[img2]}
+          formats={['avif', 'webp']}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          width={imgWidth}
+          aria-hidden="true"
+        />
+      )}
     </div>
     <div class="card-info">
       <div class="card-info-l">
@@ -48,20 +62,22 @@ const { slug, num, name, price, img, category, imgWidth = 800 } = Astro.props;
     aspect-ratio: 3/4;
     overflow: hidden;
     background: var(--color-off);
-  }
-
-  .pc-img,
-  .pc-img picture {
-    width: 100%;
-    height: 100%;
-    display: block;
+    position: relative;
   }
 
   .pc-img img {
-    width: 100%; height: 100%;
-    object-fit: contain; object-position: center;
-    display: block;
-    transition: transform var(--duration-slowest) var(--ease-img);
+    object-fit: cover;
+    object-position: center top;
+    transition: transform var(--duration-slowest) var(--ease-img), opacity 0.5s ease;
   }
-  .pc a:hover .pc-img img { transform: scale(1.03); }
+
+  .pc-img-alt {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  .pc a:hover .pc-img-primary img { transform: scale(1.04); }
+  .pc a:hover .pc-img-alt { opacity: 1; }
+  .pc a:hover .pc-img-alt img { transform: scale(1.02); }
 </style>
