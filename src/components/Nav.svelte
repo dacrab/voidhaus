@@ -73,13 +73,7 @@
 <svelte:window onkeydown={onKeydown} />
 
 <header class="nav" class:scrolled class:hidden class:open>
-  <nav class="nav-l" aria-label="Primary navigation">
-    {#each links.slice(0, 2) as { href, label }}
-      {@const active = href === '/' ? path === '/' : path.startsWith(href)}
-      <a {href} class="nav-link label" class:active
-         aria-current={active ? 'page' : undefined}>{label}</a>
-    {/each}
-  </nav>
+  <div class="nav-l"></div>
 
   <a href="/" class="nav-logo" aria-label="Voidhaus — home">VOIDHAUS</a>
 
@@ -104,26 +98,30 @@
     aria-modal="true"
     aria-label="Navigation menu"
     tabindex="-1"
-    in:panelIn
-    out:fade={{ duration: 200 }}
+    in:panelIn={{ y: 0 }}
+    out:fade={{ duration: 250 }}
   >
-    <div class="menu-head">
-      <a href="/" class="nav-logo" onclick={handleNavClick}>VOIDHAUS</a>
-      <button class="label ghost-btn" onclick={toggleMenu} aria-label="Close menu">Close</button>
-    </div>
-
-    <nav class="menu-links" aria-label="Mobile navigation">
+    <nav class="menu-links" aria-label="Navigation">
       {#each links as { href, label }, i}
         {@const active = href === '/' ? path === '/' : path.startsWith(href)}
-        <a {href} class="menu-link serif" class:active
+        <a {href} class="menu-link" class:active
            aria-current={active ? 'page' : undefined}
-           style="--i:{i}" onclick={handleNavClick}>{label}</a>
+           style="--i:{i}"
+           onclick={handleNavClick}>
+          <span class="menu-link-num label op-30">0{i + 1}</span>
+          <span class="menu-link-label">{label}</span>
+        </a>
       {/each}
     </nav>
 
     <div class="menu-foot">
-      <span class="label op-35">SS 2026</span>
-      <button class="label ghost-btn" onclick={() => { toggleMenu(); openCart(); }}>Selection →</button>
+      <div class="menu-foot-info">
+        <span class="label op-35">SS 2026</span>
+        <span class="label op-35">Milan · Antwerp · Florence · Tokyo</span>
+      </div>
+      <button class="menu-foot-cart label" onclick={() => { toggleMenu(); openCart(); }}>
+        Selection{#if cartCount > 0} ({cartCount}){/if} →
+      </button>
     </div>
   </div>
 {/if}
@@ -137,15 +135,15 @@
     transition: background var(--duration-base) ease, color var(--duration-base) ease,
                 transform var(--duration-base) ease, box-shadow var(--duration-base) ease;
   }
-  @media (min-width: var(--breakpoint-sm))  { .nav { padding-inline: 2.5rem; } }
-  @media (min-width: var(--breakpoint-lg)) { .nav { padding-inline: var(--space-3xl); } }
+  @media (min-width: 640px)  { .nav { padding-inline: 2.5rem; } }
+  @media (min-width: 1024px) { .nav { padding-inline: var(--space-3xl); } }
 
   .nav.scrolled {
-    background: var(--overlay-text-primary);
+    background: rgb(248 246 242 / 0.92);
     color: var(--color-ink);
     box-shadow: 0 1px 0 var(--color-rule);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .nav.hidden { transform: translateY(-100%); pointer-events: none; }
   .nav.open   { background: var(--color-white); color: var(--color-ink); box-shadow: none; transform: none; }
@@ -156,8 +154,7 @@
     grid-column: 2; justify-self: center;
   }
 
-  .nav-l { display: none; gap: var(--space-xl); grid-column: 1; }
-  @media (min-width: var(--breakpoint-md)) { .nav-l { display: flex; } }
+  .nav-l { grid-column: 1; }
 
   .nav-link {
     color: inherit; opacity: var(--opacity-hover);
@@ -165,8 +162,6 @@
     background: none; border: none; padding: 0;
     animation: nav-link-in 0.5s var(--ease-out) both;
   }
-  .nav-l .nav-link:nth-child(1) { animation-delay: 0.55s; }
-  .nav-l .nav-link:nth-child(2) { animation-delay: 0.62s; }
   .nav-r .nav-link:nth-child(1) { animation-delay: 0.69s; }
   .nav-r .nav-link:nth-child(2) { animation-delay: 0.76s; }
 
@@ -174,20 +169,14 @@
     from { opacity: 0; transform: translateY(-5px); }
     to   { opacity: var(--opacity-hover); transform: translateY(0); }
   }
-  .nav-link:hover, .nav-link.active { opacity: 1; }
-  .nav-link.active { position: relative; }
-  .nav-link.active::after {
-    content: ''; position: absolute;
-    inset-block-end: -3px; inset-inline: 0;
-    height: 1px; background: currentColor;
-  }
+  .nav-link:hover { opacity: 1; }
 
   .nav-r {
     display: flex; align-items: center;
     justify-content: flex-end; gap: var(--space-lg); grid-column: 3;
   }
   .nav-cart { display: flex; align-items: center; gap: 0.4rem; }
-  @media (max-width: calc(var(--breakpoint-md) - 1px)) { .nav-cart { display: none; } }
+  @media (max-width: 767px) { .nav-cart { display: none; } }
 
   .badge {
     display: inline-flex; align-items: center; justify-content: center;
@@ -202,45 +191,71 @@
 
   .menu {
     position: fixed; inset: 0; z-index: 299;
-    background: var(--color-white);
-    display: flex; flex-direction: column;
-    padding: 0 var(--space-lg) var(--space-2xl);
+    background: var(--color-off);
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: var(--nav-h) clamp(var(--space-lg), 5vw, var(--space-4xl)) var(--space-2xl);
     overflow-y: auto;
   }
-  @media (min-width: var(--breakpoint-sm)) { .menu { padding-inline: 2.5rem; } }
-
-  .menu-head {
-    display: flex; align-items: center; justify-content: space-between;
-    height: var(--nav-h); flex-shrink: 0;
-  }
-  .menu-head .nav-logo { grid-column: unset; justify-self: unset; }
 
   .menu-links {
-    display: flex; flex-direction: column; flex: 1;
-    border-top: 1px solid var(--color-rule);
+    display: flex; flex-direction: column;
+    justify-content: center;
+    gap: 0;
   }
 
   .menu-link {
-    font-family: var(--font-serif);
-    font-size: clamp(2.25rem, 8vw, 3.5rem);
-    font-style: italic; font-variation-settings: var(--font-weight-medium);
-    letter-spacing: -0.02em; color: var(--color-ink);
-    padding-block: var(--space-md); border-bottom: 1px solid var(--color-rule);
+    display: flex; align-items: baseline; gap: var(--space-lg);
+    font-family: var(--font-sans);
+    font-size: clamp(2.5rem, 7vw, 6.5rem);
+    font-variation-settings: var(--font-weight-light);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    color: var(--color-ink);
+    padding-block: 0.4em;
+    border-bottom: 1px solid var(--color-rule);
     opacity: 0;
-    animation: link-in 0.5s var(--ease-out) both;
-    animation-delay: calc(0.06s + var(--i) * var(--stagger-fast));
+    animation: link-in 0.55s var(--ease-out) both;
+    animation-delay: calc(0.05s * var(--i, 0));
     transition: opacity var(--duration-fast);
   }
-  .menu-link:hover  { opacity: var(--opacity-muted); }
-  .menu-link.active { opacity: 1; }
+  .menu-link:first-child { border-top: 1px solid var(--color-rule); }
+  .menu-link:hover  { opacity: var(--opacity-hover); }
+  .menu-link.active { font-style: italic; }
+  .menu-link.active .menu-link-label::after {
+    content: ' ·';
+    font-style: normal;
+    opacity: 0.3;
+  }
+
+  .menu-link-num {
+    font-size: var(--text-xs);
+    flex-shrink: 0;
+    width: 2rem;
+  }
+
+  .menu-link-label { flex: 1; }
 
   @keyframes link-in {
-    from { opacity: 0; transform: translateY(0.5rem); }
+    from { opacity: 0; transform: translateY(1rem); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   .menu-foot {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-top: var(--space-xl); border-top: 1px solid var(--color-rule); margin-top: var(--space-xl);
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding-top: var(--space-xl);
+    gap: var(--space-md);
+    flex-wrap: wrap;
   }
+
+  .menu-foot-info {
+    display: flex; flex-direction: column; gap: var(--space-xs);
+  }
+
+  .menu-foot-cart {
+    background: none; border: none;
+    color: var(--color-ink); opacity: var(--opacity-muted);
+    transition: opacity var(--duration-fast);
+  }
+  .menu-foot-cart:hover { opacity: 1; }
 </style>

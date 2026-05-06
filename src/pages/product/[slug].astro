@@ -65,16 +65,6 @@ const next = PRODUCTS[idx + 1] ?? null;
 
       <p class="product-desc" data-anim="scroll">{p.desc}</p>
 
-      <div class="product-story" data-anim="scroll">
-        <h2 class="story-title serif">Craftsmanship</h2>
-        <p class="story-text">
-          Each piece is crafted with meticulous attention to detail in our atelier.
-          We source materials from heritage suppliers who share our commitment to quality
-          and sustainability. The result is clothing that improves with age, developing
-          a unique character that becomes distinctly yours.
-        </p>
-      </div>
-
       <dl class="details" data-anim="scroll">
         {details.map(([k, v]) => (
           <div class="detail-row">
@@ -135,34 +125,23 @@ const next = PRODUCTS[idx + 1] ?? null;
 </Layout>
 
 <script>
-import { gsap, DUR, EASE, onReady } from '../../lib/animate';
+import { initPage, onReady, gsap, DUR, EASE } from '../../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    const el = document.querySelector<HTMLElement>('.js-main-img');
     const morphed = document.documentElement.hasAttribute('data-astro-transition');
-    if (el) {
-      if (morphed) {
-        gsap.set(el, { opacity: 1, scale: 1 });
-      } else {
-        gsap.fromTo(el, { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: DUR.lg + 0.2, ease: 'power3.out' });
-      }
+    const img = document.querySelector<HTMLElement>('.js-main-img');
+    if (img) {
+      if (morphed) gsap.set(img, { opacity: 1, scale: 1 });
+      else gsap.fromTo(img, { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: DUR.slower, ease: 'power3.out' });
     }
 
-    gsap.fromTo(
-      ['.product-name', '.product-desc', '.details', '.sizes', '.cta-block']
-        .map(s => document.querySelector(s)).filter(Boolean),
-      { opacity: 0, y: 18 },
-      { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.08, delay: 0.3 },
-    );
+    initPage();
 
     const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
     szBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        szBtns.forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-pressed', 'false');
-        });
+        szBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
         btn.classList.add('active');
         btn.setAttribute('aria-pressed', 'true');
       });
@@ -170,20 +149,18 @@ document.addEventListener('astro:page-load', () => {
 
     const addBtn = document.getElementById('js-add') as HTMLButtonElement | null;
     const addText = addBtn?.querySelector<HTMLElement>('.add-text');
-
     addBtn?.addEventListener('click', () => {
       if (!addText) return;
       const size = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
       if (!size) { addBtn.setAttribute('aria-label', 'Please select a size'); return; }
       let product: Record<string, string>;
-      try { product = JSON.parse(addBtn.dataset.product ?? '{}'); }
-      catch { return; }
+      try { product = JSON.parse(addBtn.dataset.product ?? '{}'); } catch { return; }
       window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
       gsap.timeline()
-        .to(addText, { opacity: 0, duration: 0.13, ease: 'power2.in' })
+        .to(addText, { opacity: 0, duration: 0.15, ease: 'power2.in' })
         .set(addText, { textContent: 'Added ✓' })
         .to(addText, { opacity: 1, duration: 0.2, ease: 'power2.out' })
-        .to(addText, { opacity: 0, duration: 0.13, delay: 1.6, ease: 'power2.in' })
+        .to(addText, { opacity: 0, duration: 0.15, delay: 1.5, ease: 'power2.in' })
         .set(addText, { textContent: 'Add to Selection' })
         .to(addText, { opacity: 1, duration: 0.2, ease: 'power2.out' });
     });
@@ -218,10 +195,12 @@ document.addEventListener('astro:page-load', () => {
     position: sticky;
     top: var(--nav-h);
     height: calc(100svh - var(--nav-h));
-    overflow: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
     background: none;
-    gap: 0;
+    gap: 1px;
   }
+  .product-images::-webkit-scrollbar { display: none; }
 }
 
 .img-primary {
@@ -229,14 +208,18 @@ document.addEventListener('astro:page-load', () => {
   overflow: hidden;
   background: var(--color-off);
 }
-@media (min-width: 768px) { .img-primary { aspect-ratio: unset; height: 100%; } }
+@media (min-width: 768px) { .img-primary { aspect-ratio: unset; min-height: 100%; } }
 
 .img-secondary {
-  aspect-ratio: 3/2;
   overflow: hidden;
   background: var(--color-paper);
 }
-@media (min-width: 768px) { .img-secondary { display: none; } }
+@media (min-width: 768px) {
+  .img-secondary {
+    flex: 1;
+    min-height: 60vh;
+  }
+}
 
 .product-img,
 .product-img picture {
@@ -247,7 +230,7 @@ document.addEventListener('astro:page-load', () => {
 
 .product-img img {
   width: 100%; height: 100%;
-  object-fit: contain; object-position: center;
+  object-fit: cover; object-position: center top;
   display: block;
 }
 
@@ -263,17 +246,17 @@ document.addEventListener('astro:page-load', () => {
 }
 @media (min-width: 768px) {
   .product-info {
-    padding: var(--space-3xl) var(--space-3xl) var(--space-4xl);
+    padding: var(--space-4xl) var(--space-3xl) var(--space-4xl);
     position: sticky;
     top: var(--nav-h);
     height: calc(100svh - var(--nav-h));
     overflow-y: auto;
     scrollbar-width: none;
-    justify-content: center;
+    justify-content: flex-start;
   }
   .product-info::-webkit-scrollbar { display: none; }
 }
-@media (min-width: 1280px) { .product-info { padding: var(--space-3xl) var(--space-4xl) var(--space-4xl); } }
+@media (min-width: 1280px) { .product-info { padding: var(--space-4xl) var(--space-4xl) var(--space-4xl); } }
 
 .info-top {
   display: flex;
@@ -283,12 +266,11 @@ document.addEventListener('astro:page-load', () => {
 
 .product-name {
   font-family: var(--font-sans);
-  font-size: clamp(1.75rem, 4.5vw, 3.25rem);
-  font-variation-settings: var(--font-weight-normal);
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  font-variation-settings: var(--font-weight-light);
+  letter-spacing: -0.04em;
+  line-height: 1;
   color: var(--color-ink);
-  scroll-margin-top: calc(var(--nav-h) + var(--space-lg));
 }
 
 .product-desc {
@@ -297,25 +279,6 @@ document.addEventListener('astro:page-load', () => {
   line-height: 1.8;
   color: var(--color-ink-soft);
   max-width: 36ch;
-}
-
-.product-story {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  max-width: 36ch;
-}
-
-.story-title {
-  font-size: var(--text-xl);
-  font-variation-settings: var(--font-weight-medium);
-  color: var(--color-ink);
-}
-
-.story-text {
-  font-size: var(--text-base);
-  line-height: 1.8;
-  color: var(--color-soft);
 }
 
 .details { border-top: 1px solid var(--color-rule); }
@@ -360,26 +323,28 @@ document.addEventListener('astro:page-load', () => {
   border-bottom: 1px solid var(--color-rule);
 }
 .product-price {
-  font-size: var(--text-2xl);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-style: italic;
   font-variation-settings: var(--font-weight-medium);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--color-ink);
 }
 
 .add-btn {
   width: 100%;
-  background: var(--color-ink);
-  border: none;
-  padding: 1.125rem 1.5rem;
-  transition: background var(--duration-fast);
+  background: none;
+  border: 1px solid var(--color-ink);
+  padding: 1.25rem 1.5rem;
+  transition: background var(--duration-base), color var(--duration-base);
 }
-.add-btn:hover { background: var(--color-ink-soft); }
+.add-btn:hover { background: var(--color-ink); }
+.add-btn:hover .add-text { color: var(--color-white); }
 .add-text {
-  color: var(--color-white);
+  color: var(--color-ink);
   letter-spacing: var(--letter-spacing-button);
   display: block;
   text-align: center;
+  transition: color var(--duration-base);
 }
 
 .ship-note { opacity: var(--opacity-disabled); display: block; text-align: center; }
@@ -389,8 +354,5 @@ document.addEventListener('astro:page-load', () => {
   display: flex;
   justify-content: space-between;
   padding-block: 1.5rem;
-}
-</style>
-em;
 }
 </style>

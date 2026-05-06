@@ -12,7 +12,7 @@ import { IMAGES } from '../../assets/images';
 
   <section class="statements wrap">
 
-    <div class="stmt" data-anim="statement">
+    <div class="stmt" data-anim="scroll">
       <span class="label op-30 stmt-num">001</span>
       <div class="stmt-body">
         <p class="stmt-p">Voidhaus was not born from a desire to dress people. It was born from a frustration with fashion that performs humility while demanding admiration.</p>
@@ -21,7 +21,7 @@ import { IMAGES } from '../../assets/images';
     </div>
     <div class="rule"></div>
 
-    <div class="stmt" data-anim="statement">
+    <div class="stmt" data-anim="scroll">
       <span class="label op-30 stmt-num">002</span>
       <div class="stmt-body">
         <h2 class="stmt-h">The garment as architecture.</h2>
@@ -31,7 +31,7 @@ import { IMAGES } from '../../assets/images';
     </div>
     <div class="rule"></div>
 
-    <div class="stmt" data-anim="statement">
+    <div class="stmt" data-anim="scroll">
       <span class="label op-30 stmt-num">003</span>
       <div class="stmt-body">
         <h2 class="stmt-h">On restraint.</h2>
@@ -45,7 +45,7 @@ import { IMAGES } from '../../assets/images';
     </blockquote>
     <div class="rule"></div>
 
-    <div class="stmt" data-anim="statement">
+    <div class="stmt" data-anim="scroll">
       <span class="label op-30 stmt-num">004</span>
       <div class="stmt-body">
         <h2 class="stmt-h">Who we dress.</h2>
@@ -84,39 +84,22 @@ import { IMAGES } from '../../assets/images';
 </Layout>
 
 <script>
-import { reveal, lineReveal, onReady, gsap, DUR, EASE } from '../../lib/animate';
+import { initPage, onReady, gsap, DUR, EASE } from '../../lib/animate';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    reveal();
-    lineReveal('.ph .rule', 0.3);
-      
-      // Statement reveal
-      document.querySelectorAll<HTMLElement>('[data-anim="statement"]').forEach(el => {
-        const num  = el.querySelector<HTMLElement>('.stmt-num');
-        const body = el.querySelectorAll<HTMLElement>('.stmt-h, .stmt-p');
-        ScrollTrigger.create({
-          trigger: el, start: 'top 88%', once: true,
-          onEnter: () => {
-            const tl = gsap.timeline();
-            if (num) tl.fromTo(num, { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: DUR.sm, ease: EASE.expo }, 0);
-            tl.fromTo(body, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: DUR.md, ease: EASE.expo, stagger: 0.1 }, 0.05);
-          },
-        });
+    initPage('.ph .rule');
+
+    // Atelier image parallax
+    const atelierImg = document.querySelector<HTMLElement>('.atelier-img');
+    if (atelierImg) {
+      gsap.set(atelierImg, { scale: 1.12 });
+      ScrollTrigger.create({
+        trigger: '.atelier-img-wrap', start: 'top bottom', end: 'bottom top', scrub: 2,
+        onUpdate: st => gsap.set(atelierImg, { yPercent: -8 * st.progress }),
       });
-      
-      // Pull quote
-      const el = document.querySelector<HTMLElement>('.pull-quote');
-      if (el) {
-        ScrollTrigger.create({
-          trigger: el, start: 'top 88%', once: true,
-          onEnter: () => gsap.fromTo(el,
-            { opacity: 0, y: 24, skewY: 1 },
-            { opacity: 1, y: 0, skewY: 0, duration: DUR.lg, ease: EASE.expo, clearProps: 'skewY' },
-          ),
-        });
-      }
+    }
   });
 });
 </script>
@@ -183,8 +166,6 @@ document.addEventListener('astro:page-load', () => {
   height: 100%;
   display: block;
 }
-
-.atelier-img img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
 .atelier-scrim { background: var(--scrim-dark-light); }
 
 .at-item {

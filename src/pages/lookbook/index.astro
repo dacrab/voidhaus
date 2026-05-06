@@ -78,24 +78,23 @@ const spreads = [
 </Layout>
 
 <script>
-import { reveal, lineReveal, gsap, onReady } from '../../lib/animate';
+import { initPage, onReady, gsap } from '../../lib/animate';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    reveal();
-    lineReveal('.ph .rule', 0.35);
-    
+    initPage('.ph .rule');
+
     document.querySelectorAll<HTMLElement>('.spread-hero').forEach(hero => {
       const img = hero.querySelector<HTMLElement>('.spread-img');
       const cap = hero.querySelector<HTMLElement>('.spread-cap');
       if (!img) return;
-      gsap.set(img, { scale: 1.16 });
+      gsap.set(img, { scale: 1.14 });
       ScrollTrigger.create({
-        trigger: hero, start: 'top bottom', end: 'bottom top', scrub: 1.8,
+        trigger: hero, start: 'top bottom', end: 'bottom top', scrub: 2,
         onUpdate: st => {
-          gsap.set(img, { yPercent: -14 * st.progress });
-          if (cap) gsap.set(cap, { yPercent: 4 * st.progress });
+          gsap.set(img, { yPercent: -12 * st.progress });
+          if (cap) gsap.set(cap, { yPercent: 3 * st.progress });
         },
       });
     });
@@ -104,8 +103,6 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.ph-aside { align-self: flex-end; padding-bottom: 0.3rem; }
-
 .spread-hero {
   position: relative;
   height: 85svh; min-height: 440px;
@@ -120,16 +117,8 @@ document.addEventListener('astro:page-load', () => {
   height: 100%;
 }
 
-.spread-img picture {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 .spread-img img {
-  width: 100%; height: 100%;
-  object-fit: contain; object-position: center;
-  display: block;
+  object-fit: cover; object-position: center top;
 }
 
 .spread-scrim {

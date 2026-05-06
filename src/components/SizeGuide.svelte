@@ -140,7 +140,7 @@
     max-height: 85svh;
     border: 1px solid var(--color-rule);
   }
-  @media (min-width: var(--breakpoint-sm)) { .sg-panel { inset-inline: var(--space-xl); } }
+  @media (min-width: 640px) { .sg-panel { inset-inline: var(--space-xl); } }
 
   .sg-head {
     display: flex; align-items: center; justify-content: space-between;

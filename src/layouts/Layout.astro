@@ -4,7 +4,6 @@ import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.svelte';
 import Cart from '../components/Cart.svelte';
-import ForSale from '../components/ForSale.svelte';
 import { SITE } from '../data/site';
 
 interface Props {
@@ -18,7 +17,7 @@ interface Props {
 const {
   title       = SITE.name,
   description = SITE.tagline,
-  image       = '/og.jpg',
+  image       = '/favicon.svg',
   type        = 'website',
   solidNav    = false,
 } = Astro.props;
@@ -84,8 +83,8 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   </head>
 
   <body>
+    <div class="cursor" id="js-cursor" aria-hidden="true"></div>
     <Nav client:load solidNav={solidNav} />
-    <ForSale client:load />
     <Cart client:load />
 
     <main id="main">
@@ -93,6 +92,29 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
     </main>
 
     <script>
+      // Custom cursor — re-query each frame so view transitions don't break the reference
+      if (window.matchMedia('(hover: hover)').matches) {
+        let mx = -100, my = -100;
+        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+        document.addEventListener('mousedown', () => document.getElementById('js-cursor')?.classList.add('click'));
+        document.addEventListener('mouseup',   () => document.getElementById('js-cursor')?.classList.remove('click'));
+        document.addEventListener('mouseover', e => {
+          const t = (e.target as Element).closest('a, button, [role="button"]');
+          document.getElementById('js-cursor')?.classList.toggle('hover', !!t);
+        });
+        (function loop() {
+          document.getElementById('js-cursor')?.style.setProperty('transform', `translate(calc(${mx}px - 50%), calc(${my}px - 50%))`);
+          requestAnimationFrame(loop);
+        })();
+      }
+
+      // Page entry ceremony — brief black overlay that fades out
+      const veil = document.createElement('div');
+      veil.style.cssText = 'position:fixed;inset:0;background:#1a1816;z-index:10000;pointer-events:none;transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1)';
+      document.body.prepend(veil);
+      requestAnimationFrame(() => requestAnimationFrame(() => { veil.style.opacity = '0'; }));
+      veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+
       document.getElementById('nl-form')?.addEventListener('submit', e => {
         e.preventDefault();
         const form  = e.target as HTMLFormElement;

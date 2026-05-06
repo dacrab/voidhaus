@@ -36,17 +36,14 @@ import { SITE } from '../../data/site';
 </Layout>
 
 <script>
-import { cardsCascade, lineReveal, reveal, gsap, DUR, onReady } from '../../lib/animate';
+import { initPage, onReady, gsap, DUR, EASE } from '../../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    reveal();
-    lineReveal('.coll-top .rule', 0.3);
-    cardsCascade('.pc');
+    initPage('.coll-top .rule');
 
     const cards = document.querySelectorAll<HTMLElement>('.pc');
     const btns = document.querySelectorAll<HTMLElement>('.filter-btn');
-    
     btns.forEach(btn => {
       btn.addEventListener('click', () => {
         btns.forEach(b => b.classList.remove('active'));

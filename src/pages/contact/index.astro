@@ -77,17 +77,11 @@ const info = [
 </Layout>
 
 <script>
-import { reveal, lineReveal, gsap, DUR, EASE, onReady } from '../../lib/animate';
+import { initPage, onReady, gsap } from '../../lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    reveal();
-    lineReveal('.ph .rule', 0.3);
-    
-    const form = document.querySelector<HTMLElement>('.contact-form');
-    const info = document.querySelector<HTMLElement>('.contact-info');
-    if (form) gsap.fromTo(form, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: DUR.slower, ease: EASE.expo, delay: 0.2 });
-    if (info) gsap.fromTo(info, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: DUR.slower, ease: EASE.expo, delay: 0.35 });
+    initPage('.ph .rule');
 
     const chips = document.querySelectorAll<HTMLElement>('.chip');
     const subject = document.getElementById('js-subject') as HTMLInputElement | null;
@@ -108,7 +102,7 @@ document.addEventListener('astro:page-load', () => {
       const text = document.querySelector<HTMLElement>('.submit-text');
       if (!text) return;
       gsap.timeline()
-        .to('#js-submit', { opacity: 'var(--opacity-secondary)', duration: 0.13, ease: 'power2.in' })
+        .to('#js-submit', { opacity: 0.4, duration: 0.15, ease: 'power2.in' })
         .set(text, { textContent: 'Sent ✓' })
         .to('#js-submit', { opacity: 1, duration: 0.2, ease: 'power2.out' });
     });
