@@ -5,7 +5,6 @@ export function trapFocus(container: HTMLElement, e: KeyboardEvent): void {
   if (e.key !== 'Tab') return;
   const els = [...container.querySelectorAll<HTMLElement>(FOCUSABLE)];
   if (!els.length) return;
-  
   const active = document.activeElement;
   if (e.shiftKey && active === els[0]) {
     e.preventDefault();
