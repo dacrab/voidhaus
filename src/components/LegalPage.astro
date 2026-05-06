@@ -1,5 +1,6 @@
 ---
 import Layout from '@layouts/Layout.astro';
+import PageHeader from '@components/PageHeader.astro';
 
 interface Props {
   title:       string;
@@ -13,17 +14,9 @@ const { title, description, updated, sibling, sections } = Astro.props;
 ---
 
 <Layout title={title} description={description} solidNav={true}>
+  <PageHeader label={updated} title={title} />
+
   <div class="legal wrap">
-
-    <div class="legal-head page-top-spacing">
-      <div class="lh-top">
-        <span class="label muted">Legal</span>
-        <h1 class="legal-title" data-anim="hero" data-delay="0.1">{title}</h1>
-      </div>
-      <div class="rule"></div>
-      <p class="legal-meta label muted">Last updated: {updated}</p>
-    </div>
-
     <div class="legal-body">
       <nav class="legal-nav" aria-label="Legal navigation">
         <a href={sibling.href} class="label muted muted-link">{sibling.label} →</a>
@@ -32,12 +25,11 @@ const { title, description, updated, sibling, sections } = Astro.props;
 
       {sections.map(s => (
         <div class="legal-section" data-anim="scroll">
-          <h2 class="section-title">{s.title}</h2>
-          <p  class="section-body">{s.body}</p>
+          <h2 class="section-title label">{s.title}</h2>
+          <p class="section-body">{s.body}</p>
         </div>
       ))}
     </div>
-
   </div>
 </Layout>
 
@@ -45,29 +37,12 @@ const { title, description, updated, sibling, sections } = Astro.props;
 import { initPage, onReady } from '@lib/animate';
 
 document.addEventListener('astro:page-load', () => {
-  onReady(() => { initPage(); });
+  onReady(() => { initPage('.ph .rule'); });
 });
 </script>
 
 <style>
   .legal { padding-bottom: var(--space-4xl); }
-
-  .legal-head { padding-bottom: 0; }
-
-  .lh-top {
-    display: flex; flex-direction: column;
-    gap: var(--space-sm); padding-bottom: var(--space-lg);
-  }
-
-  .legal-title {
-    font-family: var(--font-sans);
-    font-size: clamp(1.75rem, 5vw, 3.5rem);
-    font-variation-settings: var(--font-weight-normal);
-    letter-spacing: -0.03em;
-    line-height: 1;
-  }
-
-  .legal-meta { display: block; padding-block: 1rem; }
 
   .legal-body {
     display: grid;
@@ -99,12 +74,7 @@ document.addEventListener('astro:page-load', () => {
     .legal-section { padding-block: 2.5rem; }
   }
 
-  .section-title {
-    font-size: var(--text-base);
-    font-variation-settings: var(--font-weight-medium);
-    color: var(--color-ink);
-    letter-spacing: 0;
-  }
+  .section-title { color: var(--color-ink); }
 
   .section-body {
     font-size: var(--text-base);
