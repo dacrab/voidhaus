@@ -11,5 +11,3 @@ export const IMAGES: Record<string, ImageMetadata> = Object.fromEntries(
     mod.default,
   ]),
 );
-
-

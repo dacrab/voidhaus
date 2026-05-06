@@ -11,8 +11,6 @@ export default defineConfig({
     build: {
       rollupOptions: {
         onwarn(warning, warn) {
-          // Svelte transition imports (fade, fly etc) are used in templates
-          // but Vite's static analyser can't see them — suppress the false positive
           if (warning.code === 'UNUSED_EXTERNAL_IMPORT' && String(warning.id ?? '').includes('svelte')) return;
           warn(warning);
         },
@@ -21,7 +19,7 @@ export default defineConfig({
   },
 
   image: {
-    service: import.meta.env.DEV 
+    service: import.meta.env.DEV
       ? { entrypoint: 'astro/assets/services/noop' }
       : { entrypoint: 'astro/assets/services/sharp' },
   },
