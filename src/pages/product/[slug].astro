@@ -54,18 +54,18 @@ const next = PRODUCTS[idx + 1] ?? null;
     </div>
 
     <div class="product-info">
-      <div class="info-top" data-anim="hero" data-delay="0">
+      <div class="info-top">
         <a href="/collection" class="label muted-link">← Collection</a>
         <span class="label op-30">{p.num}</span>
       </div>
 
-      <h1 class="product-name" data-anim="hero" data-delay="0.15">
+      <h1 class="product-name">
         {p.name}
       </h1>
 
-      <p class="product-desc" data-anim="scroll">{p.desc}</p>
+      <p class="product-desc">{p.desc}</p>
 
-      <dl class="details" data-anim="scroll">
+      <dl class="details">
         {details.map(([k, v]) => (
           <div class="detail-row">
             <dt class="label detail-key">{k}</dt>
@@ -74,7 +74,7 @@ const next = PRODUCTS[idx + 1] ?? null;
         ))}
       </dl>
 
-      <div class="sizes" data-anim="scroll">
+      <div class="sizes">
         <div class="sizes-header">
           <span class="label sizes-lbl">Size</span>
           <SizeGuide category={p.category} client:load />
@@ -92,7 +92,7 @@ const next = PRODUCTS[idx + 1] ?? null;
         </div>
       </div>
 
-      <div class="cta-block" data-anim="scroll">
+      <div class="cta-block">
         <div class="price-row">
           <span class="product-price serif">€ {p.price.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
           <span class="label muted">Incl. VAT</span>
@@ -125,7 +125,7 @@ const next = PRODUCTS[idx + 1] ?? null;
 </Layout>
 
 <script>
-import { initPage, onReady, gsap, DUR, EASE } from '@lib/animate';
+import { onReady, gsap, DUR, EASE } from '@lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
@@ -136,7 +136,12 @@ document.addEventListener('astro:page-load', () => {
       else gsap.fromTo(img, { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: DUR.slower, ease: 'power3.out' });
     }
 
-    initPage();
+    const infoEls = ['.info-top', '.product-name', '.product-desc', '.details', '.sizes', '.cta-block']
+      .map(s => document.querySelector<HTMLElement>(s)).filter(Boolean) as HTMLElement[];
+    gsap.fromTo(infoEls,
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: DUR.slow, ease: EASE, stagger: 0.07, delay: morphed ? 0 : 0.2, clearProps: 'transform,will-change' },
+    );
 
     const szBtns = document.querySelectorAll<HTMLElement>('.sz-btn');
     szBtns.forEach(btn => {
