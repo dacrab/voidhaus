@@ -1,8 +1,8 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import ProductCard from '../../components/ProductCard.astro';
-import { PRODUCTS, CATEGORIES } from '../../data/products';
-import { SITE } from '../../data/site';
+import Layout from '@layouts/Layout.astro';
+import ProductCard from '@components/ProductCard.astro';
+import { PRODUCTS, CATEGORIES } from '@data/products';
+import { SITE } from '@data/site';
 ---
 
 <Layout title="Collection" solidNav={true}>
@@ -36,7 +36,7 @@ import { SITE } from '../../data/site';
 </Layout>
 
 <script>
-import { initPage, onReady, gsap, DUR, EASE } from '../../lib/animate';
+import { initPage, onReady, gsap, DUR, EASE } from '@lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {

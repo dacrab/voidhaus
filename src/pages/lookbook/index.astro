@@ -1,12 +1,12 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '@layouts/Layout.astro';
 import { Picture } from 'astro:assets';
-import ProductCard from '../../components/ProductCard.astro';
-import PageHeader from '../../components/PageHeader.astro';
-import CTAStrip from '../../components/CTAStrip.astro';
-import { PRODUCTS } from '../../data/products';
-import { SITE } from '../../data/site';
-import { IMAGES } from '../../assets/images';
+import ProductCard from '@components/ProductCard.astro';
+import PageHeader from '@components/PageHeader.astro';
+import CTAStrip from '@components/CTAStrip.astro';
+import { PRODUCTS } from '@data/products';
+import { SITE } from '@data/site';
+import { IMAGES } from '@assets/images';
 
 const spreads = [
   {
@@ -78,7 +78,7 @@ const spreads = [
 </Layout>
 
 <script>
-import { initPage, onReady, gsap } from '../../lib/animate';
+import { initPage, onReady, gsap } from '@lib/animate';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {

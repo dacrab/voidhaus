@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { createModal, panelIn } from '../lib/modal';
-  import { SITE } from '../data/site';
+  import { SITE } from '@data/site';
 
   const STORAGE_KEY = 'vh-forsale-dismissed';
   const modal = createModal();

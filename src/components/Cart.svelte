@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { createModal, slideIn } from '../lib/modal';
+  import { createModal, slideIn } from '@lib/modal';
   import { getCart, saveCart, formatPrice, type CartItem } from '../lib/cart';
 
   const modal = createModal();
