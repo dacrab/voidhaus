@@ -91,7 +91,6 @@ document.addEventListener('astro:page-load', () => {
   onReady(() => {
     initPage('.ph .rule');
 
-    // Atelier image parallax
     const atelierImg = document.querySelector<HTMLElement>('.atelier-img');
     if (atelierImg) {
       gsap.set(atelierImg, { scale: 1.12 });
@@ -160,12 +159,6 @@ document.addEventListener('astro:page-load', () => {
 }
 @media (min-width: 768px) { .atelier-img-wrap { height: 65svh; } }
 
-.atelier-img,
-.atelier-img picture {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
 .atelier-scrim { background: var(--scrim-dark-light); }
 
 .at-item {

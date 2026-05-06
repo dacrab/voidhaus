@@ -63,10 +63,7 @@
   }
 
   function onKeydown(e: KeyboardEvent) {
-    if (open && e.key === 'Escape') {
-      open = false;
-      modal.close();
-    }
+    if (open && e.key === 'Escape') toggleMenu();
   }
 </script>
 
