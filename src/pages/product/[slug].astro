@@ -183,7 +183,6 @@ document.addEventListener('astro:page-load', () => {
   }
 }
 
-/* Images */
 .product-images {
   display: flex;
   flex-direction: column;
@@ -221,20 +220,12 @@ document.addEventListener('astro:page-load', () => {
   }
 }
 
-.product-img,
-.product-img picture {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
 .product-img img {
   width: 100%; height: 100%;
   object-fit: cover; object-position: center top;
   display: block;
 }
 
-/* Info */
 .product-info {
   padding: calc(var(--nav-h) + var(--space-xl)) var(--space-lg) var(--space-4xl);
   display: flex;
@@ -256,7 +247,7 @@ document.addEventListener('astro:page-load', () => {
   }
   .product-info::-webkit-scrollbar { display: none; }
 }
-@media (min-width: 1280px) { .product-info { padding: var(--space-4xl) var(--space-4xl) var(--space-4xl); } }
+@media (min-width: 1280px) { .product-info { padding: var(--space-4xl); } }
 
 .info-top {
   display: flex;

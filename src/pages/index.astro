@@ -75,7 +75,6 @@ document.addEventListener('astro:page-load', () => {
   onReady(() => {
     const morphed = document.documentElement.hasAttribute('data-astro-transition');
 
-    // Hero image
     const img = document.querySelector<HTMLElement>('.js-hero-img');
     if (img) {
       gsap.set(img, { opacity: morphed ? 1 : 0, scale: morphed ? 1.08 : 1.12 });
@@ -86,7 +85,6 @@ document.addEventListener('astro:page-load', () => {
       });
     }
 
-    // Hero text sequence
     const title = document.querySelector<HTMLElement>('.js-hero-title');
     const season = document.querySelector<HTMLElement>('.js-hero-season');
     const cta = document.querySelector<HTMLElement>('.js-hero-cta');
@@ -99,14 +97,12 @@ document.addEventListener('astro:page-load', () => {
         .fromTo(cta,    { opacity: 0, y: 8 },  { opacity: 1, y: 0, duration: 0.7, ease: EASE }, 0.6);
     }
 
-    // Rest of page
     initPage();
   });
 });
 </script>
 
 <style>
-/* ── Hero ──────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
   width: 100vw;
@@ -125,11 +121,6 @@ document.addEventListener('astro:page-load', () => {
   inset: 0;
   width: 100%;
   height: 100%;
-}
-
-.hero-img picture,
-.hero-img img {
-  transform-origin: center center;
 }
 
 .hero-scrim {
@@ -195,7 +186,6 @@ document.addEventListener('astro:page-load', () => {
 }
 @media (min-width: 640px) { .hero-tagline { display: block; } }
 
-/* ── Products ──────────────────────────────────────────────────────────── */
 .products { padding-block: var(--space-3xl) var(--space-2xl); }
 @media (min-width: 768px) { .products { padding-block: var(--space-4xl) var(--space-3xl); } }
 
@@ -205,13 +195,11 @@ document.addEventListener('astro:page-load', () => {
   gap: var(--space-md);
 }
 
-/* Override grid to 3-col on desktop for home page featured strip */
 .products .product-grid {
   grid-template-columns: repeat(2, 1fr);
 }
 @media (min-width: 768px) { .products .product-grid { grid-template-columns: repeat(3, 1fr); } }
 
-/* ── Editorial ─────────────────────────────────────────────────────────── */
 .editorial {
   position: relative; height: 75svh; min-height: 420px;
   margin-block: 5rem; overflow: hidden;
@@ -241,6 +229,4 @@ document.addEventListener('astro:page-load', () => {
 .ed-quote em { font-style: normal; color: var(--overlay-text-muted); }
 .ed-link { color: var(--overlay-text-secondary); transition: color var(--duration-fast); }
 .ed-link:hover { color: #fff; }
-
-
 </style>

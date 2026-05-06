@@ -134,8 +134,6 @@
     z-index: 401;
     display: flex; flex-direction: column;
     border-left: 1px solid var(--color-rule);
-    will-change: transform;
-    backface-visibility: hidden;
   }
 
   .panel-head {

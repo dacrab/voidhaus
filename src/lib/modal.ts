@@ -1,6 +1,5 @@
 import { trapFocus } from './focusTrap';
 
-// Access lenis via the global ticker — animate.ts exposes it on window for cross-module use
 const stopScroll  = () => (window as any).__lenis?.stop();
 const startScroll = () => (window as any).__lenis?.start();
 

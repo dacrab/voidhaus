@@ -18,7 +18,6 @@
   function openModal() {
     open = true;
     modal.open();
-    requestAnimationFrame(() => document.getElementById('fs-panel')?.focus());
   }
 
   function closeModal() {
@@ -109,7 +108,6 @@
 <style>
   .fs-backdrop { --backdrop-z: 600; background: var(--backdrop-modal); }
 
-  /* ── Strip ───────────────────────────────────────────────────────────── */
   .strip {
     position: fixed; inset-inline: 0; bottom: 0; z-index: 500;
     display: flex; align-items: stretch;
@@ -144,7 +142,6 @@
   }
   .strip-dismiss:hover { opacity: 1; }
 
-  /* ── Panel ───────────────────────────────────────────────────────────── */
   .panel {
     position: fixed;
     inset-block: auto 0; inset-inline: 0;
@@ -195,7 +192,6 @@
   }
   .enquire-btn:hover { background: var(--color-ink-soft); }
 
-  /* ── Desktop — float bottom-right ───────────────────────────────────── */
   @media (min-width: 640px) {
     .panel {
       inset-block: auto var(--space-md);
