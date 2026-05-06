@@ -94,10 +94,11 @@ document.addEventListener('astro:page-load', () => {
       gsap.timeline({ delay: 0.5 })
         .fromTo(title,  { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1.2, ease: EASE }, 0)
         .fromTo(season, { opacity: 0 },        { opacity: 1, duration: 0.6, ease: EASE }, 0.4)
-        .fromTo(cta,    { opacity: 0, y: 8 },  { opacity: 1, y: 0, duration: 0.7, ease: EASE }, 0.6);
+        .fromTo(cta,    { opacity: 0, y: 8 },  { opacity: 1, y: 0, duration: 0.7, ease: EASE }, 0.6)
+        .call(() => initPage(), [], 0.8);
+    } else {
+      initPage();
     }
-
-    initPage();
   });
 });
 </script>
