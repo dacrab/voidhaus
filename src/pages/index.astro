@@ -94,11 +94,9 @@ document.addEventListener('astro:page-load', () => {
     if (!morphed && title) {
       gsap.set([title, season, cta], { opacity: 0 });
       gsap.timeline({ delay: 0.5 })
-        .to(title,  { opacity: 1, y: 0, duration: 1.2, ease: EASE }, 0)
-        .fromTo(title, { y: 50 }, { y: 0, duration: 1.2, ease: EASE }, 0)
-        .to(season, { opacity: 1, duration: 0.6, ease: EASE }, 0.4)
-        .to(cta,    { opacity: 1, y: 0, duration: 0.7, ease: EASE }, 0.6)
-        .fromTo(cta, { y: 8 }, { y: 0, duration: 0.7, ease: EASE }, 0.6);
+        .fromTo(title,  { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1.2, ease: EASE }, 0)
+        .fromTo(season, { opacity: 0 },        { opacity: 1, duration: 0.6, ease: EASE }, 0.4)
+        .fromTo(cta,    { opacity: 0, y: 8 },  { opacity: 1, y: 0, duration: 0.7, ease: EASE }, 0.6);
     }
 
     // Rest of page

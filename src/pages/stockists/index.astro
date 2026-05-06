@@ -64,7 +64,7 @@ const totalStores = STOCKISTS.reduce((t, r) => t + r.stores.length, 0);
 
   <div class="stockists wrap">
     {STOCKISTS.map((region, ri) => (
-      <div class="region" data-anim="scroll" style={`--delay:${ri * 0.1}s`}>
+      <div class="region" data-anim="scroll">
         <div class="region-header">
           <span class="label op-30 region-num">{String(ri + 1).padStart(2, '0')}</span>
           <h2 class="region-title">{region.region}</h2>
