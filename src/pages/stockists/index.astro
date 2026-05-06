@@ -1,5 +1,5 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '@layouts/Layout.astro';
 
 type Store = {
   city:    string;
@@ -96,7 +96,7 @@ const totalStores = STOCKISTS.reduce((t, r) => t + r.stores.length, 0);
 </Layout>
 
 <script>
-import { initPage, onReady } from '../../lib/animate';
+import { initPage, onReady } from '@lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {

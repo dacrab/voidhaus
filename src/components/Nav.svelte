@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { createModal, panelIn } from '../lib/modal';
-  import { getCart } from '../lib/cart';
+  import { createModal, panelIn } from '@lib/modal';
+  import { getCart } from '@lib/cart';
 
   interface Props { solidNav?: boolean; }
   let { solidNav = false }: Props = $props();
