@@ -1,84 +1,40 @@
 ---
 import Layout from '@layouts/Layout.astro';
+import { STOCKISTS } from '@data/stockists';
 
-type Store = {
-  city:    string;
-  name:    string;
-  address: string;
-  country: string;
-};
-
-type Region = {
-  region: string;
-  stores: Store[];
-};
-
-const STOCKISTS: Region[] = [
-  {
-    region: 'Europe',
-    stores: [
-      { city: 'Milan',     name: 'Antonia',             address: 'Via Cusani 5, 20121',         country: 'Italy'   },
-      { city: 'Milan',     name: '10 Corso Como',        address: 'Corso Como 10, 20154',         country: 'Italy'   },
-      { city: 'Paris',     name: 'Colette',              address: '213 Rue Saint-Honoré, 75001', country: 'France'  },
-      { city: 'Paris',     name: "L'Eclaireur",          address: '3 Rue des Rosiers, 75004',    country: 'France'  },
-      { city: 'London',    name: 'Dover Street Market',  address: '18-22 Haymarket, SW1Y 4DG',   country: 'UK'      },
-      { city: 'Antwerp',   name: 'Louis',                address: 'Lombardenvest 2, 2000',        country: 'Belgium' },
-      { city: 'Berlin',    name: 'Voo Store',            address: 'Oranienstr. 24, 10999',        country: 'Germany' },
-    ],
-  },
-  {
-    region: 'Americas',
-    stores: [
-      { city: 'New York',    name: 'Opening Ceremony', address: '35 Howard Street, NY 10013',  country: 'USA'    },
-      { city: 'New York',    name: 'Barneys New York',  address: '660 Madison Ave, NY 10065',   country: 'USA'    },
-      { city: 'Los Angeles', name: 'H.Lorenzo',         address: '8660 Sunset Blvd, CA 90069',  country: 'USA'    },
-      { city: 'Toronto',     name: 'Ssense',            address: '90 St Paul St W, H2Y 1Z1',    country: 'Canada' },
-    ],
-  },
-  {
-    region: 'Asia Pacific',
-    stores: [
-      { city: 'Tokyo',     name: 'United Arrows', address: '3-28-1 Jingumae, Shibuya',    country: 'Japan'     },
-      { city: 'Tokyo',     name: 'Isetan',        address: '3-14-1 Shinjuku, 160-0022',   country: 'Japan'     },
-      { city: 'Seoul',     name: 'Boon The Shop', address: '2F, 86 Cheongdam-dong',       country: 'Korea'     },
-      { city: 'Hong Kong', name: 'Lane Crawford', address: 'IFC Mall, 8 Finance Street',  country: 'HK'        },
-      { city: 'Sydney',    name: 'Incu',          address: '76 Oxford Street, Paddington', country: 'Australia' },
-    ],
-  },
-];
-
-const totalStores = STOCKISTS.reduce((t, r) => t + r.stores.length, 0);
+const total = STOCKISTS.reduce((n, r) => n + r.stores.length, 0);
 ---
 
 <Layout title="Stockists" description="Find Voidhaus at select retailers worldwide." solidNav={true}>
-  <div class="ph wrap page-top-spacing">
-    <div class="ph-inner">
-      <div class="ph-left">
-        <span class="label muted" data-anim="hero" data-delay="0">Worldwide</span>
-        <h1 class="ph-title" data-anim="hero" data-delay="0.15">Stockists</h1>
+
+  <header class="st-head wrap">
+    <div class="rule js-rule"></div>
+    <div class="st-head-inner">
+      <div>
+        <span class="label muted" data-anim="hero">Worldwide</span>
+        <h1 class="st-title" data-anim="hero" data-delay="0.1">Stockists</h1>
       </div>
-      <span class="label muted ph-aside" data-anim="hero" data-delay="0.25">{totalStores} stores</span>
+      <span class="label muted" data-anim="hero" data-delay="0.2">{total} stores</span>
     </div>
-    <div class="rule"></div>
-  </div>
+  </header>
 
   <div class="stockists wrap">
     {STOCKISTS.map((region, ri) => (
       <div class="region" data-anim="scroll">
-        <div class="region-header">
-          <span class="label op-30 region-num">{String(ri + 1).padStart(2, '0')}</span>
+        <div class="region-head">
+          <span class="label op-30">{String(ri + 1).padStart(2, '0')}</span>
           <h2 class="region-title">{region.region}</h2>
-          <span class="label muted region-count">{region.stores.length} stores</span>
+          <span class="label muted">{region.stores.length} stores</span>
         </div>
         <div class="stores-grid">
           {region.stores.map(s => (
             <div class="store">
               <div class="store-top">
-                <span class="store-city label op-35">{s.city}</span>
-                <span class="store-country label muted">{s.country}</span>
+                <span class="label op-35">{s.city}</span>
+                <span class="label muted">{s.country}</span>
               </div>
               <h3 class="store-name">{s.name}</h3>
-              <p class="store-address label muted">{s.address}</p>
+              <p class="store-addr label muted">{s.address}</p>
             </div>
           ))}
         </div>
@@ -86,106 +42,107 @@ const totalStores = STOCKISTS.reduce((t, r) => t + r.stores.length, 0);
       </div>
     ))}
 
-    <div class="stockists-cta" data-anim="scroll">
-      <p class="cta-text">
-        Interested in stocking Voidhaus?
-      </p>
+    <div class="st-cta" data-anim="scroll">
+      <p class="st-cta-text">Interested in stocking Voidhaus?</p>
       <a href="/contact" class="label muted-link">Get in touch →</a>
     </div>
   </div>
+
 </Layout>
 
 <script>
 import { initPage, onReady } from '@lib/animate';
-
 document.addEventListener('astro:page-load', () => {
-  onReady(() => {
-    initPage('.ph .rule');
-  });
+  onReady(() => { initPage('.js-rule'); });
 });
 </script>
 
 <style>
-  .stockists { padding-bottom: var(--space-4xl); }
+.st-head {
+  padding-top: calc(var(--nav-h) + var(--space-2xl));
+  padding-bottom: var(--space-2xl);
+}
 
-  .region { padding-block: 3.5rem 0; }
-  @media (min-width: 768px) { .region { padding-block: 5rem 0; } }
+.st-head-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-top: var(--space-lg);
+  gap: var(--space-md);
+}
 
-  .region-header {
-    display: flex;
-    align-items: baseline;
-    gap: var(--space-lg);
-    padding-bottom: var(--space-xl);
-    border-bottom: 1px solid var(--color-rule);
-    margin-bottom: 0;
-  }
+.st-title {
+  font-size: var(--text-display-md);
+  font-variation-settings: var(--font-weight-light);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-top: var(--space-xs);
+}
 
-  .region-title {
-    font-family: var(--font-sans);
-    font-size: clamp(1.25rem, 3vw, 2rem);
-    font-variation-settings: var(--font-weight-normal);
-    letter-spacing: -0.02em;
-    color: var(--color-ink);
-    flex: 1;
-  }
+.stockists { padding-bottom: var(--space-4xl); }
 
-  .stores-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1px;
-    background: var(--color-rule);
-    border-inline: 1px solid var(--color-rule);
-    border-bottom: 1px solid var(--color-rule);
-  }
-  @media (min-width: 768px)  { .stores-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1280px) { .stores-grid { grid-template-columns: repeat(4, 1fr); } }
+.region { padding-top: var(--space-3xl); }
+@media (min-width: 768px) { .region { padding-top: var(--space-4xl); } }
 
-  .store {
-    background: var(--color-white);
-    padding: var(--space-lg) 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-    transition: background var(--duration-fast);
-  }
-  @media (min-width: 768px) { .store { padding: var(--space-xl) var(--space-lg); } }
-  .store:hover { background: var(--color-off); }
+.region-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-lg);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--color-rule);
+}
 
-  .store-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-xs);
-    margin-bottom: 0.25rem;
-  }
+.region-title {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  font-variation-settings: var(--font-weight-normal);
+  letter-spacing: -0.02em;
+  flex: 1;
+}
 
-  .store-name {
-    font-family: var(--font-sans);
-    font-size: var(--text-base);
-    font-variation-settings: var(--font-weight-medium);
-    color: var(--color-ink);
-    letter-spacing: var(--letter-spacing-tight);
-  }
+.stores-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--color-rule);
+  border-inline: 1px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-rule);
+  margin-bottom: var(--space-3xl);
+}
+@media (min-width: 768px)  { .stores-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1280px) { .stores-grid { grid-template-columns: repeat(4, 1fr); } }
 
-  .store-address {
-    text-transform: none;
-    letter-spacing: var(--letter-spacing-normal);
-    line-height: 1.5;
-  }
+.store {
+  background: var(--color-white);
+  padding: var(--space-lg) 1.25rem;
+  display: flex; flex-direction: column; gap: var(--space-xs);
+  transition: background var(--duration-fast);
+}
+@media (min-width: 768px) { .store { padding: var(--space-xl) var(--space-lg); } }
+.store:hover { background: var(--color-off); }
 
-  .stockists-cta {
-    padding-block: 4rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--space-md);
-    border-top: 1px solid var(--color-rule);
-  }
+.store-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-xs); margin-bottom: 0.25rem;
+}
 
-  .cta-text {
-    font-size: var(--text-base);
-    font-variation-settings: var(--font-weight-normal);
-    color: var(--color-soft);
-  }
+.store-name {
+  font-size: var(--text-base);
+  font-variation-settings: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.store-addr { text-transform: none; letter-spacing: 0; line-height: 1.5; }
+
+.st-cta {
+  padding-block: var(--space-3xl);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: var(--space-md);
+  border-top: 1px solid var(--color-rule);
+}
+
+.st-cta-text {
+  font-size: var(--text-base);
+  font-variation-settings: var(--font-weight-normal);
+  color: var(--color-soft);
+}
 </style>

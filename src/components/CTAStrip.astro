@@ -1,8 +1,8 @@
 ---
 interface Props {
-  label: string;
+  label:    string;
   linkText: string;
-  href: string;
+  href:     string;
 }
 const { label, linkText, href } = Astro.props;
 ---
@@ -11,7 +11,7 @@ const { label, linkText, href } = Astro.props;
   <div class="rule"></div>
   <div class="cta-inner">
     <span class="label op-35">{label}</span>
-    <a href={href} class="label muted-link">{linkText} →</a>
+    <a {href} class="label muted-link">{linkText} →</a>
   </div>
   <div class="rule"></div>
 </div>

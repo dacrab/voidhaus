@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
   import { createModal, panelIn } from '@lib/modal';
   import { getCart } from '@lib/cart';
+  import { SITE } from '@data/site';
 
   interface Props { solidNav?: boolean; }
   let { solidNav = false }: Props = $props();
@@ -59,7 +60,6 @@
   function handleNavClick() {
     open = false;
     modal.close();
-    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function onKeydown(e: KeyboardEvent) {
@@ -113,8 +113,8 @@
 
     <div class="menu-foot">
       <div class="menu-foot-info">
-        <span class="label op-35">SS 2026</span>
-        <span class="label op-35">Milan · Antwerp · Florence · Tokyo</span>
+        <span class="label op-35">{SITE.season}</span>
+        <span class="label op-35">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
       </div>
       <button class="menu-foot-cart label" onclick={() => { toggleMenu(); openCart(); }}>
         Selection{#if cartCount > 0} ({cartCount}){/if} →
@@ -147,7 +147,7 @@
 
   .nav-logo {
     font-size: var(--text-sm); font-variation-settings: var(--font-weight-semibold);
-    letter-spacing: var(--letter-spacing-nav); text-transform: uppercase; color: inherit;
+    letter-spacing: var(--letter-spacing-label); text-transform: uppercase; color: inherit;
     grid-column: 2; justify-self: center;
   }
 
@@ -157,14 +157,6 @@
     color: inherit; opacity: var(--opacity-hover);
     transition: opacity var(--duration-fast);
     background: none; border: none; padding: 0;
-    animation: nav-link-in 0.5s var(--ease-out) both;
-  }
-  .nav-r .nav-link:nth-child(1) { animation-delay: 0.69s; }
-  .nav-r .nav-link:nth-child(2) { animation-delay: 0.76s; }
-
-  @keyframes nav-link-in {
-    from { opacity: 0; transform: translateY(-5px); }
-    to   { opacity: var(--opacity-hover); transform: translateY(0); }
   }
   .nav-link:hover { opacity: 1; }
 
@@ -203,7 +195,6 @@
 
   .menu-link {
     display: flex; align-items: baseline; gap: var(--space-lg);
-    font-family: var(--font-sans);
     font-size: clamp(2.5rem, 7vw, 6.5rem);
     font-variation-settings: var(--font-weight-light);
     letter-spacing: -0.04em;

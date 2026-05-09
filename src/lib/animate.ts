@@ -7,32 +7,36 @@ gsap.config({ force3D: true });
 
 export { gsap };
 export const EASE = 'expo.out';
-export const DUR = { fast: 0.4, base: 0.6, slow: 0.9, slower: 1.1 };
+export const DUR = { base: 0.6, slow: 0.9, slower: 1.1 };
 
-let lenis: Lenis;
+const isTouch = () => window.matchMedia('(hover: none)').matches;
 
-function getLenis(): Lenis {
-  if (!lenis) {
-    lenis = new Lenis({
-      duration: 1.2,
-      easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    });
-    (window as any).__lenis = lenis;
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add(time => lenis.raf(time * 1000));
-    gsap.ticker.lagSmoothing(0);
-  }
+let lenis: Lenis | null = null;
+
+export function getLenis(): Lenis | null {
   return lenis;
 }
 
-if (typeof document !== 'undefined') {
+function initLenis(): void {
+  if (lenis || isTouch()) return;
+  lenis = new Lenis({
+    duration: 1.2,
+    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(time => lenis!.raf(time * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+
+// Called once from Layout.
+export function initScrollLifecycle(): void {
   document.addEventListener('astro:before-swap', () => {
-    getLenis().stop();
+    lenis?.stop();
     ScrollTrigger.getAll().forEach(t => t.kill());
   });
-  document.addEventListener('astro:after-swap', () => {
-    getLenis().scrollTo(0, { immediate: true });
-    getLenis().start();
+  document.addEventListener('astro:page-load', () => {
+    initLenis();
+    lenis?.start();
   });
 }
 
@@ -44,7 +48,6 @@ function animateIn(els: HTMLElement[], vars: gsap.TweenVars) {
 }
 
 export function initPage(ruleSelector?: string): void {
-  getLenis();
   ScrollTrigger.refresh();
 
   const heroEls = [...document.querySelectorAll<HTMLElement>('[data-anim="hero"]')];

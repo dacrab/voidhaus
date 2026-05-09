@@ -6,6 +6,7 @@
 
   const modal = createModal();
   let open = $state(false);
+  let panelEl = $state<HTMLElement | undefined>();
 
   const clothing = [
     { size: 'XS', it: '36', fr: '36', uk: '8',  us: '4',  chest: '82–85', waist: '62–65' },
@@ -26,7 +27,7 @@
 
   function openModal() {
     open = true;
-    modal.open();
+    modal.open(panelEl);
   }
 
   function closeModal() {
@@ -35,7 +36,7 @@
   }
 
   function onKeydown(e: KeyboardEvent) {
-    if (open && e.key === 'Escape') closeModal();
+    if (open && modal.handleKeydown(panelEl, e)) closeModal();
   }
 </script>
 
@@ -59,6 +60,7 @@
     aria-modal="true"
     aria-labelledby="sg-title"
     tabindex="-1"
+    bind:this={panelEl}
     in:panelIn={{ y: 0.75, scale: true }}
     out:fade={{ duration: 200 }}
   >
