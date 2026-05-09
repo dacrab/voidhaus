@@ -18,69 +18,68 @@ const { title, description, updated, sibling, sections } = Astro.props;
 
   <div class="legal wrap">
     <div class="legal-body">
+
       <nav class="legal-nav" aria-label="Legal navigation">
         <a href={sibling.href} class="label muted muted-link">{sibling.label} →</a>
         <a href="/stockists"   class="label muted muted-link">Stockists →</a>
       </nav>
 
-      {sections.map(s => (
-        <div class="legal-section" data-anim="scroll">
-          <h2 class="section-title label">{s.title}</h2>
-          <p class="section-body">{s.body}</p>
-        </div>
-      ))}
+      <div class="legal-sections">
+        {sections.map(s => (
+          <div class="legal-section" data-anim="scroll">
+            <h2 class="section-title label">{s.title}</h2>
+            <p class="section-body">{s.body}</p>
+          </div>
+        ))}
+      </div>
+
     </div>
   </div>
 </Layout>
 
 <script>
 import { initPage, onReady } from '@lib/animate';
-
 document.addEventListener('astro:page-load', () => {
   onReady(() => { initPage('.ph .rule'); });
 });
 </script>
 
 <style>
-  .legal { padding-bottom: var(--space-4xl); }
+.legal { padding-bottom: var(--space-4xl); }
 
-  .legal-body {
-    display: grid;
-    padding-top: var(--space-2xl);
-  }
-  @media (min-width: 900px) {
-    .legal-body {
-      grid-template-columns: 200px 1fr;
-      gap: var(--space-4xl);
-      align-items: start;
-    }
-  }
+.legal-body {
+  display: grid;
+  padding-top: var(--space-2xl);
+}
+@media (min-width: 900px) {
+  .legal-body { grid-template-columns: 200px 1fr; gap: var(--space-4xl); align-items: start; }
+}
 
-  .legal-nav {
-    display: flex; flex-direction: column; gap: var(--space-sm);
-    padding-bottom: var(--space-2xl);
-    position: sticky; top: calc(var(--nav-h) + 2rem);
-  }
-  @media (max-width: 899px) { .legal-nav { position: static; flex-direction: row; } }
+.legal-nav {
+  display: flex; flex-direction: column; gap: var(--space-sm);
+  padding-bottom: var(--space-2xl);
+  position: sticky; top: calc(var(--nav-h) + 2rem);
+}
+@media (max-width: 899px) { .legal-nav { position: static; flex-direction: row; } }
 
-  .legal-section {
-    padding-block: 2rem;
-    border-bottom: 1px solid var(--color-rule);
-    display: flex; flex-direction: column; gap: var(--space-sm);
-  }
-  .legal-section:first-of-type { border-top: 1px solid var(--color-rule); }
-  @media (min-width: 900px) {
-    .legal-section:first-of-type { border-top: none; }
-    .legal-section { padding-block: 2.5rem; }
-  }
+.legal-section {
+  padding-block: 2rem;
+  border-bottom: 1px solid var(--color-rule);
+  display: flex; flex-direction: column; gap: var(--space-sm);
+}
+.legal-sections > .legal-section:first-child { border-top: 1px solid var(--color-rule); }
+@media (min-width: 900px) {
+  .legal-sections > .legal-section:first-child { border-top: none; }
+  .legal-section { padding-block: 2.5rem; }
+}
 
-  .section-title { color: var(--color-ink); }
+.section-title { color: var(--color-ink); }
 
-  .section-body {
-    font-size: var(--text-base);
-    font-variation-settings: var(--font-weight-normal);
-    line-height: 1.85;
-    color: var(--color-soft);
-    max-width: 60ch;
-  }
+.section-body {
+  font-size: var(--text-base);
+  font-variation-settings: var(--font-weight-normal);
+  line-height: 1.85;
+  color: var(--color-soft);
+  max-width: 60ch;
+}
 </style>

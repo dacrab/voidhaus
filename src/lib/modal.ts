@@ -1,14 +1,12 @@
+import { getLenis } from './animate';
 import { trapFocus } from './focusTrap';
-
-const stopScroll  = () => (window as any).__lenis?.stop();
-const startScroll = () => (window as any).__lenis?.start();
 
 export function createModal() {
   let prevFocus: HTMLElement | null = null;
 
   function open(panelEl?: HTMLElement) {
     prevFocus = document.activeElement as HTMLElement;
-    stopScroll();
+    getLenis()?.stop();
     if (panelEl) {
       requestAnimationFrame(() =>
         panelEl.querySelector<HTMLElement>('button,[href],[tabindex]')?.focus()
@@ -17,7 +15,7 @@ export function createModal() {
   }
 
   function close() {
-    startScroll();
+    getLenis()?.start();
     prevFocus?.focus();
   }
 

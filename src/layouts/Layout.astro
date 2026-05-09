@@ -33,7 +33,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#faf9f7" />
+    <meta name="theme-color" content="#f8f6f2" />
     <link rel="icon"             href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
     <link rel="canonical"        href={canonical} />
@@ -83,6 +83,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   </head>
 
   <body>
+    <div class="veil" id="js-veil" aria-hidden="true"></div>
     <div class="cursor" id="js-cursor" aria-hidden="true"></div>
     <Nav client:load solidNav={solidNav} />
     <Cart client:load />
@@ -92,41 +93,56 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
     </main>
 
     <script>
-      // Custom cursor — re-query each frame so view transitions don't break the reference
+      import { initScrollLifecycle } from '@lib/animate';
+
+      // One-time setup — persists across view transitions.
+      initScrollLifecycle();
+
       if (window.matchMedia('(hover: hover)').matches) {
+        let cursor = document.getElementById('js-cursor');
+        document.addEventListener('astro:after-swap', () => { cursor = document.getElementById('js-cursor'); });
+
         let mx = -100, my = -100;
         document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-        document.addEventListener('mousedown', () => document.getElementById('js-cursor')?.classList.add('click'));
-        document.addEventListener('mouseup',   () => document.getElementById('js-cursor')?.classList.remove('click'));
+        document.addEventListener('mousedown', () => cursor?.classList.add('click'));
+        document.addEventListener('mouseup',   () => cursor?.classList.remove('click'));
         document.addEventListener('mouseover', e => {
           const t = (e.target as Element).closest('a, button, [role="button"]');
-          document.getElementById('js-cursor')?.classList.toggle('hover', !!t);
+          cursor?.classList.toggle('hover', !!t);
         });
         (function loop() {
-          document.getElementById('js-cursor')?.style.setProperty('transform', `translate(calc(${mx}px - 50%), calc(${my}px - 50%))`);
+          cursor?.style.setProperty('transform', `translate(calc(${mx}px - 50%), calc(${my}px - 50%))`);
           requestAnimationFrame(loop);
         })();
       }
 
-      // Page entry ceremony — brief black overlay that fades out
-      const veil = document.createElement('div');
-      veil.style.cssText = 'position:fixed;inset:0;background:#1a1816;z-index:10000;pointer-events:none;transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1)';
-      document.body.prepend(veil);
-      requestAnimationFrame(() => requestAnimationFrame(() => { veil.style.opacity = '0'; }));
-      veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+      // Per-page setup — re-runs after every view transition.
+      function setupPage() {
+        const veil = document.getElementById('js-veil');
+        if (veil) {
+          if (document.documentElement.hasAttribute('data-astro-transition')) {
+            veil.remove();
+          } else {
+            requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add('out')));
+            veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+          }
+        }
 
-      document.getElementById('nl-form')?.addEventListener('submit', e => {
-        e.preventDefault();
-        const form  = e.target as HTMLFormElement;
-        const input = form.querySelector<HTMLInputElement>('.nl-input');
-        const btn   = form.querySelector<HTMLButtonElement>('.nl-btn');
-        if (!input || !btn || !input.value.includes('@')) { input?.focus(); return; }
-        btn.textContent = 'Subscribed ✓';
-        btn.classList.add('subscribed');
-        input.value    = '';
-        input.disabled = true;
-        btn.disabled   = true;
-      });
+        document.getElementById('nl-form')?.addEventListener('submit', e => {
+          e.preventDefault();
+          const form  = e.target as HTMLFormElement;
+          const input = form.querySelector<HTMLInputElement>('.nl-input');
+          const btn   = form.querySelector<HTMLButtonElement>('.nl-btn');
+          if (!input || !btn || !input.value.includes('@')) { input?.focus(); return; }
+          btn.textContent = 'Subscribed ✓';
+          btn.classList.add('subscribed');
+          input.value    = '';
+          input.disabled = true;
+          btn.disabled   = true;
+        });
+      }
+
+      document.addEventListener('astro:page-load', setupPage);
     </script>
 
     <footer class="site-footer">
@@ -168,6 +184,16 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
 </html>
 
 <style>
+  .veil {
+    position: fixed; inset: 0;
+    background: var(--color-ink);
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .veil.out { opacity: 0; }
+
   .site-footer { border-top: 1px solid var(--color-rule); margin-top: var(--space-3xl); }
 
   .newsletter { padding-block: var(--space-2xl); border-bottom: 1px solid var(--color-rule); }
@@ -177,7 +203,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   .nl-form    { display: flex; border: 1px solid var(--color-rule); flex-shrink: 0; }
   .nl-input {
     background: none; border: none;
-    color: var(--color-ink); font-family: var(--font-sans);
+    color: var(--color-ink);
     font-variation-settings: var(--font-weight-normal);
     font-size: max(16px, 0.8125rem);
     padding: var(--space-sm) var(--space-md); outline: none; width: 220px;

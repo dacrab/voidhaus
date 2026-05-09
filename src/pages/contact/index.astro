@@ -1,6 +1,5 @@
 ---
 import Layout from '@layouts/Layout.astro';
-import PageHeader from '@components/PageHeader.astro';
 import { SITE } from '@data/site';
 
 const subjects = ['General', 'Order', 'Press', 'Stockist'] as const;
@@ -14,7 +13,16 @@ const info = [
 ---
 
 <Layout title="Contact" solidNav={true}>
-  <PageHeader label="Contact" title="Let's speak." />
+
+  <header class="contact-head wrap">
+    <div class="rule js-rule"></div>
+    <div class="contact-head-inner">
+      <div>
+        <span class="label muted" data-anim="hero">Contact</span>
+        <h1 class="contact-title" data-anim="hero" data-delay="0.1">Let's speak.</h1>
+      </div>
+    </div>
+  </header>
 
   <div class="contact-body wrap">
 
@@ -23,12 +31,12 @@ const info = [
 
       <div class="field-row">
         <div class="field">
-          <label class="label muted field-label" for="name">Name</label>
+          <label class="label muted" for="name">Name</label>
           <input class="field-inp" type="text" id="name" name="name"
             placeholder="Your name" autocomplete="name" required />
         </div>
         <div class="field">
-          <label class="label muted field-label" for="email">Email</label>
+          <label class="label muted" for="email">Email</label>
           <input class="field-inp" type="email" id="email" name="email"
             placeholder="your@email.com" autocomplete="email" required />
         </div>
@@ -38,8 +46,7 @@ const info = [
         <legend class="label muted">Subject</legend>
         <div class="chips">
           {subjects.map((s, i) => (
-            <button type="button" class:list={['chip', 'label', { active: i === 0 }]}
-              data-subject={s}>
+            <button type="button" class:list={['chip', 'label', { active: i === 0 }]} data-subject={s}>
               {s}
             </button>
           ))}
@@ -48,7 +55,7 @@ const info = [
       </fieldset>
 
       <div class="field">
-        <label class="label muted field-label" for="msg">Message</label>
+        <label class="label muted" for="msg">Message</label>
         <textarea class="field-inp field-ta" id="msg" name="message"
           placeholder="Write here…" rows="5"></textarea>
       </div>
@@ -64,7 +71,7 @@ const info = [
       <dl class="info-list">
         {info.map(({ key, lines }) => (
           <div class="info-row">
-            <dt class="label op-35 info-key">{key}</dt>
+            <dt class="label op-35">{key}</dt>
             <dd class="info-vals">
               {lines.map(l => <span class="info-val">{l}</span>)}
             </dd>
@@ -74,6 +81,7 @@ const info = [
     </aside>
 
   </div>
+
 </Layout>
 
 <script>
@@ -81,22 +89,20 @@ import { initPage, onReady, gsap } from '@lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    initPage('.ph .rule');
+    initPage('.js-rule');
 
-    const chips = document.querySelectorAll<HTMLElement>('.chip');
+    const chips   = document.querySelectorAll<HTMLElement>('.chip');
     const subject = document.getElementById('js-subject') as HTMLInputElement | null;
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        if (subject) subject.value = chip.dataset.subject ?? '';
-      });
-    });
+    chips.forEach(chip => chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      if (subject) subject.value = chip.dataset.subject ?? '';
+    }));
 
     document.getElementById('js-form')?.addEventListener('submit', e => {
       e.preventDefault();
-      const form = e.target as HTMLFormElement;
-      const name = form.querySelector<HTMLInputElement>('#name');
+      const form  = e.target as HTMLFormElement;
+      const name  = form.querySelector<HTMLInputElement>('#name');
       const email = form.querySelector<HTMLInputElement>('#email');
       if (!name?.value.trim() || !email?.value.includes('@')) return;
       const text = document.querySelector<HTMLElement>('.submit-text');
@@ -111,6 +117,21 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
+.contact-head {
+  padding-top: calc(var(--nav-h) + var(--space-2xl));
+  padding-bottom: var(--space-2xl);
+}
+
+.contact-head-inner { padding-top: var(--space-lg); }
+
+.contact-title {
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  font-variation-settings: var(--font-weight-light);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-top: var(--space-xs);
+}
+
 .contact-body {
   display: grid;
   grid-template-columns: 1fr;
@@ -132,6 +153,7 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 480px) { .field-row { grid-template-columns: 1fr 1fr; } }
 
 .field { display: flex; flex-direction: column; gap: 0.65rem; }
+
 .field-inp {
   background: none; border: none;
   border-bottom: 1px solid var(--color-rule);
@@ -143,12 +165,13 @@ document.addEventListener('astro:page-load', () => {
   outline: none; width: 100%;
   transition: border-bottom-color var(--duration-fast);
 }
-.field-inp:focus { border-bottom-color: var(--color-mid); }
+.field-inp:focus       { border-bottom-color: var(--color-mid); }
 .field-inp::placeholder { color: var(--color-mid); }
 .field-ta { resize: none; }
 
 .subject-field { border: none; padding: 0; display: flex; flex-direction: column; gap: 0.65rem; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
 .chip {
   background: none; border: 1px solid var(--color-rule);
   color: var(--color-soft); padding: 0.45rem 1rem;
@@ -160,8 +183,8 @@ document.addEventListener('astro:page-load', () => {
 .submit-btn {
   display: flex; align-items: center; justify-content: space-between;
   background: none; border: 1px solid var(--color-ink);
-  color: var(--color-ink); padding: var(--space-md) 1.25rem;
-  width: 100%; transition: background var(--duration-fast), color var(--duration-fast);
+  color: var(--color-ink); padding: var(--space-md) 1.25rem; width: 100%;
+  transition: background var(--duration-fast), color var(--duration-fast);
 }
 .submit-btn:hover { background: var(--color-ink); color: var(--color-white); }
 

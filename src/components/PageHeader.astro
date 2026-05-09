@@ -10,10 +10,10 @@ const { label, title, aside } = Astro.props;
 <div class="ph wrap page-top-spacing">
   <div class="ph-inner">
     <div class="ph-left">
-      <span class="label muted" data-anim="hero" data-delay="0">{label}</span>
-      <h1 class="ph-title" data-anim="hero" data-delay="0.15">{title}</h1>
+      <span class="label muted" data-anim="hero">{label}</span>
+      <h1 class="ph-title" data-anim="hero" data-delay="0.1">{title}</h1>
     </div>
-    {aside && <span class="label muted ph-aside" data-anim="hero" data-delay="0.25">{aside}</span>}
+    {aside && <span class="label muted" data-anim="hero" data-delay="0.2">{aside}</span>}
   </div>
   <div class="rule"></div>
 </div>

@@ -7,26 +7,19 @@ import { SITE } from '@data/site';
 
 <Layout title="Collection" solidNav={true}>
 
-  <div class="coll-top wrap">
-    <div class="coll-top-inner">
-      <h1 class="coll-title" data-anim="hero" data-delay="0">Collection</h1>
-      <span class="label muted coll-count" data-anim="hero" data-delay="0.15">
-        {SITE.season} — {PRODUCTS.length} pieces
-      </span>
+  <div class="coll-head wrap">
+    <div class="coll-head-inner">
+      <h1 class="coll-title" data-anim="hero">Collection</h1>
+      <span class="label muted" data-anim="hero" data-delay="0.15">{SITE.season} — {PRODUCTS.length} pieces</span>
     </div>
-
     <div class="filters" role="group" aria-label="Filter by category" data-anim="hero" data-delay="0.2">
       {CATEGORIES.map((f, i) => (
-        <button
-          class:list={['filter-btn', 'label', { active: i === 0 }]}
-          data-filter={f}
-          type="button"
-        >
+        <button class:list={['filter-btn', 'label', { active: i === 0 }]} data-filter={f} type="button">
           {f}
         </button>
       ))}
     </div>
-    <div class="rule"></div>
+    <div class="rule js-rule"></div>
   </div>
 
   <div class="product-grid wrap" id="js-grid">
@@ -40,45 +33,44 @@ import { initPage, onReady, gsap, DUR } from '@lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    initPage('.coll-top .rule');
+    initPage('.js-rule');
 
     const cards = document.querySelectorAll<HTMLElement>('.pc');
-    const btns = document.querySelectorAll<HTMLElement>('.filter-btn');
-    btns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        btns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const f = btn.dataset.filter;
-        cards.forEach(card => {
-          const show = f === 'All' || card.dataset.category === f;
-          gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: DUR.base, ease: 'power2.out' });
-        });
+    const btns  = document.querySelectorAll<HTMLElement>('.filter-btn');
+
+    btns.forEach(btn => btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      cards.forEach(card => {
+        const show = f === 'All' || card.dataset.category === f;
+        gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: DUR.base, ease: 'power2.out' });
       });
-    });
+    }));
   });
 });
 </script>
 
 <style>
-.coll-top { padding-top: calc(var(--nav-h) + var(--space-2xl)); }
-@media (min-width: 768px) { .coll-top { padding-top: calc(var(--nav-h) + var(--space-3xl)); } }
+.coll-head {
+  padding-top: calc(var(--nav-h) + var(--space-2xl));
+}
+@media (min-width: 768px) { .coll-head { padding-top: calc(var(--nav-h) + var(--space-3xl)); } }
 
-.coll-top-inner {
+.coll-head-inner {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding-bottom: var(--space-lg);
-  gap: var(--space-md);
   flex-wrap: wrap;
+  gap: var(--space-md);
+  padding-bottom: var(--space-lg);
 }
 
 .coll-title {
-  font-family: var(--font-sans);
   font-size: clamp(1.75rem, 5vw, 3.5rem);
   font-variation-settings: var(--font-weight-normal);
   letter-spacing: -0.03em;
   line-height: 1;
-  color: var(--color-ink);
 }
 
 .filters {
@@ -92,12 +84,11 @@ document.addEventListener('astro:page-load', () => {
 @media (min-width: 768px) { .filters { gap: var(--space-xl); } }
 
 .filter-btn {
-  background: none; border: none;
+  background: none; border: none; padding: 0;
   color: var(--color-ink); opacity: var(--opacity-disabled);
+  white-space: nowrap; flex-shrink: 0;
   transition: opacity var(--duration-fast);
-  white-space: nowrap; flex-shrink: 0; padding: 0;
 }
 .filter-btn:hover  { opacity: var(--opacity-hover); }
 .filter-btn.active { opacity: 1; }
-
 </style>

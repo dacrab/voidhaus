@@ -2,79 +2,83 @@
 import Layout from '@layouts/Layout.astro';
 import { Picture } from 'astro:assets';
 import ProductCard from '@components/ProductCard.astro';
-import PageHeader from '@components/PageHeader.astro';
 import CTAStrip from '@components/CTAStrip.astro';
 import { PRODUCTS } from '@data/products';
 import { SITE } from '@data/site';
 import { IMAGES } from '@assets/images';
 
-const spreads = [
+const chapters = [
   {
-    issue:    '01',
+    num:      '01',
     title:    'Weight',
-    subtitle: 'On the architecture of outerwear',
+    sub:      'On the architecture of outerwear',
     img:      IMAGES['coat-primary'],
-    heroSlug: 'obsidian-coat',
     products: PRODUCTS.filter(p => p.category === 'Outerwear'),
   },
   {
-    issue:    '02',
+    num:      '02',
     title:    'Structure',
-    subtitle: 'Tailoring, knitwear, the dressed body',
+    sub:      'Tailoring, knitwear, the dressed body',
     img:      IMAGES['trousers-primary'],
-    heroSlug: 'ash-trousers',
     products: PRODUCTS.filter(p => ['Tailoring', 'Ready-to-wear', 'Knitwear', 'Tops'].includes(p.category)),
   },
   {
-    issue:    '03',
+    num:      '03',
     title:    'Surface',
-    subtitle: 'Leather, canvas, the carried object',
+    sub:      'Leather, canvas, the carried object',
     img:      IMAGES['boots-primary'],
-    heroSlug: 'eclipse-boots',
     products: PRODUCTS.filter(p => ['Footwear', 'Accessories'].includes(p.category)),
   },
 ] as const;
 ---
 
 <Layout title="Lookbook" solidNav={true}>
-  <PageHeader label={SITE.season} title="Lookbook" aside="Three chapters" />
 
-  {spreads.map((s, si) => (
-    <section class="spread" id={`chapter-${s.issue}`}>
+  <header class="lb-header wrap">
+    <div class="rule js-rule"></div>
+    <div class="lb-header-inner">
+      <div>
+        <span class="label muted">{SITE.season}</span>
+        <h1 class="lb-title" data-anim="hero">Lookbook</h1>
+      </div>
+      <span class="label muted" data-anim="hero" data-delay="0.1">Three chapters</span>
+    </div>
+  </header>
 
-      <div class="spread-hero">
+  {chapters.map((ch, i) => (
+    <section class="chapter" id={`chapter-${ch.num}`}>
+
+      <div class="chapter-hero js-hero">
         <Picture
-          class="spread-img"
-          src={s.img}
+          class="chapter-img js-img"
+          src={ch.img}
           formats={['avif', 'webp']}
-          alt={s.title}
-          loading={si === 0 ? undefined : 'lazy'}
+          alt={ch.title}
+          loading={i === 0 ? undefined : 'lazy'}
           decoding="async"
           width={1600}
-          transition:name={`product-img-${s.heroSlug}`}
         />
-        <div class="spread-scrim scrim"></div>
-        <div class="spread-cap wrap">
-          <span class="label spread-issue">Chapter {s.issue}</span>
-          <h2 class="spread-title serif">{s.title}</h2>
-          <p class="label spread-sub">{s.subtitle}</p>
+        <div class="chapter-scrim scrim"></div>
+        <div class="chapter-cap wrap">
+          <span class="label chapter-num">Chapter {ch.num}</span>
+          <h2 class="chapter-title serif">{ch.title}</h2>
+          <p class="label chapter-sub">{ch.sub}</p>
         </div>
       </div>
 
-      <div class="product-grid wrap" id={`spread-${s.issue}`}>
-        {s.products.map((p) => (
-          <ProductCard {...p} imgWidth={700} />
-        ))}
+      <div class="product-grid wrap">
+        {ch.products.map(p => <ProductCard {...p} imgWidth={700} />)}
       </div>
 
-      {si < spreads.length - 1 && (
-        <div class="spread-gap wrap"><div class="rule"></div></div>
+      {i < chapters.length - 1 && (
+        <div class="chapter-divider wrap"><div class="rule"></div></div>
       )}
 
     </section>
   ))}
 
   <CTAStrip label={`${SITE.season} — All pieces`} linkText="View Collection" href="/collection" />
+
 </Layout>
 
 <script>
@@ -83,19 +87,15 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    initPage('.ph .rule');
+    initPage('.js-rule');
 
-    document.querySelectorAll<HTMLElement>('.spread-hero').forEach(hero => {
-      const img = hero.querySelector<HTMLElement>('.spread-img');
-      const cap = hero.querySelector<HTMLElement>('.spread-cap');
+    document.querySelectorAll<HTMLElement>('.js-hero').forEach(hero => {
+      const img = hero.querySelector<HTMLElement>('.js-img');
       if (!img) return;
-      gsap.set(img, { scale: 1.14 });
+      gsap.set(img, { scale: 1.12 });
       ScrollTrigger.create({
         trigger: hero, start: 'top bottom', end: 'bottom top', scrub: 2,
-        onUpdate: st => {
-          gsap.set(img, { yPercent: -12 * st.progress });
-          if (cap) gsap.set(cap, { yPercent: 3 * st.progress });
-        },
+        onUpdate: st => gsap.set(img, { yPercent: -10 * st.progress }),
       });
     });
   });
@@ -103,29 +103,46 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.spread-hero {
+.lb-header {
+  padding-top: calc(var(--nav-h) + var(--space-2xl));
+  padding-bottom: var(--space-2xl);
+}
+
+.lb-header-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-top: var(--space-lg);
+  gap: var(--space-md);
+}
+
+.lb-title {
+  font-size: var(--text-display-md);
+  font-variation-settings: var(--font-weight-light);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-top: var(--space-xs);
+}
+
+.chapter-hero {
   position: relative;
-  height: 85svh; min-height: 440px;
+  height: 88svh;
+  min-height: 480px;
   overflow: hidden;
 }
-@media (min-width: 768px) { .spread-hero { height: 90svh; } }
 
-.spread-img {
+.chapter-img {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
 }
 
-.spread-img img {
-  object-fit: cover; object-position: center top;
+.chapter-img img { object-position: center top; }
+
+.chapter-scrim {
+  background: linear-gradient(to bottom, transparent 35%, rgb(28 27 25 / 0.7) 100%);
 }
 
-.spread-scrim {
-  background: linear-gradient(to bottom, transparent 40%, var(--scrim-dark-heavy) 100%);
-}
-
-.spread-cap {
+.chapter-cap {
   position: absolute;
   inset-block-end: 3.5rem;
   inset-inline: 0;
@@ -133,21 +150,27 @@ document.addEventListener('astro:page-load', () => {
   flex-direction: column;
   gap: var(--space-sm);
 }
-@media (min-width: 768px) { .spread-cap { inset-block-end: 4.5rem; } }
+@media (min-width: 768px) { .chapter-cap { inset-block-end: 5rem; } }
 
-.spread-issue { color: var(--overlay-text-muted); }
+.chapter-num { color: var(--overlay-text-muted); }
 
-.spread-title {
-  font-size: clamp(3rem, 10vw, 8rem);
+.chapter-title {
+  font-size: clamp(3.5rem, 11vw, 9rem);
   font-style: italic;
   font-variation-settings: var(--font-weight-medium);
   letter-spacing: -0.03em;
-  line-height: 0.95;
+  line-height: 0.92;
   color: var(--overlay-text-primary);
 }
 
-.spread-sub { color: var(--overlay-text-muted); }
+.chapter-sub { color: var(--overlay-text-secondary); }
 
-.spread-gap { padding-block: 5rem; }
-@media (min-width: 768px) { .spread-gap { padding-block: 7rem; } }
+.product-grid.wrap {
+  padding-block: 0;
+}
+
+.chapter-divider {
+  padding-block: var(--space-3xl);
+}
+@media (min-width: 768px) { .chapter-divider { padding-block: var(--space-4xl); } }
 </style>

@@ -1,7 +1,6 @@
 ---
 import { Picture } from 'astro:assets';
 import { IMAGES } from '@assets/images';
-import type { Product } from '@data/products';
 
 interface Props {
   slug:      string;
@@ -18,21 +17,20 @@ const { slug, num, name, price, img, img2, category, imgWidth = 800 } = Astro.pr
 ---
 
 <article class="pc" data-category={category}>
-  <a href={`/product/${slug}`} aria-label={`${name} — € ${price.toLocaleString('en-US', { minimumFractionDigits: 0 })}`}>
-    <div class="pc-img-wrap">
+  <a href={`/product/${slug}`} aria-label={`${name} — € ${price.toLocaleString('en-US')}`}>
+    <div class="pc-media">
       <Picture
-        class="pc-img pc-img-primary"
+        class="pc-img pc-primary"
         src={IMAGES[img]}
         formats={['avif', 'webp']}
         alt={name}
         loading="lazy"
         decoding="async"
         width={imgWidth}
-        transition:name={`product-img-${slug}`}
       />
       {img2 && IMAGES[img2] && (
         <Picture
-          class="pc-img pc-img-alt"
+          class="pc-img pc-alt"
           src={IMAGES[img2]}
           formats={['avif', 'webp']}
           alt=""
@@ -47,37 +45,39 @@ const { slug, num, name, price, img, img2, category, imgWidth = 800 } = Astro.pr
       <div class="card-info-l">
         <span class="label muted">{num}</span>
         <span class="card-name">{name}</span>
-        {category && <span class="label muted card-cat">{category}</span>}
+        {category && <span class="label muted">{category}</span>}
       </div>
-      <span class="label muted">€ {price.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
+      <span class="label muted card-price">€ {price.toLocaleString('en-US')}</span>
     </div>
   </a>
 </article>
 
 <style>
-  .pc { background: var(--color-white); }
-  .pc a { display: block; }
+.pc a { display: block; }
 
-  .pc-img-wrap {
-    aspect-ratio: 3/4;
-    overflow: hidden;
-    background: var(--color-off);
-    position: relative;
-  }
+.pc-media {
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  background: var(--color-off);
+  position: relative;
+}
 
-  .pc-img img {
-    object-fit: cover;
-    object-position: center top;
-    transition: transform var(--duration-slowest) var(--ease-img), opacity 0.5s ease;
-  }
+.pc-img img {
+  object-fit: cover;
+  object-position: center top;
+  transition: transform var(--duration-slowest) var(--ease-img), opacity 0.5s ease;
+}
 
-  .pc-img-alt {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-  }
+.pc-alt {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
 
-  .pc a:hover .pc-img-primary img { transform: scale(1.04); }
-  .pc a:hover .pc-img-alt { opacity: 1; }
-  .pc a:hover .pc-img-alt img { transform: scale(1.02); }
+@media (hover: hover) {
+  .pc a:hover .pc-primary img { transform: scale(1.04); }
+  .pc a:hover .pc-alt         { opacity: 1; }
+  .pc a:hover .pc-alt img     { transform: scale(1.02); }
+}
 </style>

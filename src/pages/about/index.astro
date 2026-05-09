@@ -1,65 +1,82 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { Picture } from 'astro:assets';
-import PageHeader from '@components/PageHeader.astro';
 import CTAStrip from '@components/CTAStrip.astro';
 import { SITE } from '@data/site';
 import { IMAGES } from '@assets/images';
+
+const statements = [
+  {
+    num: '001',
+    body: [
+      'Voidhaus was not born from a desire to dress people. It was born from a frustration with fashion that performs humility while demanding admiration.',
+      'We care. Deeply. Obsessively. But not about you noticing.',
+    ],
+  },
+  {
+    num: '002',
+    heading: 'The garment as architecture.',
+    body: [
+      'We work from the structure outward. A coat must stand before it must move. Comfort is a result of precision, not an excuse for its absence.',
+      'Every piece is designed to outlast the season it is born in.',
+    ],
+  },
+  {
+    num: '003',
+    heading: 'On restraint.',
+    body: [
+      'We produce twelve pieces per collection. Each garment is finished by hand. Each seam is checked by eye. We will never grow faster than our ability to care.',
+    ],
+  },
+  {
+    num: '004',
+    heading: 'Who we dress.',
+    body: [
+      'We do not design for a demographic. We design for a disposition. If you already know — you do not need us to tell you.',
+    ],
+  },
+] as const;
 ---
 
 <Layout title="Manifesto" solidNav={true}>
-  <PageHeader label="Manifesto" title="We reject the legible." />
+
+  <header class="about-head wrap">
+    <div class="rule js-rule"></div>
+    <div class="about-head-inner">
+      <div>
+        <span class="label muted" data-anim="hero">Manifesto</span>
+        <h1 class="about-title" data-anim="hero" data-delay="0.1">We reject<br/>the legible.</h1>
+      </div>
+    </div>
+  </header>
 
   <section class="statements wrap">
-
-    <div class="stmt" data-anim="scroll">
-      <span class="label op-30 stmt-num">001</span>
-      <div class="stmt-body">
-        <p class="stmt-p">Voidhaus was not born from a desire to dress people. It was born from a frustration with fashion that performs humility while demanding admiration.</p>
-        <p class="stmt-p">We care. Deeply. Obsessively. But not about you noticing.</p>
-      </div>
-    </div>
-    <div class="rule"></div>
-
-    <div class="stmt" data-anim="scroll">
-      <span class="label op-30 stmt-num">002</span>
-      <div class="stmt-body">
-        <h2 class="stmt-h">The garment as architecture.</h2>
-        <p class="stmt-p">We work from the structure outward. A coat must stand before it must move. Comfort is a result of precision, not an excuse for its absence.</p>
-        <p class="stmt-p">Every piece is designed to outlast the season it is born in.</p>
-      </div>
-    </div>
-    <div class="rule"></div>
-
-    <div class="stmt" data-anim="scroll">
-      <span class="label op-30 stmt-num">003</span>
-      <div class="stmt-body">
-        <h2 class="stmt-h">On restraint.</h2>
-        <p class="stmt-p">We produce twelve pieces per collection. Each garment is finished by hand. Each seam is checked by eye. We will never grow faster than our ability to care.</p>
-      </div>
-    </div>
-    <div class="rule"></div>
-
-    <blockquote class="pull-quote serif" data-anim="scroll">
-      "The most radical act is <em>silence.</em>"
-    </blockquote>
-    <div class="rule"></div>
-
-    <div class="stmt" data-anim="scroll">
-      <span class="label op-30 stmt-num">004</span>
-      <div class="stmt-body">
-        <h2 class="stmt-h">Who we dress.</h2>
-        <p class="stmt-p">We do not design for a demographic. We design for a disposition. If you already know — you do not need us to tell you.</p>
-      </div>
-    </div>
-    <div class="rule"></div>
-
+    {statements.map((s, i) => (
+      <>
+        <div class="stmt" data-anim="scroll">
+          <span class="label op-30 stmt-num">{s.num}</span>
+          <div class="stmt-body">
+            {'heading' in s && <h2 class="stmt-h">{s.heading}</h2>}
+            {s.body.map(p => <p class="stmt-p">{p}</p>)}
+          </div>
+        </div>
+        <div class="rule"></div>
+        {i === 1 && (
+          <>
+            <blockquote class="pull-quote serif" data-anim="scroll">
+              "The most radical act is <em>silence.</em>"
+            </blockquote>
+            <div class="rule"></div>
+          </>
+        )}
+      </>
+    ))}
   </section>
 
   <section class="atelier" data-anim="scroll">
-    <div class="atelier-img-wrap">
+    <div class="atelier-media">
       <Picture
-        class="atelier-img"
+        class="atelier-img js-atelier-img"
         src={IMAGES['atelier']}
         formats={['avif', 'webp']}
         alt="Voidhaus atelier"
@@ -71,16 +88,17 @@ import { IMAGES } from '@assets/images';
     </div>
     <div class="product-grid wrap">
       {SITE.ateliers.map((a, i) => (
-        <div class="at-item" data-anim="stagger" style={`--i:${i}`}>
-          <span class="label op-30 at-num">{String(i + 1).padStart(2, '0')}</span>
+        <div class="at-item" data-anim="stagger">
+          <span class="label op-30">{String(i + 1).padStart(2, '0')}</span>
           <span class="at-city">{a.city}</span>
-          <span class="label op-45 at-role">{a.specialty}</span>
+          <span class="label op-45">{a.specialty}</span>
         </div>
       ))}
     </div>
   </section>
 
   <CTAStrip label="Ready?" linkText="View Collection" href="/collection" />
+
 </Layout>
 
 <script>
@@ -89,14 +107,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
-    initPage('.ph .rule');
+    initPage('.js-rule');
 
-    const atelierImg = document.querySelector<HTMLElement>('.atelier-img');
-    if (atelierImg) {
-      gsap.set(atelierImg, { scale: 1.12 });
+    const img = document.querySelector<HTMLElement>('.js-atelier-img');
+    if (img) {
+      gsap.set(img, { scale: 1.12 });
       ScrollTrigger.create({
-        trigger: '.atelier-img-wrap', start: 'top bottom', end: 'bottom top', scrub: 2,
-        onUpdate: st => gsap.set(atelierImg, { yPercent: -8 * st.progress }),
+        trigger: '.atelier-media', start: 'top bottom', end: 'bottom top', scrub: 2,
+        onUpdate: st => gsap.set(img, { yPercent: -8 * st.progress }),
       });
     }
   });
@@ -104,8 +122,24 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
+.about-head {
+  padding-top: calc(var(--nav-h) + var(--space-2xl));
+  padding-bottom: var(--space-2xl);
+}
+
+.about-head-inner {
+  padding-top: var(--space-lg);
+}
+
+.about-title {
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  font-variation-settings: var(--font-weight-light);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-top: var(--space-xs);
+}
+
 .statements { padding-bottom: var(--space-2xl); }
-@media (min-width: 768px) { .statements { padding-bottom: var(--space-3xl); } }
 
 .stmt {
   display: grid;
@@ -116,17 +150,13 @@ document.addEventListener('astro:page-load', () => {
   .stmt { grid-template-columns: 5rem 1fr; gap: var(--space-2xl); padding-block: var(--space-3xl); }
 }
 
-.stmt-num { padding-top: 0.1rem; }
-
 .stmt-body { display: flex; flex-direction: column; gap: 1.25rem; max-width: 58ch; }
 
 .stmt-h {
-  font-family: var(--font-sans);
   font-size: clamp(1.125rem, 2.5vw, 1.625rem);
   font-variation-settings: var(--font-weight-normal);
   letter-spacing: -0.02em;
   line-height: 1.2;
-  color: var(--color-ink);
 }
 
 .stmt-p {
@@ -142,9 +172,8 @@ document.addEventListener('astro:page-load', () => {
   font-style: italic;
   line-height: 1.12;
   letter-spacing: -0.02em;
-  color: var(--color-ink);
-  padding-block: 5rem;
   text-align: center;
+  padding-block: 5rem;
 }
 @media (min-width: 768px) { .pull-quote { padding-block: 7rem; } }
 .pull-quote em { font-style: normal; color: var(--color-mid); }
@@ -152,12 +181,12 @@ document.addEventListener('astro:page-load', () => {
 .atelier { margin-bottom: var(--space-3xl); }
 @media (min-width: 768px) { .atelier { margin-bottom: var(--space-4xl); } }
 
-.atelier-img-wrap {
+.atelier-media {
   position: relative;
   height: 55svh; min-height: 280px;
   overflow: hidden;
 }
-@media (min-width: 768px) { .atelier-img-wrap { height: 65svh; } }
+@media (min-width: 768px) { .atelier-media { height: 65svh; } }
 
 .atelier-scrim { background: var(--scrim-dark-light); }
 
@@ -171,11 +200,8 @@ document.addEventListener('astro:page-load', () => {
 .at-item:hover { background: var(--color-off); }
 
 .at-city {
-  font-family: var(--font-sans);
   font-size: clamp(1rem, 2.5vw, 1.5rem);
   font-variation-settings: var(--font-weight-normal);
   letter-spacing: -0.02em;
-  color: var(--color-ink);
 }
-
 </style>

@@ -64,7 +64,6 @@
     transition:fade={{ duration: 300 }}
   ></div>
 
-  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
     class="panel"
     role="dialog"
