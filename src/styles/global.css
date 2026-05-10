@@ -79,8 +79,7 @@
 
   /*
    * ── Compatibility aliases ──────────────────────────────────────────────
-   * Svelte components (Nav, Cart, SizeGuide) use the old token names.
-   * These aliases keep them working without touching scoped <style> blocks.
+   * Svelte components still use --space-*, --text-*, --radius-full.
    */
   --font-sans:  var(--font-family-sans);
   --font-serif: var(--font-family-serif);
@@ -99,29 +98,6 @@
   --text-base: 1rem;
   --text-lg:   1.125rem;
   --text-xl:   1.25rem;
-
-  --font-weight-light:    var(--fw-light);
-  --font-weight-normal:   var(--fw-normal);
-  --font-weight-medium:   var(--fw-medium);
-  --font-weight-semibold: var(--fw-semibold);
-
-  --letter-spacing-label:  var(--ls-label);
-  --letter-spacing-button: var(--ls-button);
-  --letter-spacing-wide:   var(--ls-wide);
-  --letter-spacing-tight:  var(--ls-tight);
-
-  --overlay-text-primary:   var(--ot-primary);
-  --overlay-text-secondary: var(--ot-secondary);
-  --overlay-text-muted:     var(--ot-muted);
-  --scrim-dark-heavy:       var(--scrim-heavy);
-  --scrim-dark-medium:      var(--scrim-medium);
-  --scrim-dark-light:       var(--scrim-light);
-  --backdrop-modal:         var(--backdrop);
-
-  --opacity-muted:     var(--op-muted);
-  --opacity-hover:     var(--op-hover);
-  --opacity-secondary: var(--op-secondary);
-  --opacity-disabled:  var(--op-disabled);
 
   --radius-full: 9999px;
 }
@@ -198,11 +174,10 @@
     font-variation-settings: var(--fw-medium);
   }
 
-  /* Font weight utilities — replaces inline style="font-variation-settings:..." */
-  .fw-light    { font-variation-settings: var(--fw-light); }
-  .fw-normal   { font-variation-settings: var(--fw-normal); }
-  .fw-medium   { font-variation-settings: var(--fw-medium); }
-  .fw-semibold { font-variation-settings: var(--fw-semibold); }
+  /* Font weight utilities */
+  .fw-light  { font-variation-settings: var(--fw-light); }
+  .fw-normal { font-variation-settings: var(--fw-normal); }
+  .fw-medium { font-variation-settings: var(--fw-medium); }
 
   /* ── Opacity ── */
   .op-30 { opacity: 0.3; }
@@ -215,7 +190,6 @@
   .rule  { width: 100%; height: 1px; background: var(--color-rule); flex-shrink: 0; }
   .scrim { position: absolute; inset: 0; pointer-events: none; }
 
-  /* Page header spacing — used by every page header */
   .page-header {
     padding-top: var(--page-top);
     padding-bottom: var(--spacing-2xl);
