@@ -91,7 +91,7 @@ document.addEventListener('astro:page-load', () => {
     document.querySelectorAll<HTMLElement>('.js-hero').forEach(hero => {
       const img = hero.querySelector<HTMLElement>('.js-img');
       if (!img) return;
-      gsap.set(img, { scale: 1.12 });
+      gsap.to(img, { opacity: 1, scale: 1.08, duration: DUR.slower, ease: 'power3.out' });
       ScrollTrigger.create({
         trigger: hero, start: 'top bottom', end: 'bottom top', scrub: 2,
         onUpdate: st => gsap.set(img, { yPercent: -10 * st.progress }),

@@ -287,14 +287,30 @@ html:not(.no-js) [data-anim="stagger"],
 html:not(.no-js) .js-hero-season,
 html:not(.no-js) .js-hero-tagline,
 html:not(.no-js) .js-hero-title,
-html:not(.no-js) .js-hero-cta { opacity: 0; }
+html:not(.no-js) .js-hero-cta,
+html:not(.no-js) .js-hero-img,
+html:not(.no-js) .js-main-img,
+html:not(.no-js) .js-atelier-img,
+html:not(.no-js) .js-img,
+html:not(.no-js) [data-pdp-info] > * { opacity: 0; }
+
+html:not(.no-js) .js-hero-img,
+html:not(.no-js) .js-atelier-img,
+html:not(.no-js) .js-img { transform: scale(1.12); }
+
+html:not(.no-js) .js-main-img { transform: scale(1.04); }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   html:not(.no-js) [data-anim],
   html:not(.no-js) .js-hero-season,
   html:not(.no-js) .js-hero-tagline,
   html:not(.no-js) .js-hero-title,
-  html:not(.no-js) .js-hero-cta { will-change: opacity, transform; }
+  html:not(.no-js) .js-hero-cta,
+  html:not(.no-js) .js-hero-img,
+  html:not(.no-js) .js-main-img,
+  html:not(.no-js) .js-atelier-img,
+  html:not(.no-js) .js-img,
+  html:not(.no-js) [data-pdp-info] > * { will-change: opacity, transform; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -302,7 +318,12 @@ html:not(.no-js) .js-hero-cta { opacity: 0; }
   html:not(.no-js) .js-hero-season,
   html:not(.no-js) .js-hero-tagline,
   html:not(.no-js) .js-hero-title,
-  html:not(.no-js) .js-hero-cta { opacity: 1; transform: none; }
+  html:not(.no-js) .js-hero-cta,
+  html:not(.no-js) .js-hero-img,
+  html:not(.no-js) .js-main-img,
+  html:not(.no-js) .js-atelier-img,
+  html:not(.no-js) .js-img,
+  html:not(.no-js) [data-pdp-info] > * { opacity: 1; transform: none; }
 }
 
 /* ─── View transitions ───────────────────────────────────────────────────── */

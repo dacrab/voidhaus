@@ -27,22 +27,20 @@ function initLenis(): void {
 }
 
 export function initScrollLifecycle(): void {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
   document.addEventListener('astro:before-swap', () => {
     lenis?.stop();
     ScrollTrigger.getAll().forEach(t => t.kill());
   });
   document.addEventListener('astro:after-swap', () => {
-    // Reset inner scroll panels immediately (DOM is ready, no Lenis needed)
-    document.querySelectorAll<HTMLElement>('[data-scroll-panel]').forEach(el => {
-      el.scrollTop = 0;
-    });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   });
   document.addEventListener('astro:page-load', () => {
-    // Scroll to top before Lenis starts so it picks up position 0
-    window.scrollTo(0, 0);
     initLenis();
     lenis?.scrollTo(0, { immediate: true });
     lenis?.start();
+    ScrollTrigger.refresh();
   });
 }
 
@@ -54,8 +52,6 @@ function animateIn(els: HTMLElement[], vars: gsap.TweenVars) {
 }
 
 export function initPage(ruleSelector?: string): void {
-  ScrollTrigger.refresh();
-
   const heroEls = [...document.querySelectorAll<HTMLElement>('[data-anim="hero"]')];
   heroEls.forEach(el =>
     animateIn([el], { duration: DUR.slow, ease: EASE, delay: parseFloat(el.dataset.delay ?? '0') || 0 })
@@ -95,6 +91,8 @@ export function initPage(ruleSelector?: string): void {
     start: 'top 90%', once: true,
     onEnter: els => animateIn([...els] as HTMLElement[], { duration: DUR.base, ease: EASE, stagger: 0.05 }),
   });
+
+  ScrollTrigger.refresh();
 }
 
 export function onReady(callback: () => void): void {
