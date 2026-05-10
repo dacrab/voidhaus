@@ -26,7 +26,7 @@ const next = PRODUCTS[idx + 1] ?? null;
 
   <div class="flex flex-col pt-[var(--nav-h)] md:grid md:grid-cols-2 md:min-h-svh md:items-start">
 
-    <div class="flex flex-col gap-px bg-[var(--color-rule)] md:sticky md:top-[var(--nav-h)] md:h-[calc(100svh-var(--nav-h))] md:overflow-y-auto md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden md:bg-transparent">
+    <div data-scroll-panel class="flex flex-col gap-px bg-[var(--color-rule)] md:sticky md:top-[var(--nav-h)] md:h-[calc(100svh-var(--nav-h))] md:overflow-y-auto md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden md:bg-transparent">
       <div class="overflow-hidden bg-[var(--color-off)] aspect-[3/4] md:aspect-auto md:min-h-full">
         <Picture
           class="pdp-img js-main-img"
@@ -53,7 +53,7 @@ const next = PRODUCTS[idx + 1] ?? null;
       )}
     </div>
 
-    <div data-pdp-info class="flex flex-col gap-[var(--space-xl)] p-[var(--space-xl)] px-[var(--space-lg)] pb-[var(--space-4xl)] md:p-[var(--space-4xl)] md:px-[var(--space-3xl)] md:sticky md:top-[var(--nav-h)] md:h-[calc(100svh-var(--nav-h))] md:overflow-y-auto md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden xl:px-[var(--space-4xl)]">
+    <div data-pdp-info data-scroll-panel class="flex flex-col gap-[var(--space-xl)] p-[var(--space-xl)] px-[var(--space-lg)] pb-[var(--space-4xl)] md:p-[var(--space-4xl)] md:px-[var(--space-3xl)] md:sticky md:top-[var(--nav-h)] md:h-[calc(100svh-var(--nav-h))] md:overflow-y-auto md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden xl:px-[var(--space-4xl)]">
 
       <div class="flex items-center justify-between">
         <a href="/collection" class="label muted-link">← Collection</a>
