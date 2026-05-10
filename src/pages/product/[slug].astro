@@ -26,7 +26,8 @@ const next = PRODUCTS[idx + 1] ?? null;
 
   <div class="flex flex-col pt-[var(--nav-h)] md:grid md:grid-cols-2 md:min-h-svh md:items-start">
 
-    <div data-scroll-panel class="flex flex-col gap-px bg-[var(--color-rule)] md:sticky md:top-[var(--nav-h)] md:h-[calc(100svh-var(--nav-h))] md:overflow-y-auto md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden md:bg-transparent">
+    <!-- Images -->
+    <div data-scroll-panel class="flex flex-col gap-px bg-[var(--color-rule)] md:scroll-panel md:bg-transparent">
       <div class="overflow-hidden bg-[var(--color-off)] aspect-[3/4] md:aspect-auto md:min-h-full">
         <Picture
           class="pdp-img js-main-img"
@@ -53,21 +54,22 @@ const next = PRODUCTS[idx + 1] ?? null;
       )}
     </div>
 
-    <div data-pdp-info data-scroll-panel class="flex flex-col gap-[var(--space-xl)] p-[var(--space-xl)] px-[var(--space-lg)] pb-[var(--space-4xl)] md:p-[var(--space-4xl)] md:px-[var(--space-3xl)] md:sticky md:top-[var(--nav-h)] md:h-[calc(100svh-var(--nav-h))] md:overflow-y-auto md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden xl:px-[var(--space-4xl)]">
+    <!-- Info -->
+    <div data-pdp-info data-scroll-panel class="flex flex-col gap-xl p-xl px-lg pb-4xl md:scroll-panel md:p-4xl md:px-3xl xl:px-4xl">
 
       <div class="flex items-center justify-between">
         <a href="/collection" class="label muted-link">← Collection</a>
         <span class="label op-30">{p.num}</span>
       </div>
 
-      <h1 class="pdp-name" style="font-variation-settings:var(--font-weight-light)">{p.name}</h1>
+      <h1 class="pdp-name fw-light">{p.name}</h1>
 
-      <p class="text-[var(--text-lg)] leading-[1.8] text-[var(--color-ink-soft)] max-w-[36ch]" style="font-variation-settings:var(--font-weight-normal)">{p.desc}</p>
+      <p class="text-lg fw-normal leading-[1.8] text-[var(--color-ink-soft)] max-w-[36ch]">{p.desc}</p>
 
       <dl class="border-t border-[var(--color-rule)]">
         {details.map(([k, v]) => (
-          <div class="flex justify-between items-center py-[0.875rem] border-b border-[var(--color-rule)] gap-[var(--space-md)]">
-            <dt class="label opacity-[var(--opacity-muted)] shrink-0">{k}</dt>
+          <div class="flex justify-between items-center py-[0.875rem] border-b border-[var(--color-rule)] gap-md">
+            <dt class="label op-30 shrink-0">{k}</dt>
             <dd class="label text-[var(--color-ink-soft)] text-right normal-case tracking-normal">{v}</dd>
           </div>
         ))}
@@ -80,28 +82,24 @@ const next = PRODUCTS[idx + 1] ?? null;
         </div>
         <div class="flex flex-wrap gap-[0.4rem]" role="group" aria-label="Select size">
           {p.sizes.map((s, i) => (
-            <button
-              class:list={['sz-btn', 'label', { active: i === 1 }]}
-              type="button"
-              aria-pressed={i === 1}
-            >{s}</button>
+            <button class:list={['sz-btn', 'label', { active: i === 1 }]} type="button" aria-pressed={i === 1}>{s}</button>
           ))}
         </div>
       </div>
 
-      <div class="flex flex-col gap-[var(--space-md)]">
+      <div class="flex flex-col gap-md">
         <div class="flex items-baseline justify-between py-4 border-t border-b border-[var(--color-rule)]">
-          <span class="pdp-price serif italic tracking-[-0.02em]" style="font-variation-settings:var(--font-weight-medium)">€ {p.price.toLocaleString('en-US')}</span>
+          <span class="pdp-price serif fw-medium italic tracking-tight">€ {p.price.toLocaleString('en-US')}</span>
           <span class="label muted">Incl. VAT</span>
         </div>
         <button
-          class="w-full bg-transparent border border-[var(--color-ink)] p-5 transition-[background] duration-[var(--duration-base)] hover:bg-[var(--color-ink)] group"
+          class="btn-outline"
           id="js-add" type="button"
           data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price.toLocaleString('en-US'), img: IMAGES[p.img].src, num: p.num })}
         >
-          <span class="label add-text block text-center text-[var(--color-ink)] tracking-[var(--letter-spacing-button)] transition-colors duration-[var(--duration-base)] group-hover:text-[var(--color-white)]">Add to Selection</span>
+          <span class="label add-text w-full text-center tracking-[var(--ls-button)]">Add to Selection</span>
         </button>
-        <span class="label opacity-[var(--opacity-disabled)] block text-center">Complimentary worldwide shipping</span>
+        <span class="label op-30 block text-center">Complimentary worldwide shipping</span>
       </div>
 
     </div>
@@ -110,12 +108,10 @@ const next = PRODUCTS[idx + 1] ?? null;
   <nav class="wrap py-10" aria-label="Product navigation">
     <div class="rule"></div>
     <div class="flex justify-between py-6">
-      {prev
-        ? <a href={`/product/${prev.slug}`} class="label muted-link">← {prev.name}</a>
-        : <a href="/collection"             class="label muted-link">← Collection</a>}
-      {next
-        ? <a href={`/product/${next.slug}`} class="label muted-link">{next.name} →</a>
-        : <a href="/collection"             class="label muted-link">Collection →</a>}
+      {prev ? <a href={`/product/${prev.slug}`} class="label muted-link">← {prev.name}</a>
+             : <a href="/collection"             class="label muted-link">← Collection</a>}
+      {next ? <a href={`/product/${next.slug}`} class="label muted-link">{next.name} →</a>
+             : <a href="/collection"             class="label muted-link">Collection →</a>}
     </div>
     <div class="rule"></div>
   </nav>
@@ -129,14 +125,12 @@ document.addEventListener('astro:page-load', () => {
   onReady(() => {
     const morphed = document.documentElement.hasAttribute('data-astro-transition');
 
-    // Hero image entrance
     const img = document.querySelector<HTMLElement>('.js-main-img');
     if (img) {
       if (morphed) gsap.set(img, { opacity: 1, scale: 1 });
       else gsap.fromTo(img, { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: DUR.slower, ease: 'power3.out' });
     }
 
-    // Info panel stagger — select direct children of the info panel
     const panel = document.querySelector<HTMLElement>('[data-pdp-info]');
     const targets = panel ? ([...panel.children] as HTMLElement[]) : [];
     gsap.fromTo(targets,
@@ -144,7 +138,6 @@ document.addEventListener('astro:page-load', () => {
       { opacity: 1, y: 0, duration: DUR.slow, ease: EASE, stagger: 0.07, delay: morphed ? 0 : 0.2, clearProps: 'transform,will-change' },
     );
 
-    // Size selection
     const szBtns = document.querySelectorAll<HTMLButtonElement>('.sz-btn');
     szBtns.forEach(btn => btn.addEventListener('click', () => {
       szBtns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
@@ -152,7 +145,6 @@ document.addEventListener('astro:page-load', () => {
       btn.setAttribute('aria-pressed', 'true');
     }));
 
-    // Add to cart
     const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
     const addText = addBtn?.querySelector<HTMLElement>('.add-text');
     addBtn?.addEventListener('click', () => {
@@ -180,7 +172,7 @@ document.addEventListener('astro:page-load', () => {
 .pdp-price { font-size: clamp(1.75rem, 3vw, 2.5rem); }
 .sz-btn {
   background: none; border: 1px solid var(--color-rule);
-  color: var(--color-soft); padding: var(--space-xs) 0.875rem;
+  color: var(--color-soft); padding: var(--spacing-xs) 0.875rem;
   transition: border-color var(--duration-fast), color var(--duration-fast);
 }
 .sz-btn:hover  { border-color: var(--color-mid); color: var(--color-ink); }

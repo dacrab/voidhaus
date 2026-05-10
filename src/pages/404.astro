@@ -4,18 +4,18 @@ import Layout from '@layouts/Layout.astro';
 
 <Layout title="Not Found" description="Page not found.">
   <div class="wrap relative flex items-center overflow-hidden min-h-[calc(100svh-5rem)]">
-    <div class="relative z-10 flex flex-col gap-[var(--space-xl)] py-32 pb-20">
+    <div class="relative z-10 flex flex-col gap-xl py-32 pb-20">
       <span class="label muted">404</span>
-      <h1 class="nf-title serif italic leading-[0.95] tracking-[-0.03em]" style="font-variation-settings:var(--font-weight-medium)">Not<br/><em class="not-italic text-[var(--color-mid)]">found.</em></h1>
-      <p class="text-[var(--text-base)] leading-[1.85] text-[var(--color-soft)] max-w-[32ch]" style="font-variation-settings:var(--font-weight-normal)">
+      <h1 class="nf-title serif fw-medium italic leading-[0.95] tracking-[-0.03em]">Not<br/><em class="not-italic text-[var(--color-mid)]">found.</em></h1>
+      <p class="text-base fw-normal leading-[1.85] text-[var(--color-soft)] max-w-[32ch]">
         This page doesn't exist — or has been removed.<br/>The collection remains.
       </p>
-      <div class="flex gap-10 items-center pt-[var(--space-md)] border-t border-[var(--color-rule)]">
+      <div class="flex gap-10 items-center pt-md border-t border-[var(--color-rule)]">
         <a href="/"           class="label muted-link">← Home</a>
         <a href="/collection" class="label muted-link">Collection →</a>
       </div>
     </div>
-    <span class="nf-bg absolute right-[-0.05em] bottom-[-0.15em] text-transparent pointer-events-none select-none leading-none tracking-[-0.06em]" style="-webkit-text-stroke:1px var(--color-rule);font-variation-settings:var(--font-weight-light)" aria-hidden="true">404</span>
+    <span class="nf-bg fw-light absolute right-[-0.05em] bottom-[-0.15em] text-transparent pointer-events-none select-none leading-none tracking-[-0.06em]" style="-webkit-text-stroke:1px var(--color-rule)" aria-hidden="true">404</span>
   </div>
 </Layout>
 

@@ -145,22 +145,22 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
       document.addEventListener('astro:page-load', setupPage);
     </script>
 
-    <footer class="border-t border-[var(--color-rule)] mt-[var(--space-3xl)]">
-      <div class="newsletter wrap py-[var(--space-2xl)] border-b border-[var(--color-rule)]">
-        <div class="flex items-center justify-between gap-[var(--space-xl)] flex-wrap">
-          <div class="flex flex-col gap-[var(--space-xs)]">
+    <footer class="border-t border-[var(--color-rule)] mt-3xl">
+      <div class="wrap py-2xl border-b border-[var(--color-rule)]">
+        <div class="flex items-center justify-between gap-xl flex-wrap">
+          <div class="flex flex-col gap-xs">
             <span class="label muted">Newsletter</span>
-            <p class="text-[var(--text-sm)] text-[var(--color-soft)] max-w-[32ch]" style="font-variation-settings:var(--font-weight-normal)">Dispatches from the atelier. Infrequent. Worth reading.</p>
+            <p class="text-sm fw-normal text-[var(--color-soft)] max-w-[32ch]">Dispatches from the atelier. Infrequent. Worth reading.</p>
           </div>
           <form class="nl-form flex border border-[var(--color-rule)] shrink-0 max-sm:w-full" id="nl-form" novalidate>
             <input
-              class="nl-input bg-transparent border-none text-[var(--color-ink)] px-[var(--space-md)] py-[var(--space-sm)] outline-none w-[220px] max-sm:flex-1 max-sm:w-auto placeholder:text-[var(--color-mid)]"
-              style="font-variation-settings:var(--font-weight-normal);font-size:max(16px,0.8125rem)"
+              class="nl-input bg-transparent border-none text-[var(--color-ink)] fw-normal px-md py-sm outline-none w-[220px] max-sm:flex-1 max-sm:w-auto placeholder:text-[var(--color-mid)]"
+              style="font-size:max(16px,0.8125rem)"
               type="email" name="email" placeholder="your@email.com"
               autocomplete="email" aria-label="Email address for newsletter" required
             />
             <button
-              class="nl-btn label bg-transparent border-none border-l border-[var(--color-rule)] text-[var(--color-ink)] opacity-[var(--opacity-secondary)] px-[var(--space-md)] py-[var(--space-sm)] whitespace-nowrap transition-[opacity,background] duration-[var(--duration-fast)] hover:opacity-100 hover:bg-[var(--color-off)] [&.subscribed]:opacity-100 [&.subscribed]:bg-[var(--color-off)]"
+              class="nl-btn label bg-transparent border-none border-l border-[var(--color-rule)] text-[var(--color-ink)] opacity-[var(--op-secondary)] px-md py-sm whitespace-nowrap transition-[opacity,background] duration-[var(--duration-fast)] hover:opacity-100 hover:bg-[var(--color-off)] [&.subscribed]:opacity-100 [&.subscribed]:bg-[var(--color-off)]"
               type="submit">Subscribe</button>
           </form>
         </div>
@@ -168,9 +168,9 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
 
       <div class="wrap py-6 pb-8">
         <div class="rule"></div>
-        <div class="flex items-center justify-between flex-wrap gap-[var(--space-sm)] pt-[var(--space-lg)]">
+        <div class="flex items-center justify-between flex-wrap gap-sm pt-lg">
           <span class="label muted">© {new Date().getFullYear()} {SITE.name}</span>
-          <nav class="flex gap-[var(--space-lg)] items-center" aria-label="Legal navigation">
+          <nav class="flex gap-lg items-center" aria-label="Legal navigation">
             <a href="/stockists" class="label muted muted-link">Stockists</a>
             <a href="/privacy"   class="label muted muted-link">Privacy</a>
             <a href="/terms"     class="label muted muted-link">Terms</a>

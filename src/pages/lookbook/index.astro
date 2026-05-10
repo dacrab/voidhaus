@@ -34,23 +34,23 @@ const chapters = [
 
 <Layout title="Lookbook" solidNav={true}>
 
-  <header class="wrap pt-[calc(var(--nav-h)+var(--space-2xl))] pb-[var(--space-2xl)]">
+  <header class="page-header wrap">
     <div class="rule js-rule"></div>
-    <div class="flex items-end justify-between pt-[var(--space-lg)] gap-[var(--space-md)]">
+    <div class="flex items-end justify-between pt-lg gap-md">
       <div>
         <span class="label muted">{SITE.season}</span>
-        <h1 class="lb-title mt-[var(--space-xs)]" data-anim="hero" style="font-variation-settings:var(--font-weight-light)">Lookbook</h1>
+        <h1 class="lb-title fw-light mt-xs" data-anim="hero">Lookbook</h1>
       </div>
       <span class="label muted" data-anim="hero" data-delay="0.1">Three chapters</span>
     </div>
   </header>
 
   {chapters.map((ch, i) => (
-    <section class="chapter" id={`chapter-${ch.num}`}>
+    <section id={`chapter-${ch.num}`}>
 
-      <div class="chapter-hero js-hero relative min-h-[480px] h-[88svh] overflow-hidden">
+      <div class="js-hero relative min-h-[480px] h-[88svh] overflow-hidden">
         <Picture
-          class="chapter-img js-img absolute inset-0"
+          class="js-img absolute inset-0"
           src={ch.img}
           formats={['avif', 'webp']}
           alt={ch.title}
@@ -58,20 +58,20 @@ const chapters = [
           decoding="async"
           width={1600}
         />
-        <div class="scrim" style="background:linear-gradient(to bottom,transparent 35%,rgb(28 27 25/0.7) 100%)"></div>
-        <div class="wrap absolute bottom-14 md:bottom-20 inset-x-0 flex flex-col gap-[var(--space-sm)]">
-          <span class="label text-[var(--overlay-text-muted)]">Chapter {ch.num}</span>
-          <h2 class="chapter-title serif italic leading-[0.92] tracking-[-0.03em] text-[var(--overlay-text-primary)]" style="font-variation-settings:var(--font-weight-medium)">{ch.title}</h2>
-          <p class="label text-[var(--overlay-text-secondary)]">{ch.sub}</p>
+        <div class="chapter-scrim scrim"></div>
+        <div class="wrap absolute bottom-14 md:bottom-20 inset-x-0 flex flex-col gap-sm">
+          <span class="label ot-muted">Chapter {ch.num}</span>
+          <h2 class="chapter-title serif fw-medium italic leading-[0.92] tracking-[-0.03em] ot-primary">{ch.title}</h2>
+          <p class="label ot-secondary">{ch.sub}</p>
         </div>
       </div>
 
-      <div class="product-grid wrap !py-0">
+      <div class="product-grid wrap py-0">
         {ch.products.map(p => <ProductCard {...p} imgWidth={700} />)}
       </div>
 
       {i < chapters.length - 1 && (
-        <div class="wrap py-[var(--space-3xl)] md:py-[var(--space-4xl)]"><div class="rule"></div></div>
+        <div class="wrap py-3xl md:py-4xl"><div class="rule"></div></div>
       )}
 
     </section>
@@ -88,7 +88,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
     initPage('.js-rule');
-
     document.querySelectorAll<HTMLElement>('.js-hero').forEach(hero => {
       const img = hero.querySelector<HTMLElement>('.js-img');
       if (!img) return;
@@ -103,9 +102,10 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.lb-title { font-size: var(--text-display-md); letter-spacing: -0.04em; line-height: 1; }
-.chapter-img img { object-position: center top; }
+.lb-title      { font-size: var(--text-display); letter-spacing: -0.04em; line-height: 1; }
 .chapter-title { font-size: clamp(3.5rem, 11vw, 9rem); }
-/* product-grid inside wrap needs padding reset */
+.chapter-scrim { background: linear-gradient(to bottom, transparent 35%, rgb(28 27 25 / 0.7) 100%); }
+.js-img img    { object-position: center top; }
+/* product-grid sits inside .wrap — zero out the block padding */
 .product-grid.wrap { padding-block: 0; }
 </style>

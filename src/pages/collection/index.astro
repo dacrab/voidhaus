@@ -7,16 +7,14 @@ import { SITE } from '@data/site';
 
 <Layout title="Collection" solidNav={true}>
 
-  <div class="coll-head wrap pt-[calc(var(--nav-h)+var(--space-2xl))] md:pt-[calc(var(--nav-h)+var(--space-3xl))]">
-    <div class="flex items-baseline justify-between flex-wrap gap-[var(--space-md)] pb-[var(--space-lg)]">
-      <h1 class="coll-title" data-anim="hero" style="font-variation-settings:var(--font-weight-normal)">Collection</h1>
+  <div class="page-header wrap">
+    <div class="flex items-baseline justify-between flex-wrap gap-md pb-lg">
+      <h1 class="coll-title fw-normal" data-anim="hero">Collection</h1>
       <span class="label muted" data-anim="hero" data-delay="0.15">{SITE.season} — {PRODUCTS.length} pieces</span>
     </div>
-    <div class="filters flex gap-[var(--space-lg)] md:gap-[var(--space-xl)] pb-[var(--space-md)] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Filter by category" data-anim="hero" data-delay="0.2">
+    <div class="flex gap-lg md:gap-xl pb-md overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Filter by category" data-anim="hero" data-delay="0.2">
       {CATEGORIES.map((f, i) => (
-        <button class:list={['filter-btn', 'label', { active: i === 0 }]} data-filter={f} type="button">
-          {f}
-        </button>
+        <button class:list={['filter-btn', 'label', { active: i === 0 }]} data-filter={f} type="button">{f}</button>
       ))}
     </div>
     <div class="rule js-rule"></div>
@@ -34,10 +32,8 @@ import { initPage, onReady, gsap, DUR } from '@lib/animate';
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
     initPage('.js-rule');
-
     const cards = document.querySelectorAll<HTMLElement>('.pc');
     const btns  = document.querySelectorAll<HTMLElement>('.filter-btn');
-
     btns.forEach(btn => btn.addEventListener('click', () => {
       btns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -53,7 +49,12 @@ document.addEventListener('astro:page-load', () => {
 
 <style>
 .coll-title { font-size: clamp(1.75rem, 5vw, 3.5rem); letter-spacing: -0.03em; line-height: 1; }
-.filter-btn { background: none; border: none; padding: 0; color: var(--color-ink); opacity: var(--opacity-disabled); white-space: nowrap; flex-shrink: 0; transition: opacity var(--duration-fast); }
-.filter-btn:hover  { opacity: var(--opacity-hover); }
+.filter-btn {
+  background: none; border: none; padding: 0;
+  color: var(--color-ink); opacity: var(--op-disabled);
+  white-space: nowrap; flex-shrink: 0;
+  transition: opacity var(--duration-fast);
+}
+.filter-btn:hover  { opacity: var(--op-hover); }
 .filter-btn.active { opacity: 1; }
 </style>
