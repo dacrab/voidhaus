@@ -34,12 +34,12 @@ const chapters = [
 
 <Layout title="Lookbook" solidNav={true}>
 
-  <header class="lb-header wrap">
+  <header class="wrap pt-[calc(var(--nav-h)+var(--space-2xl))] pb-[var(--space-2xl)]">
     <div class="rule js-rule"></div>
-    <div class="lb-header-inner">
+    <div class="flex items-end justify-between pt-[var(--space-lg)] gap-[var(--space-md)]">
       <div>
         <span class="label muted">{SITE.season}</span>
-        <h1 class="lb-title" data-anim="hero">Lookbook</h1>
+        <h1 class="lb-title mt-[var(--space-xs)]" data-anim="hero" style="font-variation-settings:var(--font-weight-light)">Lookbook</h1>
       </div>
       <span class="label muted" data-anim="hero" data-delay="0.1">Three chapters</span>
     </div>
@@ -48,9 +48,9 @@ const chapters = [
   {chapters.map((ch, i) => (
     <section class="chapter" id={`chapter-${ch.num}`}>
 
-      <div class="chapter-hero js-hero">
+      <div class="chapter-hero js-hero relative min-h-[480px] h-[88svh] overflow-hidden">
         <Picture
-          class="chapter-img js-img"
+          class="chapter-img js-img absolute inset-0"
           src={ch.img}
           formats={['avif', 'webp']}
           alt={ch.title}
@@ -58,20 +58,20 @@ const chapters = [
           decoding="async"
           width={1600}
         />
-        <div class="chapter-scrim scrim"></div>
-        <div class="chapter-cap wrap">
-          <span class="label chapter-num">Chapter {ch.num}</span>
-          <h2 class="chapter-title serif">{ch.title}</h2>
-          <p class="label chapter-sub">{ch.sub}</p>
+        <div class="scrim" style="background:linear-gradient(to bottom,transparent 35%,rgb(28 27 25/0.7) 100%)"></div>
+        <div class="wrap absolute bottom-14 md:bottom-20 inset-x-0 flex flex-col gap-[var(--space-sm)]">
+          <span class="label text-[var(--overlay-text-muted)]">Chapter {ch.num}</span>
+          <h2 class="chapter-title serif italic leading-[0.92] tracking-[-0.03em] text-[var(--overlay-text-primary)]" style="font-variation-settings:var(--font-weight-medium)">{ch.title}</h2>
+          <p class="label text-[var(--overlay-text-secondary)]">{ch.sub}</p>
         </div>
       </div>
 
-      <div class="product-grid wrap">
+      <div class="product-grid wrap !py-0">
         {ch.products.map(p => <ProductCard {...p} imgWidth={700} />)}
       </div>
 
       {i < chapters.length - 1 && (
-        <div class="chapter-divider wrap"><div class="rule"></div></div>
+        <div class="wrap py-[var(--space-3xl)] md:py-[var(--space-4xl)]"><div class="rule"></div></div>
       )}
 
     </section>
@@ -103,74 +103,9 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.lb-header {
-  padding-top: calc(var(--nav-h) + var(--space-2xl));
-  padding-bottom: var(--space-2xl);
-}
-
-.lb-header-inner {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding-top: var(--space-lg);
-  gap: var(--space-md);
-}
-
-.lb-title {
-  font-size: var(--text-display-md);
-  font-variation-settings: var(--font-weight-light);
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-top: var(--space-xs);
-}
-
-.chapter-hero {
-  position: relative;
-  height: 88svh;
-  min-height: 480px;
-  overflow: hidden;
-}
-
-.chapter-img {
-  position: absolute;
-  inset: 0;
-}
-
+.lb-title { font-size: var(--text-display-md); letter-spacing: -0.04em; line-height: 1; }
 .chapter-img img { object-position: center top; }
-
-.chapter-scrim {
-  background: linear-gradient(to bottom, transparent 35%, rgb(28 27 25 / 0.7) 100%);
-}
-
-.chapter-cap {
-  position: absolute;
-  inset-block-end: 3.5rem;
-  inset-inline: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-@media (min-width: 768px) { .chapter-cap { inset-block-end: 5rem; } }
-
-.chapter-num { color: var(--overlay-text-muted); }
-
-.chapter-title {
-  font-size: clamp(3.5rem, 11vw, 9rem);
-  font-style: italic;
-  font-variation-settings: var(--font-weight-medium);
-  letter-spacing: -0.03em;
-  line-height: 0.92;
-  color: var(--overlay-text-primary);
-}
-
-.chapter-sub { color: var(--overlay-text-secondary); }
-
-.product-grid.wrap {
-  padding-block: 0;
-}
-
-.chapter-divider {
-  padding-block: var(--space-3xl);
-}
-@media (min-width: 768px) { .chapter-divider { padding-block: var(--space-4xl); } }
+.chapter-title { font-size: clamp(3.5rem, 11vw, 9rem); }
+/* product-grid inside wrap needs padding reset */
+.product-grid.wrap { padding-block: 0; }
 </style>

@@ -13,9 +13,7 @@ const isTouch = () => window.matchMedia('(hover: none)').matches;
 
 let lenis: Lenis | null = null;
 
-export function getLenis(): Lenis | null {
-  return lenis;
-}
+export function getLenis(): Lenis | null { return lenis; }
 
 function initLenis(): void {
   if (lenis || isTouch()) return;
@@ -28,11 +26,15 @@ function initLenis(): void {
   gsap.ticker.lagSmoothing(0);
 }
 
-// Called once from Layout.
 export function initScrollLifecycle(): void {
   document.addEventListener('astro:before-swap', () => {
     lenis?.stop();
     ScrollTrigger.getAll().forEach(t => t.kill());
+  });
+  document.addEventListener('astro:after-swap', () => {
+    // Scroll to top instantly on every navigation
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    lenis?.scrollTo(0, { immediate: true });
   });
   document.addEventListener('astro:page-load', () => {
     initLenis();

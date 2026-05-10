@@ -7,34 +7,34 @@ const total = STOCKISTS.reduce((n, r) => n + r.stores.length, 0);
 
 <Layout title="Stockists" description="Find Voidhaus at select retailers worldwide." solidNav={true}>
 
-  <header class="st-head wrap">
+  <header class="wrap pt-[calc(var(--nav-h)+var(--space-2xl))] pb-[var(--space-2xl)]">
     <div class="rule js-rule"></div>
-    <div class="st-head-inner">
+    <div class="flex items-end justify-between pt-[var(--space-lg)] gap-[var(--space-md)]">
       <div>
         <span class="label muted" data-anim="hero">Worldwide</span>
-        <h1 class="st-title" data-anim="hero" data-delay="0.1">Stockists</h1>
+        <h1 class="st-title mt-[var(--space-xs)]" data-anim="hero" data-delay="0.1" style="font-variation-settings:var(--font-weight-light)">Stockists</h1>
       </div>
       <span class="label muted" data-anim="hero" data-delay="0.2">{total} stores</span>
     </div>
   </header>
 
-  <div class="stockists wrap">
+  <div class="wrap pb-[var(--space-4xl)]">
     {STOCKISTS.map((region, ri) => (
-      <div class="region" data-anim="scroll">
-        <div class="region-head">
+      <div class="pt-[var(--space-3xl)] md:pt-[var(--space-4xl)]" data-anim="scroll">
+        <div class="flex items-baseline gap-[var(--space-lg)] pb-[var(--space-xl)] border-b border-[var(--color-rule)]">
           <span class="label op-30">{String(ri + 1).padStart(2, '0')}</span>
-          <h2 class="region-title">{region.region}</h2>
+          <h2 class="region-title flex-1" style="font-variation-settings:var(--font-weight-normal)">{region.region}</h2>
           <span class="label muted">{region.stores.length} stores</span>
         </div>
-        <div class="stores-grid">
+        <div class="stores-grid grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-px bg-[var(--color-rule)] border-x border-b border-[var(--color-rule)] mb-[var(--space-3xl)]">
           {region.stores.map(s => (
-            <div class="store">
-              <div class="store-top">
+            <div class="flex flex-col gap-[var(--space-xs)] bg-[var(--color-white)] p-[var(--space-lg)] md:p-[var(--space-xl)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--color-off)]">
+              <div class="flex items-center justify-between gap-[var(--space-xs)] mb-1">
                 <span class="label op-35">{s.city}</span>
                 <span class="label muted">{s.country}</span>
               </div>
-              <h3 class="store-name">{s.name}</h3>
-              <p class="store-addr label muted">{s.address}</p>
+              <h3 class="text-[var(--text-base)] text-[var(--color-ink)] tracking-[-0.02em]" style="font-variation-settings:var(--font-weight-medium)">{s.name}</h3>
+              <p class="label muted normal-case tracking-normal leading-[1.5]">{s.address}</p>
             </div>
           ))}
         </div>
@@ -42,8 +42,8 @@ const total = STOCKISTS.reduce((n, r) => n + r.stores.length, 0);
       </div>
     ))}
 
-    <div class="st-cta" data-anim="scroll">
-      <p class="st-cta-text">Interested in stocking Voidhaus?</p>
+    <div class="flex items-center justify-between flex-wrap gap-[var(--space-md)] py-[var(--space-3xl)] border-t border-[var(--color-rule)]" data-anim="scroll">
+      <p class="text-[var(--text-base)] text-[var(--color-soft)]" style="font-variation-settings:var(--font-weight-normal)">Interested in stocking Voidhaus?</p>
       <a href="/contact" class="label muted-link">Get in touch →</a>
     </div>
   </div>
@@ -58,91 +58,6 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.st-head {
-  padding-top: calc(var(--nav-h) + var(--space-2xl));
-  padding-bottom: var(--space-2xl);
-}
-
-.st-head-inner {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding-top: var(--space-lg);
-  gap: var(--space-md);
-}
-
-.st-title {
-  font-size: var(--text-display-md);
-  font-variation-settings: var(--font-weight-light);
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-top: var(--space-xs);
-}
-
-.stockists { padding-bottom: var(--space-4xl); }
-
-.region { padding-top: var(--space-3xl); }
-@media (min-width: 768px) { .region { padding-top: var(--space-4xl); } }
-
-.region-head {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-lg);
-  padding-bottom: var(--space-xl);
-  border-bottom: 1px solid var(--color-rule);
-}
-
-.region-title {
-  font-size: clamp(1.25rem, 3vw, 2rem);
-  font-variation-settings: var(--font-weight-normal);
-  letter-spacing: -0.02em;
-  flex: 1;
-}
-
-.stores-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--color-rule);
-  border-inline: 1px solid var(--color-rule);
-  border-bottom: 1px solid var(--color-rule);
-  margin-bottom: var(--space-3xl);
-}
-@media (min-width: 768px)  { .stores-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1280px) { .stores-grid { grid-template-columns: repeat(4, 1fr); } }
-
-.store {
-  background: var(--color-white);
-  padding: var(--space-lg) 1.25rem;
-  display: flex; flex-direction: column; gap: var(--space-xs);
-  transition: background var(--duration-fast);
-}
-@media (min-width: 768px) { .store { padding: var(--space-xl) var(--space-lg); } }
-.store:hover { background: var(--color-off); }
-
-.store-top {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: var(--space-xs); margin-bottom: 0.25rem;
-}
-
-.store-name {
-  font-size: var(--text-base);
-  font-variation-settings: var(--font-weight-medium);
-  letter-spacing: var(--letter-spacing-tight);
-}
-
-.store-addr { text-transform: none; letter-spacing: 0; line-height: 1.5; }
-
-.st-cta {
-  padding-block: var(--space-3xl);
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: var(--space-md);
-  border-top: 1px solid var(--color-rule);
-}
-
-.st-cta-text {
-  font-size: var(--text-base);
-  font-variation-settings: var(--font-weight-normal);
-  color: var(--color-soft);
-}
+.st-title    { font-size: var(--text-display-md); letter-spacing: -0.04em; line-height: 1; }
+.region-title { font-size: clamp(1.25rem, 3vw, 2rem); letter-spacing: -0.02em; }
 </style>

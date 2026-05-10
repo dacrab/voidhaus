@@ -17,8 +17,8 @@ const { slug, num, name, price, img, img2, category, imgWidth = 800 } = Astro.pr
 ---
 
 <article class="pc" data-category={category}>
-  <a href={`/product/${slug}`} aria-label={`${name} — € ${price.toLocaleString('en-US')}`}>
-    <div class="pc-media">
+  <a class="block" href={`/product/${slug}`} aria-label={`${name} — € ${price.toLocaleString('en-US')}`}>
+    <div class="pc-media relative aspect-[3/4] overflow-hidden bg-[var(--color-off)]">
       <Picture
         class="pc-img pc-primary"
         src={IMAGES[img]}
@@ -30,7 +30,7 @@ const { slug, num, name, price, img, img2, category, imgWidth = 800 } = Astro.pr
       />
       {img2 && IMAGES[img2] && (
         <Picture
-          class="pc-img pc-alt"
+          class="pc-img pc-alt absolute inset-0 opacity-0 pointer-events-none"
           src={IMAGES[img2]}
           formats={['avif', 'webp']}
           alt=""
@@ -53,28 +53,11 @@ const { slug, num, name, price, img, img2, category, imgWidth = 800 } = Astro.pr
 </article>
 
 <style>
-.pc a { display: block; }
-
-.pc-media {
-  aspect-ratio: 3/4;
-  overflow: hidden;
-  background: var(--color-off);
-  position: relative;
-}
-
 .pc-img img {
   object-fit: cover;
   object-position: center top;
   transition: transform var(--duration-slowest) var(--ease-img), opacity 0.5s ease;
 }
-
-.pc-alt {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
 @media (hover: hover) {
   .pc a:hover .pc-primary img { transform: scale(1.04); }
   .pc a:hover .pc-alt         { opacity: 1; }
