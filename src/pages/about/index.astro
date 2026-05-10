@@ -40,31 +40,29 @@ const statements = [
 
 <Layout title="Manifesto" solidNav={true}>
 
-  <header class="about-head wrap">
+  <header class="wrap pt-[calc(var(--nav-h)+var(--space-2xl))] pb-[var(--space-2xl)]">
     <div class="rule js-rule"></div>
-    <div class="about-head-inner">
-      <div>
-        <span class="label muted" data-anim="hero">Manifesto</span>
-        <h1 class="about-title" data-anim="hero" data-delay="0.1">We reject<br/>the legible.</h1>
-      </div>
+    <div class="pt-[var(--space-lg)]">
+      <span class="label muted" data-anim="hero">Manifesto</span>
+      <h1 class="about-title mt-[var(--space-xs)]" data-anim="hero" data-delay="0.1" style="font-variation-settings:var(--font-weight-light)">We reject<br/>the legible.</h1>
     </div>
   </header>
 
-  <section class="statements wrap">
+  <section class="statements wrap pb-[var(--space-2xl)] md:pb-[var(--space-3xl)]">
     {statements.map((s, i) => (
       <>
-        <div class="stmt" data-anim="scroll">
-          <span class="label op-30 stmt-num">{s.num}</span>
-          <div class="stmt-body">
-            {'heading' in s && <h2 class="stmt-h">{s.heading}</h2>}
-            {s.body.map(p => <p class="stmt-p">{p}</p>)}
+        <div class="stmt grid gap-[var(--space-md)] py-[var(--space-xl)] sm:grid-cols-[5rem_1fr] sm:gap-[var(--space-2xl)] sm:py-[var(--space-3xl)]" data-anim="scroll">
+          <span class="label op-30">{s.num}</span>
+          <div class="flex flex-col gap-5 max-w-[58ch]">
+            {'heading' in s && <h2 class="stmt-h" style="font-variation-settings:var(--font-weight-normal)">{s.heading}</h2>}
+            {s.body.map(p => <p class="text-[var(--text-lg)] leading-[1.8] text-[var(--color-ink-soft)]" style="font-variation-settings:var(--font-weight-normal)">{p}</p>)}
           </div>
         </div>
         <div class="rule"></div>
         {i === 1 && (
           <>
-            <blockquote class="pull-quote serif" data-anim="scroll">
-              "The most radical act is <em>silence.</em>"
+            <blockquote class="serif block italic leading-[1.12] tracking-[-0.02em] text-center py-20 md:py-28 pull-quote" data-anim="scroll">
+              "The most radical act is <em class="not-italic text-[var(--color-mid)]">silence.</em>"
             </blockquote>
             <div class="rule"></div>
           </>
@@ -73,10 +71,10 @@ const statements = [
     ))}
   </section>
 
-  <section class="atelier" data-anim="scroll">
-    <div class="atelier-media">
+  <section class="mb-[var(--space-3xl)] md:mb-[var(--space-4xl)]" data-anim="scroll">
+    <div class="relative min-h-[280px] h-[55svh] md:h-[65svh] overflow-hidden">
       <Picture
-        class="atelier-img js-atelier-img"
+        class="atelier-img js-atelier-img absolute inset-0"
         src={IMAGES['atelier']}
         formats={['avif', 'webp']}
         alt="Voidhaus atelier"
@@ -84,13 +82,13 @@ const statements = [
         decoding="async"
         width={1400}
       />
-      <div class="atelier-scrim scrim"></div>
+      <div class="scrim" style="background:var(--scrim-dark-light)"></div>
     </div>
     <div class="product-grid wrap">
       {SITE.ateliers.map((a, i) => (
-        <div class="at-item" data-anim="stagger">
+        <div class="at-item flex flex-col gap-[0.6rem] p-7 md:p-9 bg-[var(--color-white)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--color-off)]" data-anim="stagger">
           <span class="label op-30">{String(i + 1).padStart(2, '0')}</span>
-          <span class="at-city">{a.city}</span>
+          <span class="at-city" style="font-variation-settings:var(--font-weight-normal)">{a.city}</span>
           <span class="label op-45">{a.specialty}</span>
         </div>
       ))}
@@ -122,86 +120,9 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.about-head {
-  padding-top: calc(var(--nav-h) + var(--space-2xl));
-  padding-bottom: var(--space-2xl);
-}
-
-.about-head-inner {
-  padding-top: var(--space-lg);
-}
-
-.about-title {
-  font-size: clamp(2.5rem, 8vw, 7rem);
-  font-variation-settings: var(--font-weight-light);
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-top: var(--space-xs);
-}
-
-.statements { padding-bottom: var(--space-2xl); }
-
-.stmt {
-  display: grid;
-  gap: var(--space-md);
-  padding-block: var(--space-xl);
-}
-@media (min-width: 640px) {
-  .stmt { grid-template-columns: 5rem 1fr; gap: var(--space-2xl); padding-block: var(--space-3xl); }
-}
-
-.stmt-body { display: flex; flex-direction: column; gap: 1.25rem; max-width: 58ch; }
-
-.stmt-h {
-  font-size: clamp(1.125rem, 2.5vw, 1.625rem);
-  font-variation-settings: var(--font-weight-normal);
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.stmt-p {
-  font-size: var(--text-lg);
-  font-variation-settings: var(--font-weight-normal);
-  line-height: 1.8;
-  color: var(--color-ink-soft);
-}
-
-.pull-quote {
-  display: block;
-  font-size: clamp(1.75rem, 6vw, 4.5rem);
-  font-style: italic;
-  line-height: 1.12;
-  letter-spacing: -0.02em;
-  text-align: center;
-  padding-block: 5rem;
-}
-@media (min-width: 768px) { .pull-quote { padding-block: 7rem; } }
-.pull-quote em { font-style: normal; color: var(--color-mid); }
-
-.atelier { margin-bottom: var(--space-3xl); }
-@media (min-width: 768px) { .atelier { margin-bottom: var(--space-4xl); } }
-
-.atelier-media {
-  position: relative;
-  height: 55svh; min-height: 280px;
-  overflow: hidden;
-}
-@media (min-width: 768px) { .atelier-media { height: 65svh; } }
-
-.atelier-scrim { background: var(--scrim-dark-light); }
-
-.at-item {
-  background: var(--color-white);
-  padding: 1.75rem 1.5rem;
-  display: flex; flex-direction: column; gap: 0.6rem;
-  transition: background var(--duration-fast);
-}
-@media (min-width: 768px) { .at-item { padding: 2.25rem 2rem; } }
-.at-item:hover { background: var(--color-off); }
-
-.at-city {
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  font-variation-settings: var(--font-weight-normal);
-  letter-spacing: -0.02em;
-}
+.about-title { font-size: clamp(2.5rem, 8vw, 7rem); letter-spacing: -0.04em; line-height: 1; }
+.stmt-h      { font-size: clamp(1.125rem, 2.5vw, 1.625rem); letter-spacing: -0.02em; line-height: 1.2; }
+.pull-quote  { font-size: clamp(1.75rem, 6vw, 4.5rem); }
+.at-city     { font-size: clamp(1rem, 2.5vw, 1.5rem); letter-spacing: -0.02em; }
+.atelier-img img { object-position: center; }
 </style>

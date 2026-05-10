@@ -7,12 +7,12 @@ import { SITE } from '@data/site';
 
 <Layout title="Collection" solidNav={true}>
 
-  <div class="coll-head wrap">
-    <div class="coll-head-inner">
-      <h1 class="coll-title" data-anim="hero">Collection</h1>
+  <div class="coll-head wrap pt-[calc(var(--nav-h)+var(--space-2xl))] md:pt-[calc(var(--nav-h)+var(--space-3xl))]">
+    <div class="flex items-baseline justify-between flex-wrap gap-[var(--space-md)] pb-[var(--space-lg)]">
+      <h1 class="coll-title" data-anim="hero" style="font-variation-settings:var(--font-weight-normal)">Collection</h1>
       <span class="label muted" data-anim="hero" data-delay="0.15">{SITE.season} — {PRODUCTS.length} pieces</span>
     </div>
-    <div class="filters" role="group" aria-label="Filter by category" data-anim="hero" data-delay="0.2">
+    <div class="filters flex gap-[var(--space-lg)] md:gap-[var(--space-xl)] pb-[var(--space-md)] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Filter by category" data-anim="hero" data-delay="0.2">
       {CATEGORIES.map((f, i) => (
         <button class:list={['filter-btn', 'label', { active: i === 0 }]} data-filter={f} type="button">
           {f}
@@ -52,43 +52,8 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.coll-head {
-  padding-top: calc(var(--nav-h) + var(--space-2xl));
-}
-@media (min-width: 768px) { .coll-head { padding-top: calc(var(--nav-h) + var(--space-3xl)); } }
-
-.coll-head-inner {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-  padding-bottom: var(--space-lg);
-}
-
-.coll-title {
-  font-size: clamp(1.75rem, 5vw, 3.5rem);
-  font-variation-settings: var(--font-weight-normal);
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-
-.filters {
-  display: flex;
-  gap: var(--space-lg);
-  padding-bottom: var(--space-md);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.filters::-webkit-scrollbar { display: none; }
-@media (min-width: 768px) { .filters { gap: var(--space-xl); } }
-
-.filter-btn {
-  background: none; border: none; padding: 0;
-  color: var(--color-ink); opacity: var(--opacity-disabled);
-  white-space: nowrap; flex-shrink: 0;
-  transition: opacity var(--duration-fast);
-}
+.coll-title { font-size: clamp(1.75rem, 5vw, 3.5rem); letter-spacing: -0.03em; line-height: 1; }
+.filter-btn { background: none; border: none; padding: 0; color: var(--color-ink); opacity: var(--opacity-disabled); white-space: nowrap; flex-shrink: 0; transition: opacity var(--duration-fast); }
 .filter-btn:hover  { opacity: var(--opacity-hover); }
 .filter-btn.active { opacity: 1; }
 </style>

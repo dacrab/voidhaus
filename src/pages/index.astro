@@ -11,9 +11,9 @@ const featured = PRODUCTS.slice(0, 4);
 
 <Layout>
 
-  <section class="hero">
+  <section class="relative w-screen min-h-[600px] h-svh ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col justify-end overflow-hidden">
     <Picture
-      class="hero-img js-hero-img"
+      class="hero-img js-hero-img absolute inset-0 w-full h-full"
       src={IMAGES['hero']}
       formats={['avif', 'webp']}
       alt="VOIDHAUS SS 2026"
@@ -22,19 +22,19 @@ const featured = PRODUCTS.slice(0, 4);
       width={1800}
       transition:name="site-hero"
     />
-    <div class="hero-scrim"></div>
-    <div class="hero-content">
-      <span class="label hero-season js-hero-season">SS 2026</span>
-      <h1 class="hero-title js-hero-title">VOIDHAUS</h1>
-      <div class="hero-foot wrap">
-        <a href="/collection" class="hero-cta js-hero-cta">Enter Collection</a>
-        <span class="label hero-tagline js-hero-tagline" aria-hidden="true">Twelve pieces. One position.</span>
+    <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(to bottom,transparent 30%,rgb(28 27 25/0.55) 100%),linear-gradient(to top,transparent 92%,rgb(28 27 25/0.3) 100%)"></div>
+    <div class="relative z-10 flex flex-col">
+      <span class="label js-hero-season absolute text-[var(--overlay-text-secondary)]" style="top:calc(var(--nav-h) + var(--space-lg));left:clamp(var(--space-lg),5vw,var(--space-4xl))">SS 2026</span>
+      <h1 class="js-hero-title text-[var(--overlay-text-primary)] pb-[var(--space-lg)] whitespace-nowrap hero-title" style="padding-inline:clamp(var(--space-lg),5vw,var(--space-4xl));font-variation-settings:var(--font-weight-light)">VOIDHAUS</h1>
+      <div class="hero-foot wrap flex items-baseline justify-between pb-[var(--space-2xl)] border-t border-white/15 pt-[var(--space-md)]">
+        <a href="/collection" class="js-hero-cta text-[var(--overlay-text-primary)] border-b border-white/40 pb-[0.1rem] transition-[border-color,color] duration-[var(--duration-fast)] hover:border-white hover:text-white">Enter Collection</a>
+        <span class="label js-hero-tagline text-[var(--overlay-text-muted)] hidden sm:block" aria-hidden="true">Twelve pieces. One position.</span>
       </div>
     </div>
   </section>
 
-  <section class="products wrap">
-    <div class="products-head">
+  <section class="products wrap py-[var(--space-3xl)] md:py-[var(--space-4xl)]">
+    <div class="flex items-center justify-between pb-[var(--space-md)]">
       <span class="label muted">SS 2026 — New Arrivals</span>
       <a href="/collection" class="label muted muted-link">All ({PRODUCTS.length}) →</a>
     </div>
@@ -44,8 +44,8 @@ const featured = PRODUCTS.slice(0, 4);
     </div>
   </section>
 
-  <section class="editorial" data-anim="scroll">
-    <div class="ed-media">
+  <section class="editorial relative min-h-[420px] h-[75svh] my-20 md:h-[85svh] md:my-28 overflow-hidden" data-anim="scroll">
+    <div class="absolute inset-0">
       <Picture
         class="ed-img"
         src={IMAGES['editorial']}
@@ -55,11 +55,11 @@ const featured = PRODUCTS.slice(0, 4);
         decoding="async"
         width={1800}
       />
-      <div class="ed-scrim scrim"></div>
+      <div class="scrim" style="background:linear-gradient(135deg,var(--scrim-dark-heavy) 0%,var(--scrim-dark-light) 60%,transparent 100%)"></div>
     </div>
-    <div class="ed-text wrap">
-      <p class="serif ed-quote">"The most radical act<br/>is <em>silence.</em>"</p>
-      <a href="/about" class="label ed-link">Read manifesto →</a>
+    <div class="wrap absolute bottom-12 md:bottom-16 inset-x-0 md:max-w-[45%] flex flex-col gap-[var(--space-lg)]">
+      <p class="serif ed-quote text-[var(--overlay-text-primary)] italic leading-[1.12] tracking-[-0.02em]" style="font-size:clamp(1.75rem,5vw,4rem)">"The most radical act<br/>is <em class="not-italic text-[var(--overlay-text-muted)]">silence.</em>"</p>
+      <a href="/about" class="label text-[var(--overlay-text-secondary)] transition-colors duration-[var(--duration-fast)] hover:text-white">Read manifesto →</a>
     </div>
   </section>
 
@@ -109,125 +109,13 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.hero {
-  position: relative;
-  width: 100vw;
-  height: 100svh;
-  min-height: 600px;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  overflow: hidden;
-}
-
-.hero-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.hero-scrim {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to bottom, transparent 30%, rgb(28 27 25 / 0.55) 100%),
-    linear-gradient(to top, transparent 92%, rgb(28 27 25 / 0.3) 100%);
-  pointer-events: none;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.hero-season {
-  position: absolute;
-  top: calc(var(--nav-h) + var(--space-lg));
-  left: clamp(var(--space-lg), 5vw, var(--space-4xl));
-  color: var(--overlay-text-secondary);
-}
-
+/* hero-title font-size can't be expressed as a Tailwind utility */
 .hero-title {
   font-size: clamp(5rem, 18vw, 18rem);
-  font-variation-settings: var(--font-weight-light);
   letter-spacing: -0.06em;
   line-height: 0.88;
-  color: var(--overlay-text-primary);
-  padding-inline: clamp(var(--space-lg), 5vw, var(--space-4xl));
-  padding-bottom: var(--space-lg);
-  white-space: nowrap;
 }
-
-.hero-foot {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding-bottom: var(--space-2xl);
-  border-top: 1px solid rgb(255 255 255 / 0.15);
-  padding-top: var(--space-md);
-}
-
-.hero-cta {
-  color: var(--overlay-text-primary);
-  border-bottom: 1px solid rgb(255 255 255 / 0.4);
-  padding-bottom: 0.1rem;
-  transition: border-color var(--duration-fast), color var(--duration-fast);
-}
-.hero-cta:hover { border-bottom-color: #fff; color: #fff; }
-
-.hero-tagline {
-  color: var(--overlay-text-muted);
-  display: none;
-}
-@media (min-width: 640px) { .hero-tagline { display: block; } }
-
-.products {
-  padding-block: var(--space-3xl) var(--space-2xl);
-}
-@media (min-width: 768px) { .products { padding-block: var(--space-4xl) var(--space-3xl); } }
-
-.products-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: var(--space-md);
-}
-
-/* 4-up on desktop, 2-up on mobile — override global 3-col default */
-.featured-grid {
-  grid-template-columns: repeat(2, 1fr);
-}
-@media (min-width: 768px)  { .featured-grid { grid-template-columns: repeat(2, 1fr); } }
+/* featured grid: 2-col → 2-col md → 4-col lg */
+.featured-grid { grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 1024px) { .featured-grid { grid-template-columns: repeat(4, 1fr); } }
-
-.editorial {
-  position: relative; height: 75svh; min-height: 420px;
-  margin-block: 5rem; overflow: hidden;
-}
-@media (min-width: 768px) { .editorial { height: 85svh; margin-block: 7rem; } }
-
-.ed-media { position: absolute; inset: 0; }
-.ed-img img { object-fit: cover; object-position: center; }
-.ed-scrim {
-  background: linear-gradient(135deg, var(--scrim-dark-heavy) 0%, var(--scrim-dark-light) 60%, transparent 100%);
-}
-.ed-text {
-  position: absolute; inset-block-end: 3rem; inset-inline: 0;
-  display: flex; flex-direction: column; gap: var(--space-lg);
-}
-@media (min-width: 768px) { .ed-text { inset-block-end: 4rem; max-width: 45%; inset-inline-start: 0; inset-inline-end: auto; } }
-
-.ed-quote {
-  font-size: clamp(1.75rem, 5vw, 4rem);
-  font-style: italic; line-height: 1.12; letter-spacing: -0.02em;
-  color: var(--overlay-text-primary);
-}
-.ed-quote em { font-style: normal; color: var(--overlay-text-muted); }
-.ed-link { color: var(--overlay-text-secondary); transition: color var(--duration-fast); }
-.ed-link:hover { color: #fff; }
 </style>

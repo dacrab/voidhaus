@@ -83,7 +83,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   </head>
 
   <body>
-    <div class="veil" id="js-veil" aria-hidden="true"></div>
+    <div id="js-veil" aria-hidden="true" class="fixed inset-0 bg-[var(--color-ink)] z-[10000] pointer-events-none opacity-100 transition-opacity duration-[800ms] [cubic-bezier(0.16,1,0.3,1)] [&.out]:opacity-0"></div>
     <div class="cursor" id="js-cursor" aria-hidden="true"></div>
     <Nav client:load solidNav={solidNav} />
     <Cart client:load />
@@ -145,84 +145,39 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
       document.addEventListener('astro:page-load', setupPage);
     </script>
 
-    <footer class="site-footer">
-      <div class="newsletter wrap">
-        <div class="nl-inner">
-          <div class="nl-left">
+    <footer class="border-t border-[var(--color-rule)] mt-[var(--space-3xl)]">
+      <div class="newsletter wrap py-[var(--space-2xl)] border-b border-[var(--color-rule)]">
+        <div class="flex items-center justify-between gap-[var(--space-xl)] flex-wrap">
+          <div class="flex flex-col gap-[var(--space-xs)]">
             <span class="label muted">Newsletter</span>
-            <p class="nl-text">Dispatches from the atelier. Infrequent. Worth reading.</p>
+            <p class="text-[var(--text-sm)] text-[var(--color-soft)] max-w-[32ch]" style="font-variation-settings:var(--font-weight-normal)">Dispatches from the atelier. Infrequent. Worth reading.</p>
           </div>
-          <form class="nl-form" id="nl-form" novalidate>
+          <form class="nl-form flex border border-[var(--color-rule)] shrink-0 max-sm:w-full" id="nl-form" novalidate>
             <input
-              class="nl-input"
-              type="email"
-              name="email"
-              placeholder="your@email.com"
-              autocomplete="email"
-              aria-label="Email address for newsletter"
-              required
+              class="nl-input bg-transparent border-none text-[var(--color-ink)] px-[var(--space-md)] py-[var(--space-sm)] outline-none w-[220px] max-sm:flex-1 max-sm:w-auto placeholder:text-[var(--color-mid)]"
+              style="font-variation-settings:var(--font-weight-normal);font-size:max(16px,0.8125rem)"
+              type="email" name="email" placeholder="your@email.com"
+              autocomplete="email" aria-label="Email address for newsletter" required
             />
-            <button class="nl-btn label" type="submit">Subscribe</button>
+            <button
+              class="nl-btn label bg-transparent border-none border-l border-[var(--color-rule)] text-[var(--color-ink)] opacity-[var(--opacity-secondary)] px-[var(--space-md)] py-[var(--space-sm)] whitespace-nowrap transition-[opacity,background] duration-[var(--duration-fast)] hover:opacity-100 hover:bg-[var(--color-off)] [&.subscribed]:opacity-100 [&.subscribed]:bg-[var(--color-off)]"
+              type="submit">Subscribe</button>
           </form>
         </div>
       </div>
 
-      <div class="wrap footer-bottom">
+      <div class="wrap py-6 pb-8">
         <div class="rule"></div>
-        <div class="footer-inner">
+        <div class="flex items-center justify-between flex-wrap gap-[var(--space-sm)] pt-[var(--space-lg)]">
           <span class="label muted">© {new Date().getFullYear()} {SITE.name}</span>
-          <nav class="footer-links" aria-label="Legal navigation">
+          <nav class="flex gap-[var(--space-lg)] items-center" aria-label="Legal navigation">
             <a href="/stockists" class="label muted muted-link">Stockists</a>
             <a href="/privacy"   class="label muted muted-link">Privacy</a>
             <a href="/terms"     class="label muted muted-link">Terms</a>
           </nav>
-          <span class="label muted footer-cities">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
+          <span class="label muted hidden sm:block">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
         </div>
       </div>
     </footer>
   </body>
 </html>
-
-<style>
-  .veil {
-    position: fixed; inset: 0;
-    background: var(--color-ink);
-    z-index: 10000;
-    pointer-events: none;
-    opacity: 1;
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .veil.out { opacity: 0; }
-
-  .site-footer { border-top: 1px solid var(--color-rule); margin-top: var(--space-3xl); }
-
-  .newsletter { padding-block: var(--space-2xl); border-bottom: 1px solid var(--color-rule); }
-  .nl-inner   { display: flex; align-items: center; justify-content: space-between; gap: var(--space-xl); flex-wrap: wrap; }
-  .nl-left    { display: flex; flex-direction: column; gap: var(--space-xs); }
-  .nl-text    { font-size: var(--text-sm); font-variation-settings: var(--font-weight-normal); color: var(--color-soft); max-width: 32ch; }
-  .nl-form    { display: flex; border: 1px solid var(--color-rule); flex-shrink: 0; }
-  .nl-input {
-    background: none; border: none;
-    color: var(--color-ink);
-    font-variation-settings: var(--font-weight-normal);
-    font-size: max(16px, 0.8125rem);
-    padding: var(--space-sm) var(--space-md); outline: none; width: 220px;
-  }
-  .nl-input::placeholder { color: var(--color-mid); }
-  .nl-btn {
-    background: none; border: none; border-left: 1px solid var(--color-rule);
-    color: var(--color-ink); opacity: var(--opacity-secondary); padding: var(--space-sm) var(--space-md);
-    white-space: nowrap; transition: opacity var(--duration-fast), background var(--duration-fast);
-  }
-  .nl-btn:hover, .nl-btn.subscribed { opacity: 1; background: var(--color-off); }
-  @media (max-width: 640px) { .nl-form { width: 100%; } .nl-input { flex: 1; width: auto; } }
-
-  .footer-bottom { padding-block: 1.5rem 2rem; }
-  .footer-inner {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: var(--space-sm); padding-top: var(--space-lg);
-  }
-  .footer-links  { display: flex; gap: var(--space-lg); align-items: center; }
-  .footer-cities { display: none; }
-  @media (min-width: 640px) { .footer-cities { display: block; } }
-</style>

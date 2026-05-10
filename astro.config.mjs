@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
+import tailwindcss from '@tailwindcss/vite';
 import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
 
@@ -8,6 +9,7 @@ export default defineConfig({
   output: 'static',
 
   vite: {
+    plugins: [tailwindcss()],
     build: {
       rollupOptions: {
         onwarn(warning, warn) {

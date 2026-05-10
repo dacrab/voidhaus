@@ -24,11 +24,10 @@ const next = PRODUCTS[idx + 1] ?? null;
 
 <Layout title={p.name} description={p.desc} type="product" solidNav={true}>
 
-  <div class="pdp">
+  <div class="flex flex-col pt-[var(--nav-h)] md:grid md:grid-cols-2 md:min-h-svh md:items-start">
 
-    <!-- Images -->
-    <div class="pdp-images">
-      <div class="img-wrap img-primary">
+    <div class="flex flex-col gap-px bg-[var(--color-rule)] md:sticky md:top-[var(--nav-h)] md:h-[calc(100svh-var(--nav-h))] md:overflow-y-auto md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden md:bg-transparent">
+      <div class="overflow-hidden bg-[var(--color-off)] aspect-[3/4] md:aspect-auto md:min-h-full">
         <Picture
           class="pdp-img js-main-img"
           src={IMAGES[p.img]}
@@ -40,7 +39,7 @@ const next = PRODUCTS[idx + 1] ?? null;
         />
       </div>
       {p.img2 && (
-        <div class="img-wrap img-secondary" aria-hidden="true">
+        <div class="overflow-hidden bg-[var(--color-paper)] md:flex-1 md:min-h-[60vh]" aria-hidden="true">
           <Picture
             class="pdp-img"
             src={IMAGES[p.img2]}
@@ -54,33 +53,32 @@ const next = PRODUCTS[idx + 1] ?? null;
       )}
     </div>
 
-    <!-- Info panel -->
-    <div class="pdp-info">
+    <div data-pdp-info class="flex flex-col gap-[var(--space-xl)] p-[var(--space-xl)] px-[var(--space-lg)] pb-[var(--space-4xl)] md:p-[var(--space-4xl)] md:px-[var(--space-3xl)] md:sticky md:top-[var(--nav-h)] md:h-[calc(100svh-var(--nav-h))] md:overflow-y-auto md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden xl:px-[var(--space-4xl)]">
 
-      <div class="info-top">
+      <div class="flex items-center justify-between">
         <a href="/collection" class="label muted-link">← Collection</a>
         <span class="label op-30">{p.num}</span>
       </div>
 
-      <h1 class="pdp-name">{p.name}</h1>
+      <h1 class="pdp-name" style="font-variation-settings:var(--font-weight-light)">{p.name}</h1>
 
-      <p class="pdp-desc">{p.desc}</p>
+      <p class="text-[var(--text-lg)] leading-[1.8] text-[var(--color-ink-soft)] max-w-[36ch]" style="font-variation-settings:var(--font-weight-normal)">{p.desc}</p>
 
-      <dl class="details">
+      <dl class="border-t border-[var(--color-rule)]">
         {details.map(([k, v]) => (
-          <div class="detail-row">
-            <dt class="label detail-key">{k}</dt>
-            <dd class="label detail-val">{v}</dd>
+          <div class="flex justify-between items-center py-[0.875rem] border-b border-[var(--color-rule)] gap-[var(--space-md)]">
+            <dt class="label opacity-[var(--opacity-muted)] shrink-0">{k}</dt>
+            <dd class="label text-[var(--color-ink-soft)] text-right normal-case tracking-normal">{v}</dd>
           </div>
         ))}
       </dl>
 
-      <div class="sizes">
-        <div class="sizes-head">
+      <div class="flex flex-col gap-[0.875rem]">
+        <div class="flex items-center justify-between">
           <span class="label muted">Size</span>
           <SizeGuide category={p.category} client:load />
         </div>
-        <div class="size-row" role="group" aria-label="Select size">
+        <div class="flex flex-wrap gap-[0.4rem]" role="group" aria-label="Select size">
           {p.sizes.map((s, i) => (
             <button
               class:list={['sz-btn', 'label', { active: i === 1 }]}
@@ -91,29 +89,27 @@ const next = PRODUCTS[idx + 1] ?? null;
         </div>
       </div>
 
-      <div class="cta-block">
-        <div class="price-row">
-          <span class="pdp-price serif">€ {p.price.toLocaleString('en-US')}</span>
+      <div class="flex flex-col gap-[var(--space-md)]">
+        <div class="flex items-baseline justify-between py-4 border-t border-b border-[var(--color-rule)]">
+          <span class="pdp-price serif italic tracking-[-0.02em]" style="font-variation-settings:var(--font-weight-medium)">€ {p.price.toLocaleString('en-US')}</span>
           <span class="label muted">Incl. VAT</span>
         </div>
         <button
-          class="add-btn"
-          id="js-add"
-          type="button"
+          class="w-full bg-transparent border border-[var(--color-ink)] p-5 transition-[background] duration-[var(--duration-base)] hover:bg-[var(--color-ink)] group"
+          id="js-add" type="button"
           data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price.toLocaleString('en-US'), img: IMAGES[p.img].src, num: p.num })}
         >
-          <span class="label add-text">Add to Selection</span>
+          <span class="label add-text block text-center text-[var(--color-ink)] tracking-[var(--letter-spacing-button)] transition-colors duration-[var(--duration-base)] group-hover:text-[var(--color-white)]">Add to Selection</span>
         </button>
-        <span class="label ship-note">Complimentary worldwide shipping</span>
+        <span class="label opacity-[var(--opacity-disabled)] block text-center">Complimentary worldwide shipping</span>
       </div>
 
     </div>
   </div>
 
-  <!-- Prev / next nav -->
-  <nav class="pdp-nav wrap" aria-label="Product navigation">
+  <nav class="wrap py-10" aria-label="Product navigation">
     <div class="rule"></div>
-    <div class="pdp-nav-inner">
+    <div class="flex justify-between py-6">
       {prev
         ? <a href={`/product/${prev.slug}`} class="label muted-link">← {prev.name}</a>
         : <a href="/collection"             class="label muted-link">← Collection</a>}
@@ -140,10 +136,10 @@ document.addEventListener('astro:page-load', () => {
       else gsap.fromTo(img, { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: DUR.slower, ease: 'power3.out' });
     }
 
-    // Info panel stagger
-    const infoEls = ['.info-top', '.pdp-name', '.pdp-desc', '.details', '.sizes', '.cta-block']
-      .map(s => document.querySelector<HTMLElement>(s)).filter(Boolean) as HTMLElement[];
-    gsap.fromTo(infoEls,
+    // Info panel stagger — select direct children of the info panel
+    const panel = document.querySelector<HTMLElement>('[data-pdp-info]');
+    const targets = panel ? ([...panel.children] as HTMLElement[]) : [];
+    gsap.fromTo(targets,
       { opacity: 0, y: 16 },
       { opacity: 1, y: 0, duration: DUR.slow, ease: EASE, stagger: 0.07, delay: morphed ? 0 : 0.2, clearProps: 'transform,will-change' },
     );
@@ -179,162 +175,14 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-/* ── Layout ── */
-.pdp {
-  display: flex;
-  flex-direction: column;
-  padding-top: var(--nav-h);
-}
-@media (min-width: 768px) {
-  .pdp {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: 100svh;
-    align-items: start;
-  }
-}
-
-/* ── Images ── */
-.pdp-images {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  background: var(--color-rule);
-}
-@media (min-width: 768px) {
-  .pdp-images {
-    position: sticky;
-    top: var(--nav-h);
-    height: calc(100svh - var(--nav-h));
-    overflow-y: auto;
-    scrollbar-width: none;
-    background: none;
-  }
-  .pdp-images::-webkit-scrollbar { display: none; }
-}
-
-.img-wrap { overflow: hidden; background: var(--color-off); }
-
-.img-primary { aspect-ratio: 3/4; }
-@media (min-width: 768px) { .img-primary { aspect-ratio: unset; min-height: 100%; } }
-
-@media (min-width: 768px) { .img-secondary { flex: 1; min-height: 60vh; } }
-
 .pdp-img img { object-position: center top; }
-
-/* ── Info panel ── */
-.pdp-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-  padding: var(--space-xl) var(--space-lg) var(--space-4xl);
-}
-@media (min-width: 768px) {
-  .pdp-info {
-    padding: var(--space-4xl) var(--space-3xl);
-    position: sticky;
-    top: var(--nav-h);
-    height: calc(100svh - var(--nav-h));
-    overflow-y: auto;
-    scrollbar-width: none;
-  }
-  .pdp-info::-webkit-scrollbar { display: none; }
-}
-@media (min-width: 1280px) { .pdp-info { padding-inline: var(--space-4xl); } }
-
-.info-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.pdp-name {
-  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
-  font-variation-settings: var(--font-weight-light);
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
-.pdp-desc {
-  font-size: var(--text-lg);
-  font-variation-settings: var(--font-weight-normal);
-  line-height: 1.8;
-  color: var(--color-ink-soft);
-  max-width: 36ch;
-}
-
-/* ── Details table ── */
-.details { border-top: 1px solid var(--color-rule); }
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-block: 0.875rem;
-  border-bottom: 1px solid var(--color-rule);
-  gap: var(--space-md);
-}
-.detail-key { opacity: var(--opacity-muted); flex-shrink: 0; }
-.detail-val { color: var(--color-ink-soft); text-align: right; text-transform: none; letter-spacing: 0; }
-
-/* ── Sizes ── */
-.sizes { display: flex; flex-direction: column; gap: 0.875rem; }
-.sizes-head { display: flex; align-items: center; justify-content: space-between; }
-.size-row   { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-
+.pdp-name  { font-size: clamp(2.25rem, 5.5vw, 4.5rem); letter-spacing: -0.04em; line-height: 1; }
+.pdp-price { font-size: clamp(1.75rem, 3vw, 2.5rem); }
 .sz-btn {
-  background: none;
-  border: 1px solid var(--color-rule);
-  color: var(--color-soft);
-  padding: var(--space-xs) 0.875rem;
+  background: none; border: 1px solid var(--color-rule);
+  color: var(--color-soft); padding: var(--space-xs) 0.875rem;
   transition: border-color var(--duration-fast), color var(--duration-fast);
 }
 .sz-btn:hover  { border-color: var(--color-mid); color: var(--color-ink); }
 .sz-btn.active { border-color: var(--color-ink); color: var(--color-ink); }
-
-/* ── CTA ── */
-.cta-block { display: flex; flex-direction: column; gap: var(--space-md); }
-
-.price-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding-block: 1rem;
-  border-top: 1px solid var(--color-rule);
-  border-bottom: 1px solid var(--color-rule);
-}
-
-.pdp-price {
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
-  font-style: italic;
-  font-variation-settings: var(--font-weight-medium);
-  letter-spacing: -0.02em;
-}
-
-.add-btn {
-  width: 100%;
-  background: none;
-  border: 1px solid var(--color-ink);
-  padding: 1.25rem 1.5rem;
-  transition: background var(--duration-base), color var(--duration-base);
-}
-.add-btn:hover { background: var(--color-ink); }
-.add-btn:hover .add-text { color: var(--color-white); }
-
-.add-text {
-  display: block;
-  text-align: center;
-  color: var(--color-ink);
-  letter-spacing: var(--letter-spacing-button);
-  transition: color var(--duration-base);
-}
-
-.ship-note { opacity: var(--opacity-disabled); display: block; text-align: center; }
-
-/* ── Prev/next nav ── */
-.pdp-nav { padding-block: 2.5rem; }
-.pdp-nav-inner {
-  display: flex;
-  justify-content: space-between;
-  padding-block: 1.5rem;
-}
 </style>

@@ -14,66 +14,59 @@ const info = [
 
 <Layout title="Contact" solidNav={true}>
 
-  <header class="contact-head wrap">
+  <header class="wrap pt-[calc(var(--nav-h)+var(--space-2xl))] pb-[var(--space-2xl)]">
     <div class="rule js-rule"></div>
-    <div class="contact-head-inner">
-      <div>
-        <span class="label muted" data-anim="hero">Contact</span>
-        <h1 class="contact-title" data-anim="hero" data-delay="0.1">Let's speak.</h1>
-      </div>
+    <div class="pt-[var(--space-lg)]">
+      <span class="label muted" data-anim="hero">Contact</span>
+      <h1 class="contact-title mt-[var(--space-xs)]" data-anim="hero" data-delay="0.1" style="font-variation-settings:var(--font-weight-light)">Let's speak.</h1>
     </div>
   </header>
 
-  <div class="contact-body wrap">
+  <div class="wrap grid grid-cols-1 gap-[var(--space-3xl)] pb-[var(--space-4xl)] min-[900px]:grid-cols-[1fr_300px] min-[900px]:gap-[var(--space-4xl)] min-[900px]:items-start min-[1280px]:grid-cols-[1fr_340px]">
 
-    <form class="contact-form" id="js-form" novalidate data-anim="scroll">
-      <span class="label muted form-lbl">Message</span>
+    <form class="flex flex-col gap-[var(--space-xl)]" id="js-form" novalidate data-anim="scroll">
+      <span class="label muted block mb-[var(--space-xl)]">Message</span>
 
-      <div class="field-row">
-        <div class="field">
+      <div class="grid grid-cols-1 gap-[var(--space-xl)] min-[480px]:grid-cols-2">
+        <div class="flex flex-col gap-[0.65rem]">
           <label class="label muted" for="name">Name</label>
-          <input class="field-inp" type="text" id="name" name="name"
-            placeholder="Your name" autocomplete="name" required />
+          <input class="field-inp" type="text" id="name" name="name" placeholder="Your name" autocomplete="name" required />
         </div>
-        <div class="field">
+        <div class="flex flex-col gap-[0.65rem]">
           <label class="label muted" for="email">Email</label>
-          <input class="field-inp" type="email" id="email" name="email"
-            placeholder="your@email.com" autocomplete="email" required />
+          <input class="field-inp" type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" required />
         </div>
       </div>
 
-      <fieldset class="field subject-field">
+      <fieldset class="border-none p-0 flex flex-col gap-[0.65rem]">
         <legend class="label muted">Subject</legend>
-        <div class="chips">
+        <div class="flex flex-wrap gap-[0.4rem]">
           {subjects.map((s, i) => (
-            <button type="button" class:list={['chip', 'label', { active: i === 0 }]} data-subject={s}>
-              {s}
-            </button>
+            <button type="button" class:list={['chip', 'label', { active: i === 0 }]} data-subject={s}>{s}</button>
           ))}
         </div>
         <input type="hidden" id="js-subject" name="subject" value={subjects[0]} />
       </fieldset>
 
-      <div class="field">
+      <div class="flex flex-col gap-[0.65rem]">
         <label class="label muted" for="msg">Message</label>
-        <textarea class="field-inp field-ta" id="msg" name="message"
-          placeholder="Write here…" rows="5"></textarea>
+        <textarea class="field-inp resize-none" id="msg" name="message" placeholder="Write here…" rows="5"></textarea>
       </div>
 
-      <button class="submit-btn" id="js-submit" type="submit">
+      <button class="flex items-center justify-between bg-transparent border border-[var(--color-ink)] text-[var(--color-ink)] px-5 py-[var(--space-md)] w-full transition-[background,color] duration-[var(--duration-fast)] hover:bg-[var(--color-ink)] hover:text-[var(--color-white)]" id="js-submit" type="submit">
         <span class="label submit-text">Send Message</span>
         <span aria-hidden="true">→</span>
       </button>
     </form>
 
-    <aside class="contact-info" data-anim="scroll">
-      <span class="label muted form-lbl">Information</span>
-      <dl class="info-list">
+    <aside data-anim="scroll">
+      <span class="label muted block mb-[var(--space-xl)]">Information</span>
+      <dl class="border-t border-[var(--color-rule)]">
         {info.map(({ key, lines }) => (
-          <div class="info-row">
+          <div class="grid grid-cols-[4.5rem_1fr] gap-[var(--space-md)] py-[1.125rem] border-b border-[var(--color-rule)] items-start">
             <dt class="label op-35">{key}</dt>
-            <dd class="info-vals">
-              {lines.map(l => <span class="info-val">{l}</span>)}
+            <dd class="flex flex-col gap-[0.15rem]">
+              {lines.map(l => <span class="text-[var(--text-sm)] text-[var(--color-ink-soft)] leading-[1.6]" style="font-variation-settings:var(--font-weight-normal)">{l}</span>)}
             </dd>
           </div>
         ))}
@@ -117,61 +110,17 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.contact-head {
-  padding-top: calc(var(--nav-h) + var(--space-2xl));
-  padding-bottom: var(--space-2xl);
-}
-
-.contact-head-inner { padding-top: var(--space-lg); }
-
-.contact-title {
-  font-size: clamp(2.5rem, 8vw, 7rem);
-  font-variation-settings: var(--font-weight-light);
-  letter-spacing: -0.04em;
-  line-height: 1;
-  margin-top: var(--space-xs);
-}
-
-.contact-body {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3xl);
-  padding-bottom: var(--space-4xl);
-}
-@media (min-width: 900px) {
-  .contact-body { grid-template-columns: 1fr 300px; gap: var(--space-4xl); align-items: start; }
-}
-@media (min-width: 1280px) { .contact-body { grid-template-columns: 1fr 340px; } }
-
-.form-lbl { display: block; margin-bottom: var(--space-xl); }
-
-.contact-form { display: flex; flex-direction: column; gap: var(--space-xl); }
-
-.field-row {
-  display: grid; grid-template-columns: 1fr; gap: var(--space-xl);
-}
-@media (min-width: 480px) { .field-row { grid-template-columns: 1fr 1fr; } }
-
-.field { display: flex; flex-direction: column; gap: 0.65rem; }
-
+.contact-title { font-size: clamp(2.5rem, 8vw, 7rem); letter-spacing: -0.04em; line-height: 1; }
 .field-inp {
-  background: none; border: none;
-  border-bottom: 1px solid var(--color-rule);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
+  background: none; border: none; border-bottom: 1px solid var(--color-rule);
+  color: var(--color-ink); font-family: var(--font-sans);
   font-variation-settings: var(--font-weight-normal);
-  font-size: max(16px, 0.875rem);
-  padding-block: 0.75rem;
+  font-size: max(16px, 0.875rem); padding-block: 0.75rem;
   outline: none; width: 100%;
   transition: border-bottom-color var(--duration-fast);
 }
-.field-inp:focus       { border-bottom-color: var(--color-mid); }
+.field-inp:focus        { border-bottom-color: var(--color-mid); }
 .field-inp::placeholder { color: var(--color-mid); }
-.field-ta { resize: none; }
-
-.subject-field { border: none; padding: 0; display: flex; flex-direction: column; gap: 0.65rem; }
-.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-
 .chip {
   background: none; border: 1px solid var(--color-rule);
   color: var(--color-soft); padding: 0.45rem 1rem;
@@ -179,24 +128,4 @@ document.addEventListener('astro:page-load', () => {
 }
 .chip:hover  { border-color: var(--color-mid); color: var(--color-ink); }
 .chip.active { border-color: var(--color-ink); color: var(--color-ink); }
-
-.submit-btn {
-  display: flex; align-items: center; justify-content: space-between;
-  background: none; border: 1px solid var(--color-ink);
-  color: var(--color-ink); padding: var(--space-md) 1.25rem; width: 100%;
-  transition: background var(--duration-fast), color var(--duration-fast);
-}
-.submit-btn:hover { background: var(--color-ink); color: var(--color-white); }
-
-.info-list { border-top: 1px solid var(--color-rule); }
-.info-row {
-  display: grid; grid-template-columns: 4.5rem 1fr;
-  gap: var(--space-md); padding-block: 1.125rem;
-  border-bottom: 1px solid var(--color-rule); align-items: start;
-}
-.info-vals { display: flex; flex-direction: column; gap: 0.15rem; }
-.info-val {
-  font-size: var(--text-sm); font-variation-settings: var(--font-weight-normal);
-  color: var(--color-ink-soft); line-height: 1.6;
-}
 </style>
