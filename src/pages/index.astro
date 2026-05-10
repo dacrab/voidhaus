@@ -11,9 +11,9 @@ const featured = PRODUCTS.slice(0, 4);
 
 <Layout>
 
-  <section class="relative w-screen min-h-[600px] h-svh ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] flex flex-col justify-end overflow-hidden">
+  <section class="hero relative w-screen min-h-[600px] h-svh -ml-[calc(50vw-50%)] -mr-[calc(50vw-50%)] flex flex-col justify-end overflow-hidden">
     <Picture
-      class="hero-img js-hero-img absolute inset-0 w-full h-full"
+      class="js-hero-img absolute inset-0 w-full h-full"
       src={IMAGES['hero']}
       formats={['avif', 'webp']}
       alt="VOIDHAUS SS 2026"
@@ -22,19 +22,19 @@ const featured = PRODUCTS.slice(0, 4);
       width={1800}
       transition:name="site-hero"
     />
-    <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(to bottom,transparent 30%,rgb(28 27 25/0.55) 100%),linear-gradient(to top,transparent 92%,rgb(28 27 25/0.3) 100%)"></div>
+    <div class="hero-scrim scrim"></div>
     <div class="relative z-10 flex flex-col">
-      <span class="label js-hero-season absolute text-[var(--overlay-text-secondary)]" style="top:calc(var(--nav-h) + var(--space-lg));left:clamp(var(--space-lg),5vw,var(--space-4xl))">SS 2026</span>
-      <h1 class="js-hero-title text-[var(--overlay-text-primary)] pb-[var(--space-lg)] whitespace-nowrap hero-title" style="padding-inline:clamp(var(--space-lg),5vw,var(--space-4xl));font-variation-settings:var(--font-weight-light)">VOIDHAUS</h1>
-      <div class="hero-foot wrap flex items-baseline justify-between pb-[var(--space-2xl)] border-t border-white/15 pt-[var(--space-md)]">
-        <a href="/collection" class="js-hero-cta text-[var(--overlay-text-primary)] border-b border-white/40 pb-[0.1rem] transition-[border-color,color] duration-[var(--duration-fast)] hover:border-white hover:text-white">Enter Collection</a>
-        <span class="label js-hero-tagline text-[var(--overlay-text-muted)] hidden sm:block" aria-hidden="true">Twelve pieces. One position.</span>
+      <span class="label js-hero-season ot-secondary absolute" style="top:calc(var(--nav-h) + var(--spacing-lg));left:clamp(var(--spacing-lg),5vw,var(--spacing-4xl))">SS 2026</span>
+      <h1 class="hero-title js-hero-title fw-light ot-primary whitespace-nowrap pb-lg" style="padding-inline:clamp(var(--spacing-lg),5vw,var(--spacing-4xl))">VOIDHAUS</h1>
+      <div class="wrap flex items-baseline justify-between pb-2xl border-t border-white/15 pt-md">
+        <a href="/collection" class="js-hero-cta ot-primary border-b border-white/40 pb-[0.1rem] transition-[border-color,color] duration-[var(--duration-fast)] hover:border-white hover:text-white">Enter Collection</a>
+        <span class="label js-hero-tagline ot-muted hidden sm:block" aria-hidden="true">Twelve pieces. One position.</span>
       </div>
     </div>
   </section>
 
-  <section class="products wrap py-[var(--space-3xl)] md:py-[var(--space-4xl)]">
-    <div class="flex items-center justify-between pb-[var(--space-md)]">
+  <section class="wrap py-3xl md:py-4xl">
+    <div class="flex items-center justify-between pb-md">
       <span class="label muted">SS 2026 — New Arrivals</span>
       <a href="/collection" class="label muted muted-link">All ({PRODUCTS.length}) →</a>
     </div>
@@ -55,11 +55,11 @@ const featured = PRODUCTS.slice(0, 4);
         decoding="async"
         width={1800}
       />
-      <div class="scrim" style="background:linear-gradient(135deg,var(--scrim-dark-heavy) 0%,var(--scrim-dark-light) 60%,transparent 100%)"></div>
+      <div class="ed-scrim scrim"></div>
     </div>
-    <div class="wrap absolute bottom-12 md:bottom-16 inset-x-0 md:max-w-[45%] flex flex-col gap-[var(--space-lg)]">
-      <p class="serif ed-quote text-[var(--overlay-text-primary)] italic leading-[1.12] tracking-[-0.02em]" style="font-size:clamp(1.75rem,5vw,4rem)">"The most radical act<br/>is <em class="not-italic text-[var(--overlay-text-muted)]">silence.</em>"</p>
-      <a href="/about" class="label text-[var(--overlay-text-secondary)] transition-colors duration-[var(--duration-fast)] hover:text-white">Read manifesto →</a>
+    <div class="wrap absolute bottom-12 md:bottom-16 inset-x-0 md:max-w-[45%] flex flex-col gap-lg">
+      <p class="serif ed-quote ot-primary italic leading-[1.12] tracking-tight">"The most radical act<br/>is <em class="not-italic ot-muted">silence.</em>"</p>
+      <a href="/about" class="label ot-secondary transition-colors duration-[var(--duration-fast)] hover:text-white">Read manifesto →</a>
     </div>
   </section>
 
@@ -77,12 +77,8 @@ document.addEventListener('astro:page-load', () => {
 
     const img = document.querySelector<HTMLElement>('.js-hero-img');
     if (img) {
-      if (morphed) {
-        // View transition handled the image; set final resting state.
-        gsap.set(img, { opacity: 1, scale: 1.08 });
-      } else {
-        gsap.fromTo(img, { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1.08, duration: 1.6, ease: 'power3.out' });
-      }
+      if (morphed) gsap.set(img, { opacity: 1, scale: 1.08 });
+      else gsap.fromTo(img, { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1.08, duration: 1.6, ease: 'power3.out' });
       ScrollTrigger.create({
         trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 2,
         onUpdate: st => gsap.set(img, { yPercent: st.progress * -10 }),
@@ -109,13 +105,20 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-/* hero-title font-size can't be expressed as a Tailwind utility */
 .hero-title {
   font-size: clamp(5rem, 18vw, 18rem);
   letter-spacing: -0.06em;
   line-height: 0.88;
 }
-/* featured grid: 2-col → 2-col md → 4-col lg */
+.hero-scrim {
+  background:
+    linear-gradient(to bottom, transparent 30%, rgb(28 27 25 / 0.55) 100%),
+    linear-gradient(to top, transparent 92%, rgb(28 27 25 / 0.3) 100%);
+}
+.ed-scrim {
+  background: linear-gradient(135deg, var(--scrim-heavy) 0%, var(--scrim-light) 60%, transparent 100%);
+}
+.ed-quote { font-size: clamp(1.75rem, 5vw, 4rem); }
 .featured-grid { grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 1024px) { .featured-grid { grid-template-columns: repeat(4, 1fr); } }
 </style>
