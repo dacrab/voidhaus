@@ -66,7 +66,7 @@ const chapters = [
         </div>
       </div>
 
-      <div class="product-grid wrap py-0">
+      <div class="product-grid wrap">
         {ch.products.map(p => <ProductCard {...p} imgWidth={700} />)}
       </div>
 
@@ -106,6 +106,4 @@ document.addEventListener('astro:page-load', () => {
 .chapter-title { font-size: clamp(3.5rem, 11vw, 9rem); }
 .chapter-scrim { background: linear-gradient(to bottom, transparent 35%, rgb(28 27 25 / 0.7) 100%); }
 .js-img img    { object-position: center top; }
-/* product-grid sits inside .wrap — zero out the block padding */
-.product-grid.wrap { padding-block: 0; }
 </style>

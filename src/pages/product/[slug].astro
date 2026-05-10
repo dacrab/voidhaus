@@ -24,10 +24,10 @@ const next = PRODUCTS[idx + 1] ?? null;
 
 <Layout title={p.name} description={p.desc} type="product" solidNav={true}>
 
-  <div class="flex flex-col pt-[var(--nav-h)] md:grid md:grid-cols-2 md:min-h-svh md:items-start">
+  <div class="pdp-layout">
 
     <!-- Images -->
-    <div data-scroll-panel class="flex flex-col gap-px bg-[var(--color-rule)] md:scroll-panel md:bg-transparent">
+    <div data-scroll-panel class="pdp-images">
       <div class="overflow-hidden bg-[var(--color-off)] aspect-[3/4] md:aspect-auto md:min-h-full">
         <Picture
           class="pdp-img js-main-img"
@@ -55,7 +55,7 @@ const next = PRODUCTS[idx + 1] ?? null;
     </div>
 
     <!-- Info -->
-    <div data-pdp-info data-scroll-panel class="flex flex-col gap-xl p-xl px-lg pb-4xl md:scroll-panel md:p-4xl md:px-3xl xl:px-4xl">
+    <div data-pdp-info data-scroll-panel class="pdp-info">
 
       <div class="flex items-center justify-between">
         <a href="/collection" class="label muted-link">← Collection</a>
@@ -64,13 +64,13 @@ const next = PRODUCTS[idx + 1] ?? null;
 
       <h1 class="pdp-name fw-light">{p.name}</h1>
 
-      <p class="text-lg fw-normal leading-[1.8] text-[var(--color-ink-soft)] max-w-[36ch]">{p.desc}</p>
+      <p class="pdp-desc fw-normal">{p.desc}</p>
 
-      <dl class="border-t border-[var(--color-rule)]">
+      <dl class="pdp-details">
         {details.map(([k, v]) => (
-          <div class="flex justify-between items-center py-[0.875rem] border-b border-[var(--color-rule)] gap-md">
+          <div class="detail-row">
             <dt class="label op-30 shrink-0">{k}</dt>
-            <dd class="label text-[var(--color-ink-soft)] text-right normal-case tracking-normal">{v}</dd>
+            <dd class="label detail-val">{v}</dd>
           </div>
         ))}
       </dl>
@@ -88,7 +88,7 @@ const next = PRODUCTS[idx + 1] ?? null;
       </div>
 
       <div class="flex flex-col gap-md">
-        <div class="flex items-baseline justify-between py-4 border-t border-b border-[var(--color-rule)]">
+        <div class="price-row">
           <span class="pdp-price serif fw-medium italic tracking-tight">€ {p.price.toLocaleString('en-US')}</span>
           <span class="label muted">Incl. VAT</span>
         </div>
@@ -167,12 +167,88 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
+/* Layout */
+.pdp-layout {
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--nav-h);
+}
+@media (min-width: 768px) {
+  .pdp-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100svh;
+    align-items: start;
+  }
+}
+
+.pdp-images {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--color-rule);
+}
+@media (min-width: 768px) {
+  .pdp-images {
+    position: sticky;
+    top: var(--nav-h);
+    height: calc(100svh - var(--nav-h));
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: none;
+  }
+  .pdp-images::-webkit-scrollbar { display: none; }
+}
+
+.pdp-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-lg) var(--space-4xl);
+}
+@media (min-width: 768px) {
+  .pdp-info {
+    padding: var(--space-4xl) var(--space-3xl);
+    position: sticky;
+    top: var(--nav-h);
+    height: calc(100svh - var(--nav-h));
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .pdp-info::-webkit-scrollbar { display: none; }
+}
+@media (min-width: 1280px) { .pdp-info { padding-inline: var(--space-4xl); } }
+
+/* Elements */
 .pdp-img img { object-position: center top; }
 .pdp-name  { font-size: clamp(2.25rem, 5.5vw, 4.5rem); letter-spacing: -0.04em; line-height: 1; }
 .pdp-price { font-size: clamp(1.75rem, 3vw, 2.5rem); }
+
+.pdp-desc {
+  font-size: var(--text-lg);
+  line-height: 1.8;
+  color: var(--color-ink-soft);
+  max-width: 36ch;
+}
+
+.pdp-details { border-top: 1px solid var(--color-rule); }
+.detail-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-block: 0.875rem; border-bottom: 1px solid var(--color-rule);
+  gap: var(--space-md);
+}
+.detail-val { color: var(--color-ink-soft); text-align: right; text-transform: none; letter-spacing: 0; }
+
+.price-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding-block: 1rem;
+  border-top: 1px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-rule);
+}
+
 .sz-btn {
   background: none; border: 1px solid var(--color-rule);
-  color: var(--color-soft); padding: var(--spacing-xs) 0.875rem;
+  color: var(--color-soft); padding: var(--space-xs) 0.875rem;
   transition: border-color var(--duration-fast), color var(--duration-fast);
 }
 .sz-btn:hover  { border-color: var(--color-mid); color: var(--color-ink); }

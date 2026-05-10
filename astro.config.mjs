@@ -14,6 +14,7 @@ export default defineConfig({
       rollupOptions: {
         onwarn(warning, warn) {
           if (warning.code === 'UNUSED_EXTERNAL_IMPORT' && String(warning.id ?? '').includes('svelte')) return;
+          if (warning.code === 'UNUSED_EXTERNAL_IMPORT' && warning.exporter === 'svelte/transition') return;
           warn(warning);
         },
       },

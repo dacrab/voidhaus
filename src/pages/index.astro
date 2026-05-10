@@ -11,7 +11,7 @@ const featured = PRODUCTS.slice(0, 4);
 
 <Layout>
 
-  <section class="hero relative w-screen min-h-[600px] h-svh -ml-[calc(50vw-50%)] -mr-[calc(50vw-50%)] flex flex-col justify-end overflow-hidden">
+  <section class="hero">
     <Picture
       class="js-hero-img absolute inset-0 w-full h-full"
       src={IMAGES['hero']}
@@ -24,8 +24,8 @@ const featured = PRODUCTS.slice(0, 4);
     />
     <div class="hero-scrim scrim"></div>
     <div class="relative z-10 flex flex-col">
-      <span class="label js-hero-season ot-secondary absolute" style="top:calc(var(--nav-h) + var(--spacing-lg));left:clamp(var(--spacing-lg),5vw,var(--spacing-4xl))">SS 2026</span>
-      <h1 class="hero-title js-hero-title fw-light ot-primary whitespace-nowrap pb-lg" style="padding-inline:clamp(var(--spacing-lg),5vw,var(--spacing-4xl))">VOIDHAUS</h1>
+      <span class="label js-hero-season ot-secondary hero-season">SS 2026</span>
+      <h1 class="hero-title js-hero-title fw-light ot-primary">VOIDHAUS</h1>
       <div class="wrap flex items-baseline justify-between pb-2xl border-t border-white/15 pt-md">
         <a href="/collection" class="js-hero-cta ot-primary border-b border-white/40 pb-[0.1rem] transition-[border-color,color] duration-[var(--duration-fast)] hover:border-white hover:text-white">Enter Collection</a>
         <span class="label js-hero-tagline ot-muted hidden sm:block" aria-hidden="true">Twelve pieces. One position.</span>
@@ -44,7 +44,7 @@ const featured = PRODUCTS.slice(0, 4);
     </div>
   </section>
 
-  <section class="editorial relative min-h-[420px] h-[75svh] my-20 md:h-[85svh] md:my-28 overflow-hidden" data-anim="scroll">
+  <section class="editorial" data-anim="scroll">
     <div class="absolute inset-0">
       <Picture
         class="ed-img"
@@ -57,7 +57,7 @@ const featured = PRODUCTS.slice(0, 4);
       />
       <div class="ed-scrim scrim"></div>
     </div>
-    <div class="wrap absolute bottom-12 md:bottom-16 inset-x-0 md:max-w-[45%] flex flex-col gap-lg">
+    <div class="wrap ed-text flex flex-col gap-lg">
       <p class="serif ed-quote ot-primary italic leading-[1.12] tracking-tight">"The most radical act<br/>is <em class="not-italic ot-muted">silence.</em>"</p>
       <a href="/about" class="label ot-secondary transition-colors duration-[var(--duration-fast)] hover:text-white">Read manifesto →</a>
     </div>
@@ -105,20 +105,63 @@ document.addEventListener('astro:page-load', () => {
 </script>
 
 <style>
-.hero-title {
-  font-size: clamp(5rem, 18vw, 18rem);
-  letter-spacing: -0.06em;
-  line-height: 0.88;
+/* Full-bleed hero — break out of any parent padding */
+.hero {
+  position: relative;
+  width: 100vw;
+  height: 100svh;
+  min-height: 600px;
+  margin-inline: calc(50% - 50vw);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
 }
+
 .hero-scrim {
+  position: absolute; inset: 0; pointer-events: none;
   background:
     linear-gradient(to bottom, transparent 30%, rgb(28 27 25 / 0.55) 100%),
     linear-gradient(to top, transparent 92%, rgb(28 27 25 / 0.3) 100%);
 }
+
+.hero-season {
+  position: absolute;
+  top: calc(var(--nav-h) + var(--space-lg));
+  left: clamp(var(--space-lg), 5vw, var(--space-4xl));
+}
+
+.hero-title {
+  font-size: clamp(5rem, 18vw, 18rem);
+  letter-spacing: -0.06em;
+  line-height: 0.88;
+  padding-inline: clamp(var(--space-lg), 5vw, var(--space-4xl));
+  padding-bottom: var(--space-lg);
+  white-space: nowrap;
+}
+
+/* Featured: 2-col → 4-col lg */
+.featured-grid { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 1024px) { .featured-grid { grid-template-columns: repeat(4, 1fr); } }
+
+/* Editorial */
+.editorial {
+  position: relative;
+  height: 75svh; min-height: 420px;
+  margin-block: 5rem;
+  overflow: hidden;
+}
+@media (min-width: 768px) { .editorial { height: 85svh; margin-block: 7rem; } }
+
 .ed-scrim {
   background: linear-gradient(135deg, var(--scrim-heavy) 0%, var(--scrim-light) 60%, transparent 100%);
 }
+
+.ed-text {
+  position: absolute;
+  bottom: 3rem; inset-inline: 0;
+}
+@media (min-width: 768px) { .ed-text { bottom: 4rem; max-width: 45%; } }
+
 .ed-quote { font-size: clamp(1.75rem, 5vw, 4rem); }
-.featured-grid { grid-template-columns: repeat(2, 1fr); }
-@media (min-width: 1024px) { .featured-grid { grid-template-columns: repeat(4, 1fr); } }
 </style>
