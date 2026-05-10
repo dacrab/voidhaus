@@ -83,7 +83,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   </head>
 
   <body>
-    <div id="js-veil" aria-hidden="true" class="fixed inset-0 bg-[var(--color-ink)] z-[10000] pointer-events-none opacity-100 transition-opacity duration-[800ms] [cubic-bezier(0.16,1,0.3,1)] [&.out]:opacity-0"></div>
+    <div id="js-veil" aria-hidden="true"></div>
     <div class="cursor" id="js-cursor" aria-hidden="true"></div>
     <Nav client:load solidNav={solidNav} />
     <Cart client:load />

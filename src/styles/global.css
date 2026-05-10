@@ -70,12 +70,60 @@
   --op-hover:     0.6;
 
   /* Layout */
-  --nav-h:      4.25rem;
-  --page-top:   calc(var(--nav-h) + 3rem);   /* nav + space-2xl */
-  --page-top-lg: calc(var(--nav-h) + 4rem);  /* nav + space-3xl */
+  --nav-h:       4.25rem;
+  --page-top:    calc(var(--nav-h) + 3rem);
+  --page-top-lg: calc(var(--nav-h) + 4rem);
 
   /* Display type scale */
   --text-display: clamp(2.5rem, 8vw, 6rem);
+
+  /*
+   * ── Compatibility aliases ──────────────────────────────────────────────
+   * Svelte components (Nav, Cart, SizeGuide) use the old token names.
+   * These aliases keep them working without touching scoped <style> blocks.
+   */
+  --font-sans:  var(--font-family-sans);
+  --font-serif: var(--font-family-serif);
+
+  --space-xs:  0.5rem;
+  --space-sm:  0.75rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+
+  --text-xs:   0.6875rem;
+  --text-sm:   0.8125rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+
+  --font-weight-light:    var(--fw-light);
+  --font-weight-normal:   var(--fw-normal);
+  --font-weight-medium:   var(--fw-medium);
+  --font-weight-semibold: var(--fw-semibold);
+
+  --letter-spacing-label:  var(--ls-label);
+  --letter-spacing-button: var(--ls-button);
+  --letter-spacing-wide:   var(--ls-wide);
+  --letter-spacing-tight:  var(--ls-tight);
+
+  --overlay-text-primary:   var(--ot-primary);
+  --overlay-text-secondary: var(--ot-secondary);
+  --overlay-text-muted:     var(--ot-muted);
+  --scrim-dark-heavy:       var(--scrim-heavy);
+  --scrim-dark-medium:      var(--scrim-medium);
+  --scrim-dark-light:       var(--scrim-light);
+  --backdrop-modal:         var(--backdrop);
+
+  --opacity-muted:     var(--op-muted);
+  --opacity-hover:     var(--op-hover);
+  --opacity-secondary: var(--op-secondary);
+  --opacity-disabled:  var(--op-disabled);
+
+  --radius-full: 9999px;
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
@@ -86,7 +134,7 @@
   html {
     background-color: var(--color-white);
     color: var(--color-ink);
-    font-family: var(--font-family-sans);
+    font-family: var(--font-sans);
     font-size: 16px;
     font-variation-settings: var(--fw-normal);
     line-height: 1.7;
@@ -146,7 +194,7 @@
     color: var(--color-soft);
   }
   .serif {
-    font-family: var(--font-family-serif);
+    font-family: var(--font-serif);
     font-variation-settings: var(--fw-medium);
   }
 
