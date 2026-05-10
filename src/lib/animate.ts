@@ -32,9 +32,13 @@ export function initScrollLifecycle(): void {
     ScrollTrigger.getAll().forEach(t => t.kill());
   });
   document.addEventListener('astro:after-swap', () => {
-    // Scroll to top instantly on every navigation
+    // Reset window scroll
     window.scrollTo({ top: 0, behavior: 'instant' });
     lenis?.scrollTo(0, { immediate: true });
+    // Also reset any inner scrollable panels (e.g. sticky product page columns)
+    document.querySelectorAll<HTMLElement>('[data-scroll-panel]').forEach(el => {
+      el.scrollTop = 0;
+    });
   });
   document.addEventListener('astro:page-load', () => {
     initLenis();
