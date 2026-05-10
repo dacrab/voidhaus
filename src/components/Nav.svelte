@@ -128,7 +128,7 @@
     position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 300;
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
     padding-inline: var(--space-lg); height: var(--nav-h);
-    color: var(--overlay-text-primary);
+    color: var(--ot-primary);
     transition: background var(--duration-base) ease, color var(--duration-base) ease,
                 transform var(--duration-base) ease, box-shadow var(--duration-base) ease;
   }
@@ -146,15 +146,15 @@
   .nav.open   { background: var(--color-white); color: var(--color-ink); box-shadow: none; transform: none; }
 
   .nav-logo {
-    font-size: var(--text-sm); font-variation-settings: var(--font-weight-semibold);
-    letter-spacing: var(--letter-spacing-label); text-transform: uppercase; color: inherit;
+    font-size: var(--text-sm); font-variation-settings: var(--fw-semibold);
+    letter-spacing: var(--ls-label); text-transform: uppercase; color: inherit;
     grid-column: 2; justify-self: center;
   }
 
   .nav-l { grid-column: 1; }
 
   .nav-link {
-    color: inherit; opacity: var(--opacity-hover);
+    color: inherit; opacity: var(--op-hover);
     transition: opacity var(--duration-fast);
     background: none; border: none; padding: 0;
   }
@@ -171,34 +171,28 @@
     display: inline-flex; align-items: center; justify-content: center;
     width: var(--space-md); height: var(--space-md);
     background: currentColor; color: var(--color-white);
-    font-size: var(--space-xs); font-variation-settings: var(--font-weight-semibold); letter-spacing: 0;
+    font-size: var(--text-xs); font-variation-settings: var(--fw-semibold); letter-spacing: 0;
     border-radius: var(--radius-full);
   }
   .nav:not(.scrolled):not(.open) .badge {
-    background: var(--overlay-text-primary); color: var(--color-ink);
+    background: var(--ot-primary); color: var(--color-ink);
   }
 
   .menu {
     position: fixed; inset: 0; z-index: 299;
     background: var(--color-off);
-    display: grid;
-    grid-template-rows: 1fr auto;
+    display: grid; grid-template-rows: 1fr auto;
     padding: var(--nav-h) clamp(var(--space-lg), 5vw, var(--space-4xl)) var(--space-2xl);
     overflow-y: auto;
   }
 
-  .menu-links {
-    display: flex; flex-direction: column;
-    justify-content: center;
-    gap: 0;
-  }
+  .menu-links { display: flex; flex-direction: column; justify-content: center; }
 
   .menu-link {
     display: flex; align-items: baseline; gap: var(--space-lg);
     font-size: clamp(2.5rem, 7vw, 6.5rem);
-    font-variation-settings: var(--font-weight-light);
-    letter-spacing: -0.04em;
-    line-height: 1.05;
+    font-variation-settings: var(--fw-light);
+    letter-spacing: -0.04em; line-height: 1.05;
     color: var(--color-ink);
     padding-block: 0.4em;
     border-bottom: 1px solid var(--color-rule);
@@ -208,20 +202,11 @@
     transition: opacity var(--duration-fast);
   }
   .menu-link:first-child { border-top: 1px solid var(--color-rule); }
-  .menu-link:hover  { opacity: var(--opacity-hover); }
+  .menu-link:hover  { opacity: var(--op-hover); }
   .menu-link.active { font-style: italic; }
-  .menu-link.active .menu-link-label::after {
-    content: ' ·';
-    font-style: normal;
-    opacity: 0.3;
-  }
+  .menu-link.active .menu-link-label::after { content: ' ·'; font-style: normal; opacity: 0.3; }
 
-  .menu-link-num {
-    font-size: var(--text-xs);
-    flex-shrink: 0;
-    width: 2rem;
-  }
-
+  .menu-link-num   { font-size: var(--text-xs); flex-shrink: 0; width: 2rem; }
   .menu-link-label { flex: 1; }
 
   @keyframes link-in {
@@ -231,18 +216,12 @@
 
   .menu-foot {
     display: flex; align-items: flex-end; justify-content: space-between;
-    padding-top: var(--space-xl);
-    gap: var(--space-md);
-    flex-wrap: wrap;
+    padding-top: var(--space-xl); gap: var(--space-md); flex-wrap: wrap;
   }
-
-  .menu-foot-info {
-    display: flex; flex-direction: column; gap: var(--space-xs);
-  }
-
+  .menu-foot-info { display: flex; flex-direction: column; gap: var(--space-xs); }
   .menu-foot-cart {
     background: none; border: none;
-    color: var(--color-ink); opacity: var(--opacity-muted);
+    color: var(--color-ink); opacity: var(--op-muted);
     transition: opacity var(--duration-fast);
   }
   .menu-foot-cart:hover { opacity: 1; }

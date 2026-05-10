@@ -123,7 +123,7 @@
 {/if}
 
 <style>
-  .sg-backdrop { --backdrop-z: 500; background: var(--backdrop-modal); }
+  .sg-backdrop { --backdrop-z: 500; background: var(--backdrop); }
 
   .sg-btn {
     background: none; border: none;
@@ -155,24 +155,21 @@
     display: flex; flex-direction: column; gap: var(--space-xl); flex: 1;
   }
 
-  .sg-note {
-    font-size: var(--text-sm); font-variation-settings: var(--font-weight-normal);
-    line-height: 1.7; color: var(--color-soft);
-  }
+  .sg-note { font-size: var(--text-sm); font-variation-settings: var(--fw-normal); line-height: 1.7; color: var(--color-soft); }
 
   .sg-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); border: 1px solid var(--color-rule); }
   .sg-table th {
     text-align: left; padding: var(--space-sm) var(--space-md);
     border-bottom: 1px solid var(--color-rule);
-    background: var(--color-off); font-size: var(--text-xs); opacity: var(--opacity-muted);
+    background: var(--color-off); font-size: var(--text-xs); opacity: var(--op-muted);
   }
   .sg-table td {
     padding: 0.875rem var(--space-md); border-bottom: 1px solid var(--color-rule);
-    font-variation-settings: var(--font-weight-normal); color: var(--color-soft);
+    font-variation-settings: var(--fw-normal); color: var(--color-soft);
   }
   .sg-table tr:last-child td { border-bottom: none; }
   .sg-table tr:hover td { background: var(--color-off); }
-  .td-main { font-variation-settings: var(--font-weight-medium); color: var(--color-ink); }
+  .td-main { font-variation-settings: var(--fw-medium); color: var(--color-ink); }
 
   .sg-note-block {
     display: flex; flex-direction: column; gap: var(--space-sm);

@@ -124,7 +124,7 @@
 {/if}
 
 <style>
-  .cart-backdrop { --backdrop-z: 400; background: var(--scrim-dark-medium); }
+  .cart-backdrop { --backdrop-z: 400; background: var(--scrim-medium); }
 
   .panel {
     position: fixed; inset-block: 0; inset-inline-end: 0;
@@ -145,8 +145,8 @@
     align-items: center; justify-content: center;
     gap: var(--space-xl); padding: var(--space-2xl) var(--space-lg); text-align: center;
   }
-  .empty-msg  { font-size: var(--text-base); font-variation-settings: var(--font-weight-normal); color: var(--color-soft); }
-  .empty-link { color: var(--color-ink); opacity: var(--opacity-muted); transition: opacity var(--duration-fast); border-bottom: 1px solid var(--color-rule); }
+  .empty-msg  { font-size: var(--text-base); font-variation-settings: var(--fw-normal); color: var(--color-soft); }
+  .empty-link { color: var(--color-ink); opacity: var(--op-muted); transition: opacity var(--duration-fast); border-bottom: 1px solid var(--color-rule); }
   .empty-link:hover { opacity: 1; }
 
   .items {
@@ -154,8 +154,8 @@
     background:
       linear-gradient(var(--color-white) 30%, transparent),
       linear-gradient(transparent, var(--color-white) 70%) bottom,
-      radial-gradient(farthest-side at 50% 0, var(--scrim-dark-light), transparent),
-      radial-gradient(farthest-side at 50% 100%, var(--scrim-dark-light), transparent) bottom;
+      radial-gradient(farthest-side at 50% 0, var(--scrim-light), transparent),
+      radial-gradient(farthest-side at 50% 100%, var(--scrim-light), transparent) bottom;
     background-repeat: no-repeat;
     background-size: 100% 40px, 100% 40px, 100% 10px, 100% 10px;
     background-attachment: local, local, scroll, scroll;
@@ -172,14 +172,14 @@
     object-fit: cover; object-position: center;
     transition: opacity var(--duration-base);
   }
-  .item-img-link:hover .item-img { opacity: var(--opacity-hover); }
+  .item-img-link:hover .item-img { opacity: var(--op-hover); }
 
   .item-body {
     display: flex; flex-direction: column; justify-content: space-between;
     gap: var(--space-md); padding-block: var(--space-xs); min-height: 100%;
   }
   .item-top  { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-sm); }
-  .item-name { font-size: var(--text-sm); font-variation-settings: var(--font-weight-normal); color: var(--color-ink); display: block; line-height: 1.3; }
+  .item-name { font-size: var(--text-sm); font-variation-settings: var(--fw-normal); color: var(--color-ink); display: block; line-height: 1.3; }
 
   .footer {
     padding: 1.25rem var(--space-lg) var(--space-xl);
@@ -188,15 +188,15 @@
   }
 
   .total-row  { display: flex; align-items: baseline; justify-content: space-between; padding-block: var(--space-xs); }
-  .total      { font-size: var(--text-xl); font-style: italic; font-variation-settings: var(--font-weight-medium); color: var(--color-ink); }
+  .total      { font-size: var(--text-xl); font-style: italic; font-variation-settings: var(--fw-medium); color: var(--color-ink); }
 
-  .item-size  { opacity: var(--opacity-muted); text-transform: none; letter-spacing: var(--letter-spacing-wide); }
-  .item-price { opacity: var(--opacity-muted); }
+  .item-size  { opacity: var(--op-muted); text-transform: none; letter-spacing: var(--ls-wide); }
+  .item-price { opacity: var(--op-muted); }
   .ship-note  { text-align: center; }
 
   .checkout-btn {
     width: 100%; background: var(--color-ink); color: var(--color-white);
-    border: none; padding: var(--space-md); letter-spacing: var(--letter-spacing-button); transition: background var(--duration-fast);
+    border: none; padding: var(--space-md); letter-spacing: var(--ls-button); transition: background var(--duration-fast);
   }
   .checkout-btn:hover { background: var(--color-ink-soft); }
 </style>
