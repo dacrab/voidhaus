@@ -32,16 +32,16 @@ export function initScrollLifecycle(): void {
     ScrollTrigger.getAll().forEach(t => t.kill());
   });
   document.addEventListener('astro:after-swap', () => {
-    // Reset window scroll
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    lenis?.scrollTo(0, { immediate: true });
-    // Also reset any inner scrollable panels (e.g. sticky product page columns)
+    // Reset inner scroll panels immediately (DOM is ready, no Lenis needed)
     document.querySelectorAll<HTMLElement>('[data-scroll-panel]').forEach(el => {
       el.scrollTop = 0;
     });
   });
   document.addEventListener('astro:page-load', () => {
+    // Scroll to top before Lenis starts so it picks up position 0
+    window.scrollTo(0, 0);
     initLenis();
+    lenis?.scrollTo(0, { immediate: true });
     lenis?.start();
   });
 }
