@@ -1,5 +1,7 @@
 ---
 import '@styles/global.css';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import Nav from '@components/Nav.svelte';
@@ -179,5 +181,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
         </div>
       </div>
     </footer>
+  <Analytics />
+  <SpeedInsights />
   </body>
 </html>
