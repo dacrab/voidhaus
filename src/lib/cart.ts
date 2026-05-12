@@ -1,7 +1,7 @@
 const KEY = 'vh-cart';
 
 export type CartItem = {
-  slug: string; name: string; price: string;
+  slug: string; name: string; price: number;
   size: string; img: string; num: string;
 };
 

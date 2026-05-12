@@ -11,7 +11,7 @@
   let panelEl = $state<HTMLElement | undefined>();
 
   const total = $derived(
-    formatPrice(items.reduce((s, i) => s + parseFloat(i.price.replace(/,/g, '')), 0))
+    formatPrice(items.reduce((s, i) => s + i.price, 0))
   );
 
   function openCart() {
@@ -104,7 +104,7 @@
                 <button class="label ghost-btn" onclick={() => remove(item.slug, item.size)}
                   aria-label="Remove {item.name}, size {item.size}">Remove</button>
               </div>
-              <span class="item-price label">€ {item.price}</span>
+              <span class="item-price label">€ {formatPrice(item.price)}</span>
             </div>
           </li>
           <div class="rule"></div>
@@ -137,13 +137,13 @@
 
   .panel-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: var(--space-lg) var(--space-lg) 1.25rem;
+    padding: var(--spacing-lg) var(--spacing-lg) 1.25rem;
   }
 
   .empty {
     flex: 1; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: var(--space-xl); padding: var(--space-2xl) var(--space-lg); text-align: center;
+    gap: var(--spacing-xl); padding: var(--spacing-2xl) var(--spacing-lg); text-align: center;
   }
   .empty-msg  { font-size: var(--text-base); font-variation-settings: var(--fw-normal); color: var(--color-soft); }
   .empty-link { color: var(--color-ink); opacity: var(--op-muted); transition: opacity var(--duration-fast); border-bottom: 1px solid var(--color-rule); }
@@ -163,7 +163,7 @@
 
   .item {
     display: grid; grid-template-columns: 80px 1fr;
-    gap: 1.25rem; padding: 1.25rem var(--space-lg); align-items: start;
+    gap: 1.25rem; padding: 1.25rem var(--spacing-lg); align-items: start;
   }
 
   .item-img-wrap { aspect-ratio: 3/4; overflow: hidden; background: var(--color-off); }
@@ -176,18 +176,18 @@
 
   .item-body {
     display: flex; flex-direction: column; justify-content: space-between;
-    gap: var(--space-md); padding-block: var(--space-xs); min-height: 100%;
+    gap: var(--spacing-md); padding-block: var(--spacing-xs); min-height: 100%;
   }
-  .item-top  { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-sm); }
+  .item-top  { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--spacing-sm); }
   .item-name { font-size: var(--text-sm); font-variation-settings: var(--fw-normal); color: var(--color-ink); display: block; line-height: 1.3; }
 
   .footer {
-    padding: 1.25rem var(--space-lg) var(--space-xl);
-    display: flex; flex-direction: column; gap: var(--space-md);
+    padding: 1.25rem var(--spacing-lg) var(--spacing-xl);
+    display: flex; flex-direction: column; gap: var(--spacing-md);
     border-top: 1px solid var(--color-rule);
   }
 
-  .total-row  { display: flex; align-items: baseline; justify-content: space-between; padding-block: var(--space-xs); }
+  .total-row  { display: flex; align-items: baseline; justify-content: space-between; padding-block: var(--spacing-xs); }
   .total      { font-size: var(--text-xl); font-style: italic; font-variation-settings: var(--fw-medium); color: var(--color-ink); }
 
   .item-size  { opacity: var(--op-muted); text-transform: none; letter-spacing: var(--ls-wide); }
@@ -196,7 +196,7 @@
 
   .checkout-btn {
     width: 100%; background: var(--color-ink); color: var(--color-white);
-    border: none; padding: var(--space-md); letter-spacing: var(--ls-button); transition: background var(--duration-fast);
+    border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button); transition: background var(--duration-fast);
   }
   .checkout-btn:hover { background: var(--color-ink-soft); }
 </style>

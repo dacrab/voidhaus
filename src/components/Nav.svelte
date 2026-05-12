@@ -17,6 +17,10 @@
   let scrolled = $state(false);
   let hidden = $state(false);
 
+  $effect(() => {
+    scrolled = solidNav || window.scrollY > 40;
+  });
+
   const links = [
     { href: '/collection', label: 'Curated Collection' },
     { href: '/lookbook', label: 'Lookbook' },
@@ -136,13 +140,13 @@
   .nav {
     position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 300;
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-    padding-inline: var(--space-lg); height: var(--nav-h);
+    padding-inline: var(--spacing-lg); height: var(--nav-h);
     color: var(--ot-primary);
     transition: background var(--duration-base) ease, color var(--duration-base) ease,
                 transform var(--duration-base) ease, box-shadow var(--duration-base) ease;
   }
   @media (min-width: 640px)  { .nav { padding-inline: 2.5rem; } }
-  @media (min-width: 1024px) { .nav { padding-inline: var(--space-3xl); } }
+  @media (min-width: 1024px) { .nav { padding-inline: var(--spacing-3xl); } }
 
   .nav.scrolled {
     background: rgb(248 246 242 / 0.92);
@@ -171,14 +175,14 @@
 
   .nav-r {
     display: flex; align-items: center;
-    justify-content: flex-end; gap: var(--space-lg); grid-column: 3;
+    justify-content: flex-end; gap: var(--spacing-lg); grid-column: 3;
   }
   .nav-cart { display: flex; align-items: center; gap: 0.4rem; }
   @media (max-width: 767px) { .nav-cart { display: none; } }
 
   .badge {
     display: inline-flex; align-items: center; justify-content: center;
-    width: var(--space-md); height: var(--space-md);
+    width: var(--spacing-md); height: var(--spacing-md);
     background: currentColor; color: var(--color-white);
     font-size: var(--text-xs); font-variation-settings: var(--fw-semibold); letter-spacing: 0;
     border-radius: var(--radius-full);
@@ -191,14 +195,14 @@
     position: fixed; inset: 0; z-index: 299;
     background: var(--color-off);
     display: grid; grid-template-rows: 1fr auto;
-    padding: var(--nav-h) clamp(var(--space-lg), 5vw, var(--space-4xl)) var(--space-2xl);
+    padding: var(--nav-h) clamp(var(--spacing-lg), 5vw, var(--spacing-4xl)) var(--spacing-2xl);
     overflow-y: auto;
   }
 
   .menu-links { display: flex; flex-direction: column; justify-content: center; }
 
   .menu-link {
-    display: flex; align-items: baseline; gap: var(--space-lg);
+    display: flex; align-items: baseline; gap: var(--spacing-lg);
     font-size: clamp(2.5rem, 7vw, 6.5rem);
     font-variation-settings: var(--fw-light);
     letter-spacing: -0.04em; line-height: 1.05;
@@ -218,9 +222,9 @@
 
   .menu-foot {
     display: flex; align-items: flex-end; justify-content: space-between;
-    padding-top: var(--space-xl); gap: var(--space-md); flex-wrap: wrap;
+    padding-top: var(--spacing-xl); gap: var(--spacing-md); flex-wrap: wrap;
   }
-  .menu-foot-info { display: flex; flex-direction: column; gap: var(--space-xs); }
+  .menu-foot-info { display: flex; flex-direction: column; gap: var(--spacing-xs); }
   .menu-foot-cart {
     background: none; border: none;
     color: var(--color-ink); opacity: var(--op-muted);

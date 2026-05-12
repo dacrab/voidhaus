@@ -98,11 +98,12 @@ document.addEventListener('astro:page-load', () => {
       const name  = form.querySelector<HTMLInputElement>('#name');
       const email = form.querySelector<HTMLInputElement>('#email');
       if (!name?.value.trim() || !email?.value.includes('@')) return;
+      // TODO: Connect to a real backend (e.g. API route, serverless function)
       const text = document.querySelector<HTMLElement>('.submit-text');
       if (!text) return;
       gsap.timeline()
         .to('#js-submit', { opacity: 0.4, duration: 0.15, ease: 'power2.in' })
-        .set(text, { textContent: 'Sent ✓' })
+        .set(text, { textContent: 'Thanks for reaching out' })
         .to('#js-submit', { opacity: 1, duration: 0.2, ease: 'power2.out' });
     });
   });
