@@ -162,7 +162,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
               autocomplete="email" aria-label="Email address for newsletter" required
             />
             <button
-              class="nl-btn label bg-transparent border-none border-l border-[var(--color-rule)] text-[var(--color-ink)] opacity-[var(--op-secondary)] px-md py-sm whitespace-nowrap transition-[opacity,background] duration-[var(--duration-fast)] hover:opacity-100 hover:bg-[var(--color-off)] [&.subscribed]:opacity-100 [&.subscribed]:bg-[var(--color-off)]"
+              class="nl-btn label bg-transparent border-none border-l border-[var(--color-rule)] text-[var(--color-ink)] opacity-[var(--op-secondary)] px-md py-md whitespace-nowrap transition-[opacity,background] duration-[var(--duration-fast)] hover:opacity-100 hover:bg-[var(--color-off)] [&.subscribed]:opacity-100 [&.subscribed]:bg-[var(--color-off)]"
               type="submit">Subscribe</button>
           </form>
         </div>
@@ -173,9 +173,9 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
         <div class="flex items-center justify-between flex-wrap gap-sm pt-lg">
           <span class="label muted">© {new Date().getFullYear()} {SITE.name}</span>
           <nav class="flex gap-lg items-center" aria-label="Legal navigation">
-            <a href="/stockists" class="label muted muted-link">Stockists</a>
-            <a href="/privacy"   class="label muted muted-link">Privacy</a>
-            <a href="/terms"     class="label muted muted-link">Terms</a>
+            <a href="/stockists" class="label muted muted-link" style="padding-block:0.5rem">Stockists</a>
+            <a href="/privacy"   class="label muted muted-link" style="padding-block:0.5rem">Privacy</a>
+            <a href="/terms"     class="label muted muted-link" style="padding-block:0.5rem">Terms</a>
           </nav>
           <span class="label muted hidden sm:block">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
         </div>
