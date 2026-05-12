@@ -77,6 +77,7 @@
       </p>
 
       {#if category === 'Footwear'}
+        <div style="overflow-x:auto">
         <table class="sg-table">
           <thead><tr>
             <th class="label" scope="col">EU</th><th class="label" scope="col">UK</th>
@@ -91,7 +92,9 @@
             {/each}
           </tbody>
         </table>
+        </div>
       {:else}
+        <div style="overflow-x:auto">
         <table class="sg-table">
           <thead><tr>
             <th class="label" scope="col">Size</th><th class="label" scope="col">IT/EU</th>
@@ -108,6 +111,7 @@
             {/each}
           </tbody>
         </table>
+        </div>
       {/if}
 
       <div class="sg-note-block">

@@ -165,7 +165,7 @@
   .nav-link {
     color: inherit; opacity: var(--op-hover);
     transition: opacity var(--duration-fast);
-    background: none; border: none; padding: 0;
+    background: none; border: none; padding: 0.75rem;
   }
   .nav-link:hover { opacity: 1; }
 
