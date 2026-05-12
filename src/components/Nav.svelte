@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import { createModal, panelIn } from '@lib/modal';
   import { getCart } from '@lib/cart';
   import { SITE } from '@data/site';
+  import gsap from 'gsap';
 
   interface Props { solidNav?: boolean; }
   let { solidNav = false }: Props = $props();
@@ -54,6 +55,15 @@
     } else {
       open = true;
       modal.open();
+      tick().then(() => {
+        const menuLinks = document.querySelectorAll<HTMLElement>('.menu-link');
+        if (menuLinks.length) {
+          gsap.fromTo(menuLinks,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger: 0.1 }
+          );
+        }
+      });
     }
   }
 
@@ -103,7 +113,6 @@
         {@const active = href === '/' ? path === '/' : path.startsWith(href)}
         <a {href} class="menu-link" class:active
            aria-current={active ? 'page' : undefined}
-           style="--i:{i}"
            onclick={handleNavClick}>
           <span class="menu-link-num label op-30">0{i + 1}</span>
           <span class="menu-link-label">{label}</span>
@@ -197,8 +206,6 @@
     padding-block: 0.4em;
     border-bottom: 1px solid var(--color-rule);
     opacity: 0;
-    animation: link-in 0.55s var(--ease-out) both;
-    animation-delay: calc(0.05s * var(--i, 0));
     transition: opacity var(--duration-fast);
   }
   .menu-link:first-child { border-top: 1px solid var(--color-rule); }
@@ -208,11 +215,6 @@
 
   .menu-link-num   { font-size: var(--text-xs); flex-shrink: 0; width: 2rem; }
   .menu-link-label { flex: 1; }
-
-  @keyframes link-in {
-    from { opacity: 0; transform: translateY(1rem); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
 
   .menu-foot {
     display: flex; align-items: flex-end; justify-content: space-between;

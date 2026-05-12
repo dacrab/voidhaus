@@ -173,11 +173,11 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
-export const SHARED_DETAILS = [
+export const SHARED_DETAILS: [string, string][] = [
   ['Construction', 'Hand-finished seams'],
   ['Care',         'Dry clean only'],
   ['Delivery',     '5–10 business days'],
-] as const;
+];
 
 export const CATEGORIES = [
   'All',

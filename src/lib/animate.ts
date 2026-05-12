@@ -7,16 +7,14 @@ gsap.config({ force3D: true });
 
 export { gsap };
 export const EASE = 'expo.out';
-export const DUR = { base: 0.6, slow: 0.9, slower: 1.1 };
-
-const isTouch = () => window.matchMedia('(hover: none)').matches;
+export const DUR = { major: 0.8, minor: 0.6, slow: 1.0 };
+export const STAGGER = 0.12;
 
 let lenis: Lenis | null = null;
-
 export function getLenis(): Lenis | null { return lenis; }
 
 function initLenis(): void {
-  if (lenis || isTouch()) return;
+  if (lenis || window.matchMedia('(hover: none)').matches) return;
   lenis = new Lenis({
     duration: 1.2,
     easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -47,49 +45,54 @@ export function initScrollLifecycle(): void {
 const inView = (el: Element) =>
   el.getBoundingClientRect().top < window.innerHeight * 0.85;
 
-function animateIn(els: HTMLElement[], vars: gsap.TweenVars) {
-  gsap.fromTo(els, { opacity: 0, y: 20 }, { opacity: 1, y: 0, clearProps: 'transform,will-change', ...vars });
+function reveal(els: HTMLElement[], vars: gsap.TweenVars) {
+  gsap.fromTo(els, { opacity: 0, y: 30 }, { opacity: 1, y: 0, clearProps: 'transform,will-change', ...vars });
 }
 
 export function initPage(ruleSelector?: string): void {
+  // Hero elements
   const heroEls = [...document.querySelectorAll<HTMLElement>('[data-anim="hero"]')];
   heroEls.forEach(el =>
-    animateIn([el], { duration: DUR.slow, ease: EASE, delay: parseFloat(el.dataset.delay ?? '0') || 0 })
+    reveal([el], { duration: DUR.major, ease: EASE, delay: parseFloat(el.dataset.delay ?? '0') || 0 })
   );
 
+  // Rule lines
   if (ruleSelector) {
     document.querySelectorAll<HTMLElement>(ruleSelector).forEach(el =>
       gsap.fromTo(el,
         { scaleX: 0, transformOrigin: 'left center' },
-        { scaleX: 1, duration: DUR.slower, ease: EASE, delay: 0.3, clearProps: 'will-change' },
+        { scaleX: 1, duration: DUR.slow, ease: EASE, delay: 0.3, clearProps: 'will-change' },
       )
     );
   }
 
+  // Product cards
   const cards = [...document.querySelectorAll<HTMLElement>('.pc')];
   if (cards.length) {
     gsap.fromTo(cards,
-      { opacity: 0, y: 32 },
-      { opacity: 1, y: 0, duration: DUR.slow, ease: EASE, stagger: 0.06, delay: heroEls.length ? 0.2 : 0, clearProps: 'transform,will-change' },
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: DUR.major, ease: EASE, stagger: STAGGER, delay: heroEls.length ? 0.2 : 0, clearProps: 'transform,will-change' },
     );
   }
 
+  // Scroll-triggered elements
   const scrollEls = [...document.querySelectorAll<HTMLElement>('[data-anim="scroll"]')];
   const scrollAbove = scrollEls.filter(inView);
   const scrollBelow = scrollEls.filter(el => !inView(el));
-  if (scrollAbove.length) animateIn(scrollAbove, { duration: DUR.slow, ease: EASE, stagger: 0.07, delay: heroEls.length ? 0.1 : 0 });
+  if (scrollAbove.length) reveal(scrollAbove, { duration: DUR.major, ease: EASE, stagger: STAGGER, delay: heroEls.length ? 0.1 : 0 });
   if (scrollBelow.length) ScrollTrigger.batch(scrollBelow, {
     start: 'top 88%', once: true,
-    onEnter: els => animateIn([...els] as HTMLElement[], { duration: DUR.slow, ease: EASE, stagger: 0.07 }),
+    onEnter: els => reveal([...els] as HTMLElement[], { duration: DUR.major, ease: EASE, stagger: STAGGER }),
   });
 
+  // Stagger elements
   const staggerEls = [...document.querySelectorAll<HTMLElement>('[data-anim="stagger"]')];
   const staggerAbove = staggerEls.filter(inView);
   const staggerBelow = staggerEls.filter(el => !inView(el));
-  if (staggerAbove.length) animateIn(staggerAbove, { duration: DUR.base, ease: EASE, stagger: 0.05 });
+  if (staggerAbove.length) reveal(staggerAbove, { duration: DUR.minor, ease: EASE, stagger: 0.1 });
   if (staggerBelow.length) ScrollTrigger.batch(staggerBelow, {
     start: 'top 90%', once: true,
-    onEnter: els => animateIn([...els] as HTMLElement[], { duration: DUR.base, ease: EASE, stagger: 0.05 }),
+    onEnter: els => reveal([...els] as HTMLElement[], { duration: DUR.minor, ease: EASE, stagger: 0.1 }),
   });
 
   ScrollTrigger.refresh();
