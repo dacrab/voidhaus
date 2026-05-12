@@ -87,6 +87,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   <body>
     <div id="js-veil" aria-hidden="true"></div>
     <div class="cursor" id="js-cursor" aria-hidden="true"></div>
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:bg-[var(--color-white)] focus:px-md focus:py-sm focus:text-[var(--color-ink)] focus:border focus:border-[var(--color-ink)]">Skip to content</a>
     <Nav client:load solidNav={solidNav} />
     <Cart client:load />
 
@@ -101,11 +102,12 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
       initScrollLifecycle();
 
       if (window.matchMedia('(hover: hover)').matches) {
+        document.documentElement.classList.add('custom-cursor-active');
         let cursor = document.getElementById('js-cursor');
         document.addEventListener('astro:after-swap', () => { cursor = document.getElementById('js-cursor'); });
 
-        let mx = -100, my = -100;
-        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+        let mx = -100, my = -100, dirty = false;
+        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dirty = true; });
         document.addEventListener('mousedown', () => cursor?.classList.add('click'));
         document.addEventListener('mouseup',   () => cursor?.classList.remove('click'));
         document.addEventListener('mouseover', e => {
@@ -113,7 +115,10 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
           cursor?.classList.toggle('hover', !!t);
         });
         (function loop() {
-          cursor?.style.setProperty('transform', `translate(calc(${mx}px - 50%), calc(${my}px - 50%))`);
+          if (dirty) {
+            cursor?.style.setProperty('transform', `translate(calc(${mx}px - 50%), calc(${my}px - 50%))`);
+            dirty = false;
+          }
           requestAnimationFrame(loop);
         })();
       }

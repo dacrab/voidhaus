@@ -14,7 +14,7 @@ import { SITE } from '@data/site';
     </div>
     <div class="flex gap-lg md:gap-xl pb-md overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Filter by category" data-anim="hero" data-delay="0.2">
       {CATEGORIES.map((f, i) => (
-        <button class:list={['filter-btn', 'label', { active: i === 0 }]} data-filter={f} type="button">{f}</button>
+        <button class:list={['filter-btn', 'label', { active: i === 0 }]} data-filter={f} type="button" aria-pressed={i === 0 ? 'true' : 'false'}>{f}</button>
       ))}
     </div>
     <div class="rule js-rule"></div>
@@ -35,8 +35,9 @@ document.addEventListener('astro:page-load', () => {
     const cards = document.querySelectorAll<HTMLElement>('.pc');
     const btns  = document.querySelectorAll<HTMLElement>('.filter-btn');
     btns.forEach(btn => btn.addEventListener('click', () => {
-      btns.forEach(b => b.classList.remove('active'));
+      btns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       const f = btn.dataset.filter;
       cards.forEach(card => {
         const show = f === 'All' || card.dataset.category === f;

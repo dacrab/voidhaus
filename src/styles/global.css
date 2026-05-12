@@ -79,19 +79,10 @@
 
   /*
    * ── Compatibility aliases ──────────────────────────────────────────────
-   * Svelte components still use --space-*, --text-*, --radius-full.
+   * Svelte components use --text-*, --radius-full, --font-sans/serif.
    */
   --font-sans:  var(--font-family-sans);
   --font-serif: var(--font-family-serif);
-
-  --space-xs:  0.5rem;
-  --space-sm:  0.75rem;
-  --space-md:  1rem;
-  --space-lg:  1.5rem;
-  --space-xl:  2rem;
-  --space-2xl: 3rem;
-  --space-3xl: 4rem;
-  --space-4xl: 6rem;
 
   --text-xs:   0.6875rem;
   --text-sm:   0.8125rem;
@@ -129,7 +120,7 @@
   ::-webkit-scrollbar-thumb { background: var(--color-rule); }
   ::selection { background: var(--color-ink); color: var(--color-white); }
 
-  @media (hover: hover) { * { cursor: none; } }
+  @media (hover: hover) { .custom-cursor-active * { cursor: none; } }
 
   picture { display: block; width: 100%; height: 100%; }
   picture img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
@@ -195,16 +186,6 @@
     padding-bottom: var(--spacing-2xl);
   }
   @media (min-width: 768px) { .page-header { padding-top: var(--page-top-lg); } }
-
-  /* Sticky scroll panel — used by product page columns */
-  .scroll-panel {
-    position: sticky;
-    top: var(--nav-h);
-    height: calc(100svh - var(--nav-h));
-    overflow-y: auto;
-    scrollbar-width: none;
-  }
-  .scroll-panel::-webkit-scrollbar { display: none; }
 
   .backdrop { position: fixed; inset: 0; z-index: var(--backdrop-z, 100); }
 

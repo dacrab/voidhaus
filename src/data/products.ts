@@ -173,6 +173,11 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
+/** Format a numeric price for display (e.g. 3200 → "3,200") */
+export function formatProductPrice(price: number): string {
+  return price.toLocaleString('en-US');
+}
+
 export const SHARED_DETAILS: [string, string][] = [
   ['Construction', 'Hand-finished seams'],
   ['Care',         'Dry clean only'],

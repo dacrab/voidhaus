@@ -138,7 +138,7 @@
   .sg-btn:hover { opacity: 1; border-bottom-color: var(--color-ink); }
 
   .sg-panel {
-    position: fixed; inset-inline: var(--space-md); top: 50%; translate: 0 -50%;
+    position: fixed; inset-inline: var(--spacing-md); top: 50%; translate: 0 -50%;
     max-width: 720px; margin-inline: auto;
     background: var(--color-white);
     z-index: 501;
@@ -146,29 +146,29 @@
     max-height: 85svh;
     border: 1px solid var(--color-rule);
   }
-  @media (min-width: 640px) { .sg-panel { inset-inline: var(--space-xl); } }
+  @media (min-width: 640px) { .sg-panel { inset-inline: var(--spacing-xl); } }
 
   .sg-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1.25rem var(--space-lg) var(--space-md); flex-shrink: 0;
+    padding: 1.25rem var(--spacing-lg) var(--spacing-md); flex-shrink: 0;
   }
   .sg-title { color: var(--color-ink); }
 
   .sg-body {
-    overflow-y: auto; padding: var(--space-lg);
-    display: flex; flex-direction: column; gap: var(--space-xl); flex: 1;
+    overflow-y: auto; padding: var(--spacing-lg);
+    display: flex; flex-direction: column; gap: var(--spacing-xl); flex: 1;
   }
 
   .sg-note { font-size: var(--text-sm); font-variation-settings: var(--fw-normal); line-height: 1.7; color: var(--color-soft); }
 
   .sg-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); border: 1px solid var(--color-rule); }
   .sg-table th {
-    text-align: left; padding: var(--space-sm) var(--space-md);
+    text-align: left; padding: var(--spacing-sm) var(--spacing-md);
     border-bottom: 1px solid var(--color-rule);
     background: var(--color-off); font-size: var(--text-xs); opacity: var(--op-muted);
   }
   .sg-table td {
-    padding: 0.875rem var(--space-md); border-bottom: 1px solid var(--color-rule);
+    padding: 0.875rem var(--spacing-md); border-bottom: 1px solid var(--color-rule);
     font-variation-settings: var(--fw-normal); color: var(--color-soft);
   }
   .sg-table tr:last-child td { border-bottom: none; }
@@ -176,8 +176,8 @@
   .td-main { font-variation-settings: var(--fw-medium); color: var(--color-ink); }
 
   .sg-note-block {
-    display: flex; flex-direction: column; gap: var(--space-sm);
-    padding-top: var(--space-md); border-top: 1px solid var(--color-rule);
+    display: flex; flex-direction: column; gap: var(--spacing-sm);
+    padding-top: var(--spacing-md); border-top: 1px solid var(--color-rule);
   }
   .sg-link {
     color: var(--color-ink); border-bottom: 1px solid var(--color-rule);

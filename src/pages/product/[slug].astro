@@ -95,7 +95,7 @@ const next = PRODUCTS[idx + 1] ?? null;
         <button
           class="btn-outline"
           id="js-add" type="button"
-          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price.toLocaleString('en-US'), img: IMAGES[p.img].src, num: p.num })}
+          data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price, img: IMAGES[p.img].src, num: p.num })}
         >
           <span class="label add-text w-full text-center tracking-[var(--ls-button)]">Add to Selection</span>
         </button>
@@ -203,12 +203,12 @@ document.addEventListener('astro:page-load', () => {
 .pdp-info {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
-  padding: var(--space-xl) var(--space-lg) var(--space-4xl);
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-4xl);
 }
 @media (min-width: 768px) {
   .pdp-info {
-    padding: var(--space-4xl) var(--space-3xl);
+    padding: var(--spacing-4xl) var(--spacing-3xl);
     position: sticky;
     top: var(--nav-h);
     height: calc(100svh - var(--nav-h));
@@ -217,7 +217,7 @@ document.addEventListener('astro:page-load', () => {
   }
   .pdp-info::-webkit-scrollbar { display: none; }
 }
-@media (min-width: 1280px) { .pdp-info { padding-inline: var(--space-4xl); } }
+@media (min-width: 1280px) { .pdp-info { padding-inline: var(--spacing-4xl); } }
 
 /* Elements */
 .pdp-img img { object-position: center top; }
@@ -235,7 +235,7 @@ document.addEventListener('astro:page-load', () => {
 .detail-row {
   display: flex; justify-content: space-between; align-items: center;
   padding-block: 0.875rem; border-bottom: 1px solid var(--color-rule);
-  gap: var(--space-md);
+  gap: var(--spacing-md);
 }
 .detail-val { color: var(--color-ink-soft); text-align: right; text-transform: none; letter-spacing: 0; }
 
@@ -248,7 +248,7 @@ document.addEventListener('astro:page-load', () => {
 
 .sz-btn {
   background: none; border: 1px solid var(--color-rule);
-  color: var(--color-soft); padding: var(--space-xs) 0.875rem;
+  color: var(--color-soft); padding: var(--spacing-xs) 0.875rem;
   min-height: 44px;
   transition: border-color var(--duration-fast), color var(--duration-fast);
 }

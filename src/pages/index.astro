@@ -28,7 +28,7 @@ const featured = PRODUCTS.slice(0, 4);
       <h1 class="hero-title js-hero-title fw-light ot-primary">VOIDHAUS</h1>
       <div class="wrap flex items-baseline justify-between pb-2xl border-t border-white/15 pt-md">
         <a href="/collection" class="js-hero-cta ot-primary border-b border-white/40 pb-[0.1rem] transition-[border-color,color] duration-[var(--duration-fast)] hover:border-white hover:text-white">Enter Collection</a>
-        <span class="label js-hero-tagline ot-muted hidden sm:block" aria-hidden="true">Twelve pieces. One position.</span>
+        <span class="label js-hero-tagline ot-muted hidden sm:block">Twelve pieces. One position.</span>
       </div>
     </div>
   </section>
@@ -127,16 +127,16 @@ document.addEventListener('astro:page-load', () => {
 
 .hero-season {
   position: absolute;
-  top: calc(var(--nav-h) + var(--space-lg));
-  left: clamp(var(--space-lg), 5vw, var(--space-4xl));
+  top: calc(var(--nav-h) + var(--spacing-lg));
+  left: clamp(var(--spacing-lg), 5vw, var(--spacing-4xl));
 }
 
 .hero-title {
   font-size: clamp(3rem, 18vw, 18rem);
   letter-spacing: -0.06em;
   line-height: 0.88;
-  padding-inline: clamp(var(--space-lg), 5vw, var(--space-4xl));
-  padding-bottom: var(--space-lg);
+  padding-inline: clamp(var(--spacing-lg), 5vw, var(--spacing-4xl));
+  padding-bottom: var(--spacing-lg);
 }
 
 /* Featured: 2-col → 4-col lg */
