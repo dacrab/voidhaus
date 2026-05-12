@@ -27,7 +27,7 @@ import { SITE } from '@data/site';
 </Layout>
 
 <script>
-import { initPage, onReady, gsap, DUR } from '@lib/animate';
+import { initPage, onReady, gsap, DUR, EASE } from '@lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
@@ -40,7 +40,7 @@ document.addEventListener('astro:page-load', () => {
       const f = btn.dataset.filter;
       cards.forEach(card => {
         const show = f === 'All' || card.dataset.category === f;
-        gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: DUR.base, ease: 'power2.out' });
+        gsap.to(card, { autoAlpha: show ? 1 : 0.1, scale: show ? 1 : 0.97, duration: DUR.minor, ease: EASE });
       });
     }));
   });

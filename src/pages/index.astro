@@ -78,7 +78,7 @@ document.addEventListener('astro:page-load', () => {
     const img = document.querySelector<HTMLElement>('.js-hero-img');
     if (img) {
       if (morphed) gsap.set(img, { opacity: 1, scale: 1.08 });
-      else gsap.fromTo(img, { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1.08, duration: 1.6, ease: 'power3.out' });
+      else gsap.fromTo(img, { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1.08, duration: DUR.slow, ease: 'power3.out' });
       ScrollTrigger.create({
         trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 2,
         onUpdate: st => gsap.set(img, { yPercent: st.progress * -10 }),
@@ -91,12 +91,12 @@ document.addEventListener('astro:page-load', () => {
     const tagline = document.querySelector<HTMLElement>('.js-hero-tagline');
 
     if (!morphed && title) {
-      gsap.timeline({ delay: 0.5 })
-        .fromTo(title,   { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1.2, ease: EASE }, 0)
-        .fromTo(season,  { opacity: 0 },         { opacity: 1, duration: 0.6, ease: EASE }, 0.4)
-        .fromTo(cta,     { opacity: 0, y: 8 },   { opacity: 1, y: 0, duration: 0.7, ease: EASE }, 0.6)
-        .fromTo(tagline, { opacity: 0 },          { opacity: 1, duration: 0.6, ease: EASE }, 0.7)
-        .call(() => initPage(), [], 0.8);
+      gsap.timeline({ delay: 0.4 })
+        .fromTo(title,   { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: DUR.major, ease: EASE }, 0)
+        .fromTo(season,  { opacity: 0 },         { opacity: 1, duration: DUR.minor, ease: EASE }, 0.3)
+        .fromTo(cta,     { opacity: 0, y: 12 },  { opacity: 1, y: 0, duration: DUR.minor, ease: EASE }, 0.5)
+        .fromTo(tagline, { opacity: 0 },          { opacity: 1, duration: DUR.minor, ease: EASE }, 0.6)
+        .call(() => initPage(), [], 0.7);
     } else {
       initPage();
     }

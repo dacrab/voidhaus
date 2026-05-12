@@ -119,7 +119,7 @@ const next = PRODUCTS[idx + 1] ?? null;
 </Layout>
 
 <script>
-import { onReady, gsap, DUR, EASE } from '@lib/animate';
+import { onReady, gsap, DUR, EASE, STAGGER } from '@lib/animate';
 
 document.addEventListener('astro:page-load', () => {
   onReady(() => {
@@ -128,14 +128,14 @@ document.addEventListener('astro:page-load', () => {
     const img = document.querySelector<HTMLElement>('.js-main-img');
     if (img) {
       if (morphed) gsap.set(img, { opacity: 1, scale: 1 });
-      else gsap.fromTo(img, { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: DUR.slower, ease: 'power3.out' });
+      else gsap.fromTo(img, { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: DUR.major, ease: 'power3.out' });
     }
 
     const panel = document.querySelector<HTMLElement>('[data-pdp-info]');
     const targets = panel ? ([...panel.children] as HTMLElement[]) : [];
     gsap.fromTo(targets,
-      { opacity: 0, y: 16 },
-      { opacity: 1, y: 0, duration: DUR.slow, ease: EASE, stagger: 0.07, delay: morphed ? 0 : 0.2, clearProps: 'transform,will-change' },
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: DUR.major, ease: EASE, stagger: STAGGER, delay: morphed ? 0 : 0.2, clearProps: 'transform,will-change' },
     );
 
     const szBtns = document.querySelectorAll<HTMLButtonElement>('.sz-btn');

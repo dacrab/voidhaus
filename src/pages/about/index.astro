@@ -100,7 +100,7 @@ const statements = [
 </Layout>
 
 <script>
-import { initPage, onReady, gsap } from '@lib/animate';
+import { initPage, onReady, gsap, DUR } from '@lib/animate';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 document.addEventListener('astro:page-load', () => {
@@ -108,7 +108,7 @@ document.addEventListener('astro:page-load', () => {
     initPage('.js-rule');
     const img = document.querySelector<HTMLElement>('.js-atelier-img');
     if (img) {
-      gsap.to(img, { opacity: 1, scale: 1.08, duration: DUR.slower, ease: 'power3.out' });
+      gsap.fromTo(img, { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1.08, duration: DUR.slow, ease: 'power3.out' });
       ScrollTrigger.create({
         trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: 2,
         onUpdate: st => gsap.set(img, { yPercent: -8 * st.progress }),
