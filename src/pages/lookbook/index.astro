@@ -71,7 +71,7 @@ const chapters = [
       </div>
 
       {i < chapters.length - 1 && (
-        <div class="wrap py-3xl md:py-4xl"><div class="rule"></div></div>
+        <div class="wrap py-4xl md:py-5xl"><div class="rule"></div></div>
       )}
 
     </section>
@@ -94,7 +94,7 @@ document.addEventListener('astro:page-load', () => {
       gsap.fromTo(img, { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1.08, duration: DUR.slow, ease: 'power3.out' });
       ScrollTrigger.create({
         trigger: hero, start: 'top bottom', end: 'bottom top', scrub: 2,
-        onUpdate: st => gsap.set(img, { yPercent: -10 * st.progress }),
+        onUpdate: st => gsap.set(img, { yPercent: -5 * st.progress }),
       });
     });
   });

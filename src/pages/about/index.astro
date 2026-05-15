@@ -48,7 +48,7 @@ const statements = [
     </div>
   </header>
 
-  <section class="wrap pb-2xl md:pb-3xl">
+  <section class="wrap pb-3xl md:pb-4xl">
     {statements.map((s, i) => (
       <>
         <div class="grid gap-md py-xl sm:grid-cols-[5rem_1fr] sm:gap-2xl sm:py-3xl" data-anim="scroll">
@@ -61,7 +61,7 @@ const statements = [
         <div class="rule"></div>
         {i === 1 && (
           <>
-            <blockquote class="serif pull-quote fw-medium italic leading-[1.12] tracking-tight text-center py-20 md:py-28" data-anim="scroll">
+            <blockquote class="serif pull-quote fw-medium italic leading-[1.12] tracking-tight text-center py-24 md:py-32" data-anim="scroll">
               "The most radical act is <em class="not-italic text-[var(--color-mid)]">silence.</em>"
             </blockquote>
             <div class="rule"></div>
@@ -71,7 +71,7 @@ const statements = [
     ))}
   </section>
 
-  <section class="mb-3xl md:mb-4xl" data-anim="scroll">
+  <section class="mb-4xl md:mb-5xl" data-anim="scroll">
     <div class="relative min-h-[280px] h-[55svh] md:h-[65svh] overflow-hidden">
       <Picture
         class="js-atelier-img absolute inset-0"
@@ -111,7 +111,7 @@ document.addEventListener('astro:page-load', () => {
       gsap.fromTo(img, { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1.08, duration: DUR.slow, ease: 'power3.out' });
       ScrollTrigger.create({
         trigger: img.parentElement, start: 'top bottom', end: 'bottom top', scrub: 2,
-        onUpdate: st => gsap.set(img, { yPercent: -8 * st.progress }),
+        onUpdate: st => gsap.set(img, { yPercent: -5 * st.progress }),
       });
     }
   });

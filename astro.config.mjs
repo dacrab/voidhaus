@@ -32,7 +32,7 @@ export default defineConfig({
   fonts: [
     {
       provider: fontProviders.fontsource(),
-      name: 'DM Sans',
+      name: 'Instrument Sans',
       cssVariable: '--font-sans',
       weights: [200, 300, 400, 500],
       styles: ['normal'],

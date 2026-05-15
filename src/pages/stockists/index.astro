@@ -18,9 +18,9 @@ const total = STOCKISTS.reduce((n, r) => n + r.stores.length, 0);
     </div>
   </header>
 
-  <div class="wrap pb-4xl">
+  <div class="wrap pb-5xl">
     {STOCKISTS.map((region, ri) => (
-      <div class="pt-3xl md:pt-4xl" data-anim="scroll">
+      <div class="pt-4xl md:pt-5xl" data-anim="scroll">
         <div class="flex items-baseline gap-lg pb-xl border-b border-[var(--color-rule)]">
           <span class="label op-30">{String(ri + 1).padStart(2, '0')}</span>
           <h2 class="region-title fw-normal flex-1">{region.region}</h2>
@@ -42,7 +42,7 @@ const total = STOCKISTS.reduce((n, r) => n + r.stores.length, 0);
       </div>
     ))}
 
-    <div class="flex items-center justify-between flex-wrap gap-md py-3xl border-t border-[var(--color-rule)]" data-anim="scroll">
+    <div class="flex items-center justify-between flex-wrap gap-md py-4xl border-t border-[var(--color-rule)]" data-anim="scroll">
       <p class="text-base fw-normal text-[var(--color-soft)]">Interested in stocking Voidhaus?</p>
       <a href="/contact" class="label muted-link">Get in touch →</a>
     </div>

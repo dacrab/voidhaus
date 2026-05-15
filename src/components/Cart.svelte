@@ -91,7 +91,7 @@
     class="backdrop cart-backdrop"
     role="presentation"
     onclick={closeCart}
-    transition:fade={{ duration: 300 }}
+    transition:fade={{ duration: 450 }}
   ></div>
 
   <div
@@ -180,7 +180,7 @@
 
   .panel-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: var(--spacing-lg) var(--spacing-lg) 1.25rem;
+    padding: var(--spacing-xl) var(--spacing-lg) 1.5rem;
   }
 
   .empty {
@@ -206,7 +206,7 @@
 
   .item {
     display: grid; grid-template-columns: 80px 1fr;
-    gap: 1.25rem; padding: 1.25rem var(--spacing-lg); align-items: start;
+    gap: 1.5rem; padding: 1.5rem var(--spacing-lg); align-items: start;
   }
 
   .item-img-wrap { aspect-ratio: 3/4; overflow: hidden; background: var(--color-off); }
@@ -225,8 +225,8 @@
   .item-name { font-size: var(--text-sm); font-variation-settings: var(--fw-normal); color: var(--color-ink); display: block; line-height: 1.3; }
 
   .footer {
-    padding: 1.25rem var(--spacing-lg) var(--spacing-xl);
-    display: flex; flex-direction: column; gap: var(--spacing-md);
+    padding: 1.5rem var(--spacing-lg) var(--spacing-2xl);
+    display: flex; flex-direction: column; gap: var(--spacing-lg);
     border-top: 1px solid var(--color-rule);
   }
 
@@ -239,7 +239,7 @@
 
   .checkout-btn {
     width: 100%; background: var(--color-ink); color: var(--color-white);
-    border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button); transition: background var(--duration-fast);
+    border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button); transition: background var(--duration-base);
   }
   .checkout-btn:hover { background: var(--color-ink-soft); }
   .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
