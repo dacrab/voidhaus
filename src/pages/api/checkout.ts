@@ -29,7 +29,9 @@ export const POST: APIRoute = async ({ request }) => {
     for (const item of items) {
       const product = await convex.query(api.products.getBySlug, { slug: item.slug });
       if (!product || !product.active) continue;
-      if (product.stock < 1) continue;
+      // Check per-size stock
+      const sizeAvailable = product.sizeStock?.[item.size] ?? 0;
+      if (sizeAvailable < 1) continue;
 
       lineItems.push({
         price_data: {

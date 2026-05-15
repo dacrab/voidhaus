@@ -12,9 +12,15 @@ export default defineSchema({
     origin: v.string(),
     desc: v.string(),
     sizes: v.array(v.string()),
+    // Per-size stock: { "S": 5, "M": 10, "L": 3 }
+    sizeStock: v.optional(v.record(v.string(), v.number())),
+    // Legacy total stock (computed from sizeStock)
+    stock: v.number(),
+    // Image references: either a key (legacy) or a Convex storage ID
     img: v.string(),
     img2: v.optional(v.string()),
-    stock: v.number(),
+    imgStorageId: v.optional(v.id("_storage")),
+    img2StorageId: v.optional(v.id("_storage")),
     active: v.boolean(),
   })
     .index("by_slug", ["slug"])
@@ -64,8 +70,8 @@ export default defineSchema({
 
   coupons: defineTable({
     code: v.string(),
-    type: v.string(), // "percent" | "fixed"
-    value: v.number(), // percent (0-100) or fixed amount in cents
+    type: v.string(),
+    value: v.number(),
     minOrder: v.optional(v.number()),
     maxUses: v.optional(v.number()),
     usedCount: v.number(),
@@ -74,4 +80,18 @@ export default defineSchema({
   })
     .index("by_code", ["code"])
     .index("by_active", ["active"]),
+
+  // Admin users for Convex Auth
+  admins: defineTable({
+    email: v.string(),
+    passwordHash: v.string(),
+    name: v.string(),
+  }).index("by_email", ["email"]),
+
+  // Admin sessions
+  adminSessions: defineTable({
+    adminId: v.id("admins"),
+    token: v.string(),
+    expiresAt: v.number(),
+  }).index("by_token", ["token"]),
 });

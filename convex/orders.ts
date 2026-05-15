@@ -89,13 +89,15 @@ export const fulfill = mutation({
       customerEmail: args.customerEmail ?? order.customerEmail,
       shippingAddress: args.shippingAddress,
     });
-    // Decrement stock
+    // Decrement stock per size
     for (const item of order.items) {
       const product = await ctx.db.get(item.productId);
       if (product) {
-        await ctx.db.patch(product._id, {
-          stock: Math.max(0, product.stock - item.quantity),
-        });
+        const sizeStock = { ...product.sizeStock };
+        const current = sizeStock[item.size] ?? 0;
+        sizeStock[item.size] = Math.max(0, current - item.quantity);
+        const stock = Object.values(sizeStock).reduce((s, n) => s + n, 0);
+        await ctx.db.patch(product._id, { sizeStock, stock });
       }
     }
     // Send confirmation email
