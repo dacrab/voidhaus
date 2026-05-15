@@ -10,6 +10,8 @@
   let items = $state<CartItem[]>([]);
   let panelEl = $state<HTMLElement | undefined>();
   let checking = $state(false);
+  let couponCode = $state('');
+  let checkoutError = $state('');
 
   const total = $derived(
     formatPrice(items.reduce((s, i) => s + i.price, 0))
@@ -17,19 +19,26 @@
 
   async function checkout() {
     checking = true;
+    checkoutError = '';
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: items.map(i => ({ slug: i.slug, size: i.size })) }),
+        body: JSON.stringify({
+          items: items.map(i => ({ slug: i.slug, size: i.size })),
+          couponCode: couponCode.trim() || undefined,
+        }),
       });
       const data = await res.json();
       if (data.url) {
         saveCart([]);
         window.location.href = data.url;
+      } else if (data.error) {
+        checkoutError = data.error;
       }
     } catch (e) {
       console.error('Checkout failed:', e);
+      checkoutError = 'Something went wrong';
     } finally {
       checking = false;
     }
@@ -137,10 +146,21 @@
           <span class="label muted">Estimated total</span>
           <span class="total serif">€ {total}</span>
         </div>
+        <div class="coupon-row">
+          <input
+            class="coupon-input label"
+            type="text"
+            placeholder="Promo code"
+            bind:value={couponCode}
+          />
+        </div>
         <p class="ship-note label muted">Complimentary worldwide shipping · Duty-free</p>
         <button class="checkout-btn label" onclick={checkout} disabled={checking}>
           {checking ? 'Processing…' : 'Complete Selection'}
         </button>
+        {#if checkoutError}
+          <p class="checkout-error label">{checkoutError}</p>
+        {/if}
       </div>
     {/if}
   </div>
@@ -222,4 +242,16 @@
     border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button); transition: background var(--duration-fast);
   }
   .checkout-btn:hover { background: var(--color-ink-soft); }
+  .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .coupon-row { display: flex; gap: var(--spacing-xs); }
+  .coupon-input {
+    flex: 1; background: none; border: 1px solid var(--color-rule);
+    padding: var(--spacing-sm) var(--spacing-md); font-size: max(16px, 0.75rem);
+    color: var(--color-ink); outline: none; text-transform: uppercase;
+    transition: border-color var(--duration-fast);
+  }
+  .coupon-input:focus { border-color: var(--color-mid); }
+  .coupon-input::placeholder { text-transform: none; color: var(--color-mid); }
+  .checkout-error { color: #dc2626; text-align: center; font-size: 12px; }
 </style>

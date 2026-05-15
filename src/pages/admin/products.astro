@@ -11,6 +11,7 @@ import Layout from '@layouts/Layout.astro';
         <a href="/admin" class="label">Dashboard</a>
         <a href="/admin/products" class="label active">Products</a>
         <a href="/admin/orders" class="label">Orders</a>
+        <a href="/admin/coupons" class="label">Coupons</a>
         <a href="/admin/messages" class="label">Messages</a>
       </nav>
     </aside>
@@ -54,6 +55,7 @@ import Layout from '@layouts/Layout.astro';
         <td class="label ${p.stock < 5 ? 'low-stock' : ''}">${p.stock}</td>
         <td class="label">${p.active ? '✓' : '✗'}</td>
         <td class="label actions">
+          <a href="/admin/products/edit?slug=${p.slug}" class="action-btn">Edit</a>
           <button class="action-btn toggle-btn" data-id="${p._id}" data-active="${p.active}">${p.active ? 'Deactivate' : 'Activate'}</button>
           <button class="action-btn stock-btn" data-id="${p._id}">+Stock</button>
         </td>

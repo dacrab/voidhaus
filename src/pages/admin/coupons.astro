@@ -1,0 +1,147 @@
+---
+export const prerender = false;
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Coupons — Admin — VOIDHAUS" solidNav>
+  <div class="admin-shell">
+    <aside class="admin-nav">
+      <span class="admin-brand label">VOIDHAUS Admin</span>
+      <nav class="admin-links">
+        <a href="/admin" class="label">Dashboard</a>
+        <a href="/admin/products" class="label">Products</a>
+        <a href="/admin/orders" class="label">Orders</a>
+        <a href="/admin/coupons" class="label active">Coupons</a>
+        <a href="/admin/messages" class="label">Messages</a>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1 class="admin-title">Coupons</h1>
+      </div>
+
+      <form id="coupon-form" class="coupon-form">
+        <input type="text" name="code" placeholder="CODE" required class="field" />
+        <select name="type" required class="field">
+          <option value="percent">% Off</option>
+          <option value="fixed">€ Fixed</option>
+        </select>
+        <input type="number" name="value" placeholder="Value" required class="field small" />
+        <input type="number" name="minOrder" placeholder="Min order €" class="field small" />
+        <input type="number" name="maxUses" placeholder="Max uses" class="field small" />
+        <button type="submit" class="create-btn label">Create</button>
+      </form>
+
+      <div id="coupons-list">
+        <p class="label muted">Loading…</p>
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import { ConvexHttpClient } from "convex/browser";
+  import { api } from "../../../convex/_generated/api";
+
+  const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
+
+  async function load() {
+    const coupons = await convex.query(api.coupons.list, {});
+    const wrap = document.getElementById("coupons-list")!;
+
+    if (!coupons.length) {
+      wrap.innerHTML = '<p class="label muted">No coupons yet.</p>';
+      return;
+    }
+
+    wrap.innerHTML = `<table class="coupons-table">
+      <thead><tr>
+        <th class="label">Code</th>
+        <th class="label">Type</th>
+        <th class="label">Value</th>
+        <th class="label">Min Order</th>
+        <th class="label">Used / Max</th>
+        <th class="label">Status</th>
+        <th class="label">Actions</th>
+      </tr></thead>
+      <tbody>${coupons.map((c: any) => `<tr>
+        <td class="label code-cell">${c.code}</td>
+        <td class="label">${c.type === 'percent' ? '% Off' : '€ Fixed'}</td>
+        <td class="label">${c.type === 'percent' ? c.value + '%' : '€' + c.value}</td>
+        <td class="label">${c.minOrder ? '€' + c.minOrder : '—'}</td>
+        <td class="label">${c.usedCount}${c.maxUses ? ' / ' + c.maxUses : ''}</td>
+        <td class="label ${c.active ? 'status-active' : 'status-inactive'}">${c.active ? 'Active' : 'Inactive'}</td>
+        <td class="label">${c.active ? `<button class="action-btn deactivate-btn" data-id="${c._id}">Deactivate</button>` : ''}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+
+    wrap.querySelectorAll('.deactivate-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = (e.target as HTMLElement).dataset.id!;
+        await convex.mutation(api.coupons.deactivate, { id: id as any });
+        load();
+      });
+    });
+  }
+
+  document.getElementById("coupon-form")!.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const data = new FormData(form);
+    await convex.mutation(api.coupons.create, {
+      code: data.get("code") as string,
+      type: data.get("type") as string,
+      value: Number(data.get("value")),
+      minOrder: data.get("minOrder") ? Number(data.get("minOrder")) : undefined,
+      maxUses: data.get("maxUses") ? Number(data.get("maxUses")) : undefined,
+    });
+    form.reset();
+    load();
+  });
+
+  load();
+</script>
+
+<style>
+  .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  .admin-nav {
+    background: var(--color-ink); color: var(--color-white);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    display: flex; flex-direction: column; gap: var(--spacing-xl);
+    position: sticky; top: 0; height: 100vh;
+  }
+  .admin-brand { font-size: var(--text-sm); opacity: 0.6; }
+  .admin-links { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+  .admin-links a { color: var(--color-white); opacity: 0.7; text-decoration: none; padding: var(--spacing-xs) 0; transition: opacity var(--duration-fast); }
+  .admin-links a:hover, .admin-links a.active { opacity: 1; }
+  .admin-main { padding: var(--spacing-2xl) var(--spacing-xl); }
+  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-xl); }
+  .admin-title { font-size: var(--text-2xl); font-variation-settings: var(--fw-medium); }
+  .coupon-form {
+    display: flex; gap: var(--spacing-sm); align-items: center; flex-wrap: wrap;
+    margin-bottom: var(--spacing-xl); padding-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .field {
+    background: none; border: 1px solid var(--color-rule); padding: 8px 12px;
+    font-size: 13px; font-family: inherit; color: var(--color-ink); outline: none;
+  }
+  .field:focus { border-color: var(--color-ink); }
+  .field.small { width: 100px; }
+  .create-btn {
+    padding: 8px 16px; background: var(--color-ink); color: var(--color-white);
+    border: none; cursor: pointer; transition: opacity var(--duration-fast);
+  }
+  .create-btn:hover { opacity: 0.85; }
+  .coupons-table { width: 100%; border-collapse: collapse; }
+  .coupons-table th, .coupons-table td { text-align: left; padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--color-rule); }
+  .code-cell { font-family: monospace; font-weight: 600; }
+  .status-active { color: #16a34a; }
+  .status-inactive { color: #6b7280; }
+  .action-btn {
+    font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 4px 8px; border: 1px solid var(--color-rule); background: none;
+    cursor: pointer; transition: background var(--duration-fast);
+  }
+  .action-btn:hover { background: var(--color-off); }
+</style>
