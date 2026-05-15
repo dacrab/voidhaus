@@ -61,4 +61,17 @@ export default defineSchema({
     message: v.string(),
     read: v.boolean(),
   }).index("by_read", ["read"]),
+
+  coupons: defineTable({
+    code: v.string(),
+    type: v.string(), // "percent" | "fixed"
+    value: v.number(), // percent (0-100) or fixed amount in cents
+    minOrder: v.optional(v.number()),
+    maxUses: v.optional(v.number()),
+    usedCount: v.number(),
+    active: v.boolean(),
+    expiresAt: v.optional(v.number()),
+  })
+    .index("by_code", ["code"])
+    .index("by_active", ["active"]),
 });
