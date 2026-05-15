@@ -53,8 +53,12 @@ import Layout from '@layouts/Layout.astro';
             </select>
           </div>
           <div class="field">
-            <label class="label" for="stock">Stock</label>
-            <input type="number" id="stock" name="stock" required />
+            <label class="label" for="stock">Stock (total — read only)</label>
+            <input type="number" id="stock" name="stock" readonly disabled />
+          </div>
+          <div class="field full">
+            <label class="label">Per-Size Stock</label>
+            <div id="size-stock-grid" class="size-stock-grid"></div>
           </div>
           <div class="field">
             <label class="label" for="material">Material</label>
@@ -73,12 +77,22 @@ import Layout from '@layouts/Layout.astro';
             <input type="text" id="sizes" name="sizes" required />
           </div>
           <div class="field">
-            <label class="label" for="img">Image key</label>
+            <label class="label" for="img">Image key (legacy)</label>
             <input type="text" id="img" name="img" required />
           </div>
           <div class="field">
             <label class="label" for="img2">Secondary image key</label>
             <input type="text" id="img2" name="img2" />
+          </div>
+          <div class="field">
+            <label class="label">Upload Primary Image</label>
+            <input type="file" id="img-upload" accept="image/*" class="file-input" />
+            <span id="img-upload-status" class="upload-status"></span>
+          </div>
+          <div class="field">
+            <label class="label">Upload Secondary Image</label>
+            <input type="file" id="img2-upload" accept="image/*" class="file-input" />
+            <span id="img2-upload-status" class="upload-status"></span>
           </div>
         </div>
         <div class="form-actions">
@@ -97,6 +111,59 @@ import Layout from '@layouts/Layout.astro';
 
   const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
   const slug = new URLSearchParams(window.location.search).get("slug");
+  let currentSizeStock: Record<string, number> = {};
+  let imgStorageId: string | undefined;
+  let img2StorageId: string | undefined;
+
+  function renderSizeStockGrid(sizes: string[], sizeStock: Record<string, number>) {
+    const grid = document.getElementById("size-stock-grid")!;
+    grid.innerHTML = sizes.map(s => `
+      <div class="size-stock-item">
+        <span class="size-label">${s}</span>
+        <input type="number" min="0" class="size-stock-input" data-size="${s}" value="${sizeStock[s] ?? 0}" />
+      </div>
+    `).join('');
+    grid.querySelectorAll('.size-stock-input').forEach(input => {
+      input.addEventListener('change', (e) => {
+        const size = (e.target as HTMLInputElement).dataset.size!;
+        currentSizeStock[size] = Number((e.target as HTMLInputElement).value);
+        const total = Object.values(currentSizeStock).reduce((s, n) => s + n, 0);
+        (document.getElementById("stock") as HTMLInputElement).value = String(total);
+      });
+    });
+  }
+
+  async function uploadFile(file: File, statusEl: HTMLElement): Promise<string | undefined> {
+    statusEl.textContent = "Uploading…";
+    try {
+      const uploadUrl = await convex.mutation(api.files.generateUploadUrl, {});
+      const res = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const { storageId } = await res.json();
+      statusEl.textContent = "✓ Uploaded";
+      return storageId;
+    } catch (err) {
+      statusEl.textContent = "✗ Upload failed";
+      return undefined;
+    }
+  }
+
+  // Image upload handlers
+  document.getElementById("img-upload")!.addEventListener("change", async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const id = await uploadFile(file, document.getElementById("img-upload-status")!);
+    if (id) imgStorageId = id;
+  });
+  document.getElementById("img2-upload")!.addEventListener("change", async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const id = await uploadFile(file, document.getElementById("img2-upload-status")!);
+    if (id) img2StorageId = id;
+  });
 
   async function load() {
     if (!slug) { window.location.href = "/admin/products"; return; }
@@ -120,6 +187,9 @@ import Layout from '@layouts/Layout.astro';
     (document.getElementById("sizes") as HTMLInputElement).value = product.sizes.join(", ");
     (document.getElementById("img") as HTMLInputElement).value = product.img;
     (document.getElementById("img2") as HTMLInputElement).value = product.img2 ?? "";
+
+    currentSizeStock = product.sizeStock ?? {};
+    renderSizeStockGrid(product.sizes, currentSizeStock);
   }
 
   document.getElementById("edit-form")!.addEventListener("submit", async (e) => {
@@ -134,21 +204,25 @@ import Layout from '@layouts/Layout.astro';
       const data = new FormData(form);
       const id = (document.getElementById("product-id") as HTMLInputElement).value;
 
-      await convex.mutation(api.products.update, {
+      const updateArgs: any = {
         id: id as any,
         name: data.get("name") as string,
         slug: data.get("slug") as string,
         num: data.get("num") as string,
         price: Number(data.get("price")),
         category: data.get("category") as string,
-        stock: Number(data.get("stock")),
         material: data.get("material") as string,
         origin: data.get("origin") as string,
         desc: data.get("desc") as string,
         sizes: (data.get("sizes") as string).split(",").map((s) => s.trim()),
+        sizeStock: currentSizeStock,
         img: data.get("img") as string,
         img2: (data.get("img2") as string) || undefined,
-      });
+      };
+      if (imgStorageId) updateArgs.imgStorageId = imgStorageId;
+      if (img2StorageId) updateArgs.img2StorageId = img2StorageId;
+
+      await convex.mutation(api.products.update, updateArgs);
       status.textContent = "✓ Saved";
       status.className = "status success";
     } catch (err: any) {
@@ -198,6 +272,13 @@ import Layout from '@layouts/Layout.astro';
   }
   .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--color-ink); }
   .form-actions { display: flex; gap: var(--spacing-md); margin-top: var(--spacing-xl); }
+  .size-stock-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .size-stock-item { display: flex; align-items: center; gap: 6px; }
+  .size-label { font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.6; min-width: 30px; }
+  .size-stock-input { width: 60px; background: none; border: 1px solid var(--color-rule); padding: 6px 8px; font-size: 13px; color: var(--color-ink); outline: none; text-align: center; }
+  .size-stock-input:focus { border-color: var(--color-ink); }
+  .file-input { font-size: 13px; margin-top: 4px; }
+  .upload-status { font-size: 12px; opacity: 0.7; margin-left: 8px; }
   .submit-btn {
     padding: 12px 24px; background: var(--color-ink); color: var(--color-white);
     border: none; cursor: pointer; transition: opacity var(--duration-fast);

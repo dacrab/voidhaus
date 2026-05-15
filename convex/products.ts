@@ -22,10 +22,21 @@ export const list = query({
 export const getBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const product = await ctx.db
       .query("products")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
+    if (!product) return null;
+    // Resolve image URLs if stored in Convex
+    let imgUrl: string | null = null;
+    let img2Url: string | null = null;
+    if (product.imgStorageId) {
+      imgUrl = await ctx.storage.getUrl(product.imgStorageId);
+    }
+    if (product.img2StorageId) {
+      img2Url = await ctx.storage.getUrl(product.img2StorageId);
+    }
+    return { ...product, imgUrl, img2Url };
   },
 });
 
@@ -40,12 +51,15 @@ export const create = mutation({
     origin: v.string(),
     desc: v.string(),
     sizes: v.array(v.string()),
+    sizeStock: v.record(v.string(), v.number()),
     img: v.string(),
     img2: v.optional(v.string()),
-    stock: v.number(),
+    imgStorageId: v.optional(v.id("_storage")),
+    img2StorageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
-    const id = await ctx.db.insert("products", { ...args, active: true });
+    const stock = Object.values(args.sizeStock).reduce((s, n) => s + n, 0);
+    const id = await ctx.db.insert("products", { ...args, stock, active: true });
     await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
     return id;
   },
@@ -63,19 +77,30 @@ export const update = mutation({
     origin: v.optional(v.string()),
     desc: v.optional(v.string()),
     sizes: v.optional(v.array(v.string())),
+    sizeStock: v.optional(v.record(v.string(), v.number())),
     img: v.optional(v.string()),
     img2: v.optional(v.string()),
-    stock: v.optional(v.number()),
+    imgStorageId: v.optional(v.id("_storage")),
+    img2StorageId: v.optional(v.id("_storage")),
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const { id, ...fields } = args;
-    const updates = Object.fromEntries(
-      Object.entries(fields).filter(([, v]) => v !== undefined)
-    );
+    const updates: Record<string, any> = {};
+    for (const [k, val] of Object.entries(fields)) {
+      if (val !== undefined) updates[k] = val;
+    }
+    // Recompute total stock if sizeStock changed
+    if (updates.sizeStock) {
+      updates.stock = Object.values(updates.sizeStock as Record<string, number>).reduce(
+        (s, n) => s + n,
+        0
+      );
+    }
     await ctx.db.patch(id, updates);
-    // Trigger rebuild if anything other than stock changed
-    const nonStockChange = Object.keys(updates).some((k) => k !== "stock");
+    const nonStockChange = Object.keys(updates).some(
+      (k) => k !== "stock" && k !== "sizeStock"
+    );
     if (nonStockChange) {
       await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
     }
@@ -87,5 +112,19 @@ export const remove = mutation({
   handler: async (ctx, args) => {
     await ctx.db.delete(args.id);
     await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
+  },
+});
+
+// Decrement stock for a specific size
+export const decrementSizeStock = mutation({
+  args: { id: v.id("products"), size: v.string(), quantity: v.number() },
+  handler: async (ctx, args) => {
+    const product = await ctx.db.get(args.id);
+    if (!product) return;
+    const sizeStock = { ...product.sizeStock };
+    const current = sizeStock[args.size] ?? 0;
+    sizeStock[args.size] = Math.max(0, current - args.quantity);
+    const stock = Object.values(sizeStock).reduce((s, n) => s + n, 0);
+    await ctx.db.patch(args.id, { sizeStock, stock });
   },
 });

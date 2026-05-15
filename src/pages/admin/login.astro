@@ -1,27 +1,5 @@
 ---
 export const prerender = false;
-
-// If already authenticated, redirect to admin
-const cookie = Astro.cookies.get("vh-admin-token");
-const validToken = import.meta.env.ADMIN_TOKEN;
-if (cookie?.value === validToken) {
-  return Astro.redirect("/admin");
-}
-
-// Handle login POST
-if (Astro.request.method === "POST") {
-  const form = await Astro.request.formData();
-  const token = form.get("token")?.toString();
-  if (token === validToken) {
-    Astro.cookies.set("vh-admin-token", token, {
-      path: "/admin",
-      httpOnly: true,
-      secure: import.meta.env.PROD,
-      maxAge: 60 * 60 * 24 * 7,
-    });
-    return Astro.redirect("/admin");
-  }
-}
 ---
 
 <html lang="en">
@@ -42,7 +20,7 @@ if (Astro.request.method === "POST") {
     }
     .brand { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.4; }
     h1 { font-size: 1.5rem; font-weight: 300; letter-spacing: -0.02em; }
-    label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+    label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 0.4rem; }
     input {
       width: 100%; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.15);
       color: #f8f6f2; font-size: 1rem; padding: 0.75rem 0; outline: none;
@@ -55,19 +33,69 @@ if (Astro.request.method === "POST") {
       cursor: pointer; transition: opacity 0.2s;
     }
     button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
     .error { font-size: 0.75rem; color: #ef4444; text-align: center; }
+    .field { margin-bottom: 1rem; }
   </style>
 </head>
 <body>
-  <form class="login-card" method="POST">
+  <form class="login-card" id="login-form">
     <span class="brand">VOIDHAUS</span>
     <h1>Admin Access</h1>
-    <div>
-      <label for="token">Access Token</label>
-      <input type="password" id="token" name="token" placeholder="Enter admin token" required autofocus />
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="admin@voidhaus.com" required autofocus />
     </div>
-    <button type="submit">Enter</button>
-    {Astro.request.method === "POST" && <p class="error">Invalid token</p>}
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="••••••••" required />
+    </div>
+    <button type="submit" id="submit-btn">Enter</button>
+    <p class="error" id="error" style="display:none"></p>
   </form>
+
+  <script type="module">
+    import { ConvexHttpClient } from "https://esm.sh/convex@1.39.1/browser";
+
+    const CONVEX_URL = document.querySelector('meta[name="convex-url"]')?.content
+      || window.__CONVEX_URL__
+      || "";
+
+    const convex = new ConvexHttpClient(CONVEX_URL);
+
+    // Check if already logged in
+    const existingToken = document.cookie.match(/vh-admin-session=([^;]+)/)?.[1];
+    if (existingToken) {
+      window.location.href = "/admin";
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("submit-btn");
+      const error = document.getElementById("error");
+      btn.disabled = true;
+      error.style.display = "none";
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const result = await convex.mutation("auth:login", { email, password });
+        if (result.error) {
+          error.textContent = result.error;
+          error.style.display = "block";
+        } else {
+          // Set session cookie
+          document.cookie = `vh-admin-session=${result.token}; path=/admin; max-age=${7 * 24 * 60 * 60}; samesite=strict`;
+          window.location.href = "/admin";
+        }
+      } catch (err) {
+        error.textContent = "Connection error";
+        error.style.display = "block";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>

@@ -161,7 +161,26 @@ document.addEventListener('astro:page-load', () => {
         })
           .then(r => r.json())
           .then(data => {
-            if (data?.value?.stock === 0) {
+            const product = data?.value;
+            if (!product) return;
+            // Disable sizes that are out of stock
+            if (product.sizeStock) {
+              szBtns.forEach(btn => {
+                const size = btn.textContent?.trim() ?? '';
+                const qty = product.sizeStock[size] ?? 0;
+                if (qty === 0) {
+                  btn.classList.add('sold-out-size');
+                  btn.disabled = true;
+                  btn.setAttribute('aria-disabled', 'true');
+                }
+              });
+              // If all sizes are out, disable add button
+              if (product.stock === 0) {
+                addBtn.disabled = true;
+                addBtn.classList.add('sold-out');
+                addText.textContent = 'Sold Out';
+              }
+            } else if (product.stock === 0) {
               addBtn.disabled = true;
               addBtn.classList.add('sold-out');
               addText.textContent = 'Sold Out';
@@ -281,4 +300,6 @@ document.addEventListener('astro:page-load', () => {
 
 .sold-out { opacity: 0.4; cursor: not-allowed; border-color: var(--color-rule); }
 .sold-out:hover { background: none; }
+.sold-out-size { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
+.sold-out-size:hover { border-color: var(--color-rule); color: var(--color-soft); }
 </style>
