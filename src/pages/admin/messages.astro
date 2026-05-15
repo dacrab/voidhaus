@@ -1,0 +1,94 @@
+---
+export const prerender = false;
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Messages — Admin — VOIDHAUS" solidNav>
+  <div class="admin-shell">
+    <aside class="admin-nav">
+      <span class="admin-brand label">VOIDHAUS Admin</span>
+      <nav class="admin-links">
+        <a href="/admin" class="label">Dashboard</a>
+        <a href="/admin/products" class="label">Products</a>
+        <a href="/admin/orders" class="label">Orders</a>
+        <a href="/admin/messages" class="label active">Messages</a>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <h1 class="admin-title">Messages</h1>
+      <div id="messages-list">
+        <p class="label muted">Loading…</p>
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import { ConvexHttpClient } from "convex/browser";
+  import { api } from "../../../convex/_generated/api";
+
+  const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
+
+  async function load() {
+    const messages = await convex.query(api.messages.list, {});
+    const wrap = document.getElementById("messages-list")!;
+
+    if (!messages.length) {
+      wrap.innerHTML = '<p class="label muted">No messages yet.</p>';
+      return;
+    }
+
+    wrap.innerHTML = messages.map((m: any) => `
+      <div class="msg-card ${m.read ? 'read' : 'unread'}">
+        <div class="msg-header">
+          <span class="msg-from label">${m.name} &lt;${m.email}&gt;</span>
+          <span class="msg-date label muted">${new Date(m._creationTime).toLocaleDateString()}</span>
+        </div>
+        <span class="msg-subject label">${m.subject}</span>
+        <p class="msg-body">${m.message}</p>
+        ${!m.read ? `<button class="action-btn mark-read-btn" data-id="${m._id}">Mark Read</button>` : ''}
+      </div>
+    `).join('');
+
+    wrap.querySelectorAll('.mark-read-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = (e.target as HTMLElement).dataset.id!;
+        await convex.mutation(api.messages.markRead, { id: id as any });
+        load();
+      });
+    });
+  }
+  load();
+</script>
+
+<style>
+  .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  .admin-nav {
+    background: var(--color-ink); color: var(--color-white);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    display: flex; flex-direction: column; gap: var(--spacing-xl);
+    position: sticky; top: 0; height: 100vh;
+  }
+  .admin-brand { font-size: var(--text-sm); opacity: 0.6; }
+  .admin-links { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+  .admin-links a { color: var(--color-white); opacity: 0.7; text-decoration: none; padding: var(--spacing-xs) 0; transition: opacity var(--duration-fast); }
+  .admin-links a:hover, .admin-links a.active { opacity: 1; }
+  .admin-main { padding: var(--spacing-2xl) var(--spacing-xl); }
+  .admin-title { font-size: var(--text-2xl); font-variation-settings: var(--fw-medium); margin-bottom: var(--spacing-xl); }
+  .msg-card {
+    border: 1px solid var(--color-rule); padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md); display: flex; flex-direction: column; gap: var(--spacing-sm);
+  }
+  .msg-card.unread { border-left: 3px solid var(--color-ink); }
+  .msg-card.read { opacity: 0.6; }
+  .msg-header { display: flex; justify-content: space-between; align-items: center; }
+  .msg-from { font-weight: 500; }
+  .msg-subject { opacity: 0.7; }
+  .msg-body { font-size: var(--text-sm); line-height: 1.6; color: var(--color-ink-soft); }
+  .action-btn {
+    font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 4px 8px; border: 1px solid var(--color-rule); background: none;
+    cursor: pointer; transition: background var(--duration-fast); align-self: flex-start;
+  }
+  .action-btn:hover { background: var(--color-off); }
+</style>

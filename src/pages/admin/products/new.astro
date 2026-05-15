@@ -1,0 +1,180 @@
+---
+export const prerender = false;
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Add Product — Admin — VOIDHAUS" solidNav>
+  <div class="admin-shell">
+    <aside class="admin-nav">
+      <span class="admin-brand label">VOIDHAUS Admin</span>
+      <nav class="admin-links">
+        <a href="/admin" class="label">Dashboard</a>
+        <a href="/admin/products" class="label active">Products</a>
+        <a href="/admin/orders" class="label">Orders</a>
+        <a href="/admin/messages" class="label">Messages</a>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1 class="admin-title">Add Product</h1>
+        <a href="/admin/products" class="label back-link">← Back to Products</a>
+      </div>
+      <form id="product-form" class="product-form">
+        <div class="form-grid">
+          <div class="field">
+            <label class="label" for="name">Name</label>
+            <input type="text" id="name" name="name" required placeholder="Obsidian Coat" />
+          </div>
+          <div class="field">
+            <label class="label" for="slug">Slug</label>
+            <input type="text" id="slug" name="slug" required placeholder="obsidian-coat" />
+          </div>
+          <div class="field">
+            <label class="label" for="num">Number</label>
+            <input type="text" id="num" name="num" required placeholder="013" />
+          </div>
+          <div class="field">
+            <label class="label" for="price">Price (€)</label>
+            <input type="number" id="price" name="price" required placeholder="2400" />
+          </div>
+          <div class="field">
+            <label class="label" for="category">Category</label>
+            <select id="category" name="category" required>
+              <option value="Outerwear">Outerwear</option>
+              <option value="Tailoring">Tailoring</option>
+              <option value="Ready-to-wear">Ready-to-wear</option>
+              <option value="Knitwear">Knitwear</option>
+              <option value="Tops">Tops</option>
+              <option value="Footwear">Footwear</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="stock">Stock</label>
+            <input type="number" id="stock" name="stock" required placeholder="10" />
+          </div>
+          <div class="field">
+            <label class="label" for="material">Material</label>
+            <input type="text" id="material" name="material" required placeholder="Virgin wool, silk lining" />
+          </div>
+          <div class="field">
+            <label class="label" for="origin">Origin</label>
+            <input type="text" id="origin" name="origin" required placeholder="Milan, Italy" />
+          </div>
+          <div class="field full">
+            <label class="label" for="desc">Description</label>
+            <textarea id="desc" name="desc" rows="3" required placeholder="Product description..."></textarea>
+          </div>
+          <div class="field">
+            <label class="label" for="sizes">Sizes (comma-separated)</label>
+            <input type="text" id="sizes" name="sizes" required placeholder="XS, S, M, L, XL" />
+          </div>
+          <div class="field">
+            <label class="label" for="img">Image key</label>
+            <input type="text" id="img" name="img" required placeholder="coat-primary" />
+          </div>
+          <div class="field">
+            <label class="label" for="img2">Secondary image key (optional)</label>
+            <input type="text" id="img2" name="img2" placeholder="coat-secondary" />
+          </div>
+        </div>
+        <button type="submit" class="submit-btn label" id="submit-btn">Create Product</button>
+        <p id="status" class="status"></p>
+      </form>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import { ConvexHttpClient } from "convex/browser";
+  import { api } from "../../../../convex/_generated/api";
+
+  const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
+
+  // Auto-generate slug from name
+  document.getElementById("name")!.addEventListener("input", (e) => {
+    const name = (e.target as HTMLInputElement).value;
+    const slugField = document.getElementById("slug") as HTMLInputElement;
+    if (!slugField.dataset.manual) {
+      slugField.value = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    }
+  });
+  document.getElementById("slug")!.addEventListener("input", (e) => {
+    (e.target as HTMLInputElement).dataset.manual = "true";
+  });
+
+  document.getElementById("product-form")!.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const btn = document.getElementById("submit-btn") as HTMLButtonElement;
+    const status = document.getElementById("status")!;
+    btn.disabled = true;
+    btn.textContent = "Creating…";
+
+    try {
+      const data = new FormData(form);
+      await convex.mutation(api.products.create, {
+        name: data.get("name") as string,
+        slug: data.get("slug") as string,
+        num: data.get("num") as string,
+        price: Number(data.get("price")),
+        category: data.get("category") as string,
+        material: data.get("material") as string,
+        origin: data.get("origin") as string,
+        desc: data.get("desc") as string,
+        sizes: (data.get("sizes") as string).split(",").map((s) => s.trim()),
+        img: data.get("img") as string,
+        img2: (data.get("img2") as string) || undefined,
+        stock: Number(data.get("stock")),
+      });
+      status.textContent = "✓ Product created";
+      status.className = "status success";
+      form.reset();
+    } catch (err: any) {
+      status.textContent = `✗ ${err.message}`;
+      status.className = "status error";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Create Product";
+    }
+  });
+</script>
+
+<style>
+  .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  .admin-nav {
+    background: var(--color-ink); color: var(--color-white);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    display: flex; flex-direction: column; gap: var(--spacing-xl);
+    position: sticky; top: 0; height: 100vh;
+  }
+  .admin-brand { font-size: var(--text-sm); opacity: 0.6; }
+  .admin-links { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+  .admin-links a { color: var(--color-white); opacity: 0.7; text-decoration: none; padding: var(--spacing-xs) 0; transition: opacity var(--duration-fast); }
+  .admin-links a:hover, .admin-links a.active { opacity: 1; }
+  .admin-main { padding: var(--spacing-2xl) var(--spacing-xl); max-width: 900px; }
+  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-xl); }
+  .admin-title { font-size: var(--text-2xl); font-variation-settings: var(--fw-medium); }
+  .back-link { opacity: var(--op-muted); transition: opacity var(--duration-fast); }
+  .back-link:hover { opacity: 1; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { opacity: 0.6; }
+  .field input, .field select, .field textarea {
+    background: none; border: 1px solid var(--color-rule); padding: 10px 12px;
+    font-size: 14px; font-family: inherit; color: var(--color-ink); outline: none;
+    transition: border-color var(--duration-fast);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--color-ink); }
+  .submit-btn {
+    margin-top: var(--spacing-xl); padding: 12px 24px;
+    background: var(--color-ink); color: var(--color-white); border: none;
+    cursor: pointer; transition: opacity var(--duration-fast);
+  }
+  .submit-btn:hover { opacity: 0.85; }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .status { margin-top: var(--spacing-md); font-size: 14px; }
+  .status.success { color: #16a34a; }
+  .status.error { color: #dc2626; }
+</style>

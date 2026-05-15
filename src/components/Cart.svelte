@@ -9,10 +9,31 @@
   let open = $state(false);
   let items = $state<CartItem[]>([]);
   let panelEl = $state<HTMLElement | undefined>();
+  let checking = $state(false);
 
   const total = $derived(
     formatPrice(items.reduce((s, i) => s + i.price, 0))
   );
+
+  async function checkout() {
+    checking = true;
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: items.map(i => ({ slug: i.slug, size: i.size })) }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        saveCart([]);
+        window.location.href = data.url;
+      }
+    } catch (e) {
+      console.error('Checkout failed:', e);
+    } finally {
+      checking = false;
+    }
+  }
 
   function openCart() {
     open = true;
@@ -117,7 +138,9 @@
           <span class="total serif">€ {total}</span>
         </div>
         <p class="ship-note label muted">Complimentary worldwide shipping · Duty-free</p>
-        <button class="checkout-btn label">Complete Selection</button>
+        <button class="checkout-btn label" onclick={checkout} disabled={checking}>
+          {checking ? 'Processing…' : 'Complete Selection'}
+        </button>
       </div>
     {/if}
   </div>

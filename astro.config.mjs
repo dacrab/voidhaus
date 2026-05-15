@@ -3,10 +3,12 @@ import { defineConfig, fontProviders } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
 
 export default defineConfig({
   site: 'https://voidhaus.vercel.app',
   output: 'static',
+  adapter: vercel(),
 
   vite: {
     plugins: [tailwindcss()],

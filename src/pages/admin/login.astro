@@ -1,0 +1,73 @@
+---
+export const prerender = false;
+
+// If already authenticated, redirect to admin
+const cookie = Astro.cookies.get("vh-admin-token");
+const validToken = import.meta.env.ADMIN_TOKEN;
+if (cookie?.value === validToken) {
+  return Astro.redirect("/admin");
+}
+
+// Handle login POST
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const token = form.get("token")?.toString();
+  if (token === validToken) {
+    Astro.cookies.set("vh-admin-token", token, {
+      path: "/admin",
+      httpOnly: true,
+      secure: import.meta.env.PROD,
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    return Astro.redirect("/admin");
+  }
+}
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login — VOIDHAUS</title>
+  <style>
+    * { margin: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #1c1b19; color: #f8f6f2;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    }
+    .login-card {
+      width: min(380px, 90vw); padding: 3rem 2rem;
+      display: flex; flex-direction: column; gap: 1.5rem;
+    }
+    .brand { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.4; }
+    h1 { font-size: 1.5rem; font-weight: 300; letter-spacing: -0.02em; }
+    label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+    input {
+      width: 100%; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.15);
+      color: #f8f6f2; font-size: 1rem; padding: 0.75rem 0; outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: rgba(255,255,255,0.5); }
+    button {
+      width: 100%; padding: 0.875rem; background: #f8f6f2; color: #1c1b19;
+      border: none; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.85; }
+    .error { font-size: 0.75rem; color: #ef4444; text-align: center; }
+  </style>
+</head>
+<body>
+  <form class="login-card" method="POST">
+    <span class="brand">VOIDHAUS</span>
+    <h1>Admin Access</h1>
+    <div>
+      <label for="token">Access Token</label>
+      <input type="password" id="token" name="token" placeholder="Enter admin token" required autofocus />
+    </div>
+    <button type="submit">Enter</button>
+    {Astro.request.method === "POST" && <p class="error">Invalid token</p>}
+  </form>
+</body>
+</html>

@@ -40,6 +40,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
     <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
     <link rel="canonical"        href={canonical} />
     <link rel="sitemap"          href="/sitemap-index.xml" />
+    <link rel="manifest"         href="/manifest.json" />
     <Font cssVariable="--font-sans"  preload />
     <Font cssVariable="--font-serif" preload />
     <ClientRouter />
@@ -82,6 +83,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
     })} />
 
     <script is:inline>document.documentElement.classList.remove('no-js');</script>
+    <script is:inline define:vars={{ convexUrl: import.meta.env.PUBLIC_CONVEX_URL || '' }}>window.__CONVEX_URL__ = convexUrl;</script>
   </head>
 
   <body>
@@ -188,5 +190,8 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
     </footer>
   <Analytics />
   <SpeedInsights />
+  <script is:inline>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+  </script>
   </body>
 </html>
