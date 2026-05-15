@@ -1,0 +1,135 @@
+---
+export const prerender = false;
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout title="Orders — Admin — VOIDHAUS" solidNav>
+  <div class="admin-shell">
+    <aside class="admin-nav">
+      <span class="admin-brand label">VOIDHAUS Admin</span>
+      <nav class="admin-links">
+        <a href="/admin" class="label">Dashboard</a>
+        <a href="/admin/products" class="label">Products</a>
+        <a href="/admin/orders" class="label active">Orders</a>
+        <a href="/admin/messages" class="label">Messages</a>
+      </nav>
+    </aside>
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1 class="admin-title">Orders</h1>
+        <div class="filter-group">
+          <button class="filter-btn label active" data-status="">All</button>
+          <button class="filter-btn label" data-status="pending">Pending</button>
+          <button class="filter-btn label" data-status="paid">Paid</button>
+          <button class="filter-btn label" data-status="shipped">Shipped</button>
+          <button class="filter-btn label" data-status="delivered">Delivered</button>
+        </div>
+      </div>
+      <div id="orders-list">
+        <p class="label muted">Loading…</p>
+      </div>
+    </main>
+  </div>
+</Layout>
+
+<script>
+  import { ConvexHttpClient } from "convex/browser";
+  import { api } from "../../../convex/_generated/api";
+
+  const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
+  let currentFilter = "";
+
+  async function load(status?: string) {
+    const orders = await convex.query(api.orders.list, { status: status || undefined });
+    const wrap = document.getElementById("orders-list")!;
+
+    if (!orders.length) {
+      wrap.innerHTML = '<p class="label muted">No orders found.</p>';
+      return;
+    }
+
+    wrap.innerHTML = `<table class="orders-table">
+      <thead><tr>
+        <th class="label">Date</th>
+        <th class="label">Email</th>
+        <th class="label">Items</th>
+        <th class="label">Total</th>
+        <th class="label">Status</th>
+        <th class="label">Actions</th>
+      </tr></thead>
+      <tbody>${orders.map((o: any) => `<tr>
+        <td class="label">${new Date(o._creationTime).toLocaleDateString()}</td>
+        <td class="label">${o.customerEmail || '—'}</td>
+        <td class="label">${o.items.map((i: any) => `${i.name} (${i.size})`).join(', ')}</td>
+        <td class="label">€${o.total.toLocaleString()}</td>
+        <td class="label status-${o.status}">${o.status}</td>
+        <td class="label">
+          ${o.status === 'paid' ? `<button class="action-btn ship-btn" data-id="${o._id}">Mark Shipped</button>` : ''}
+          ${o.status === 'shipped' ? `<button class="action-btn deliver-btn" data-id="${o._id}">Mark Delivered</button>` : ''}
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+
+    wrap.querySelectorAll('.ship-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = (e.target as HTMLElement).dataset.id!;
+        await convex.mutation(api.orders.updateStatus, { id: id as any, status: 'shipped' });
+        load(currentFilter);
+      });
+    });
+
+    wrap.querySelectorAll('.deliver-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = (e.target as HTMLElement).dataset.id!;
+        await convex.mutation(api.orders.updateStatus, { id: id as any, status: 'delivered' });
+        load(currentFilter);
+      });
+    });
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      (e.target as HTMLElement).classList.add('active');
+      currentFilter = (e.target as HTMLElement).dataset.status || "";
+      load(currentFilter);
+    });
+  });
+
+  load();
+</script>
+
+<style>
+  .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  .admin-nav {
+    background: var(--color-ink); color: var(--color-white);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    display: flex; flex-direction: column; gap: var(--spacing-xl);
+    position: sticky; top: 0; height: 100vh;
+  }
+  .admin-brand { font-size: var(--text-sm); opacity: 0.6; }
+  .admin-links { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+  .admin-links a { color: var(--color-white); opacity: 0.7; text-decoration: none; padding: var(--spacing-xs) 0; transition: opacity var(--duration-fast); }
+  .admin-links a:hover, .admin-links a.active { opacity: 1; }
+  .admin-main { padding: var(--spacing-2xl) var(--spacing-xl); }
+  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-xl); flex-wrap: wrap; gap: var(--spacing-md); }
+  .admin-title { font-size: var(--text-2xl); font-variation-settings: var(--fw-medium); }
+  .filter-group { display: flex; gap: var(--spacing-xs); }
+  .filter-btn {
+    padding: 4px 12px; border: 1px solid var(--color-rule); background: none;
+    cursor: pointer; transition: all var(--duration-fast);
+  }
+  .filter-btn.active { background: var(--color-ink); color: var(--color-white); border-color: var(--color-ink); }
+  .orders-table { width: 100%; border-collapse: collapse; }
+  .orders-table th, .orders-table td { text-align: left; padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--color-rule); }
+  .status-paid { color: #16a34a; }
+  .status-pending { color: #ca8a04; }
+  .status-shipped { color: #2563eb; }
+  .status-delivered { color: #6b7280; }
+  .action-btn {
+    font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 4px 8px; border: 1px solid var(--color-rule); background: none;
+    cursor: pointer; transition: background var(--duration-fast);
+  }
+  .action-btn:hover { background: var(--color-off); }
+</style>

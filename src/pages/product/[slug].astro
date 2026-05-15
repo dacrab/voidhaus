@@ -96,6 +96,7 @@ const next = PRODUCTS[idx + 1] ?? null;
           class="btn-outline"
           id="js-add" type="button"
           data-product={JSON.stringify({ slug: p.slug, name: p.name, price: p.price, img: IMAGES[p.img].src, num: p.num })}
+          data-slug={p.slug}
         >
           <span class="label add-text w-full text-center tracking-[var(--ls-button)]">Add to Selection</span>
         </button>
@@ -147,8 +148,31 @@ document.addEventListener('astro:page-load', () => {
 
     const addBtn  = document.getElementById('js-add') as HTMLButtonElement | null;
     const addText = addBtn?.querySelector<HTMLElement>('.add-text');
+
+    // Stock check
+    const slug = addBtn?.dataset.slug;
+    if (slug && addBtn && addText) {
+      const convexUrl = (import.meta as any).env?.PUBLIC_CONVEX_URL || window.__CONVEX_URL__;
+      if (convexUrl) {
+        fetch(`${convexUrl}/api/query`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: 'products:getBySlug', args: { slug } }),
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data?.value?.stock === 0) {
+              addBtn.disabled = true;
+              addBtn.classList.add('sold-out');
+              addText.textContent = 'Sold Out';
+            }
+          })
+          .catch(() => {});
+      }
+    }
+
     addBtn?.addEventListener('click', () => {
-      if (!addText) return;
+      if (!addText || addBtn.disabled) return;
       const size = document.querySelector<HTMLElement>('.sz-btn.active')?.textContent?.trim() ?? '';
       if (!size) return;
       let product: Record<string, string>;
@@ -254,4 +278,7 @@ document.addEventListener('astro:page-load', () => {
 }
 .sz-btn:hover  { border-color: var(--color-mid); color: var(--color-ink); }
 .sz-btn.active { border-color: var(--color-ink); color: var(--color-ink); }
+
+.sold-out { opacity: 0.4; cursor: not-allowed; border-color: var(--color-rule); }
+.sold-out:hover { background: none; }
 </style>
