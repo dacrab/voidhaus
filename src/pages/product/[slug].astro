@@ -106,9 +106,9 @@ const next = PRODUCTS[idx + 1] ?? null;
     </div>
   </div>
 
-  <nav class="wrap py-10" aria-label="Product navigation">
+  <nav class="wrap py-14" aria-label="Product navigation">
     <div class="rule"></div>
-    <div class="flex justify-between py-6">
+    <div class="flex justify-between py-8">
       {prev ? <a href={`/product/${prev.slug}`} class="label muted-link">← {prev.name}</a>
              : <a href="/collection"             class="label muted-link">← Collection</a>}
       {next ? <a href={`/product/${next.slug}`} class="label muted-link">{next.name} →</a>
@@ -198,12 +198,12 @@ document.addEventListener('astro:page-load', () => {
       try { product = JSON.parse(addBtn.dataset.product ?? '{}'); } catch { return; }
       window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: { ...product, size } }));
       gsap.timeline()
-        .to(addText,  { opacity: 0, duration: 0.15, ease: 'power2.in' })
+        .to(addText,  { opacity: 0, duration: 0.25, ease: 'power2.in' })
         .set(addText, { textContent: 'Added ✓' })
-        .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' })
-        .to(addText,  { opacity: 0, duration: 0.15, delay: 1.5, ease: 'power2.in' })
+        .to(addText,  { opacity: 1, duration: 0.35,  ease: 'power2.out' })
+        .to(addText,  { opacity: 0, duration: 0.25, delay: 2, ease: 'power2.in' })
         .set(addText, { textContent: 'Add to Selection' })
-        .to(addText,  { opacity: 1, duration: 0.2,  ease: 'power2.out' });
+        .to(addText,  { opacity: 1, duration: 0.35,  ease: 'power2.out' });
     });
   });
 });
@@ -246,7 +246,7 @@ document.addEventListener('astro:page-load', () => {
 .pdp-info {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl);
+  gap: var(--spacing-2xl);
   padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-4xl);
 }
 @media (min-width: 768px) {

@@ -64,7 +64,7 @@
         if (menuLinks.length) {
           gsap.fromTo(menuLinks,
             { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger: 0.1 }
+            { opacity: 1, y: 0, duration: 0.9, ease: 'expo.out', stagger: 0.18 }
           );
         }
       });
@@ -149,11 +149,9 @@
   @media (min-width: 1024px) { .nav { padding-inline: var(--spacing-3xl); } }
 
   .nav.scrolled {
-    background: rgb(248 246 242 / 0.92);
+    background: rgb(248 246 242 / 0.97);
     color: var(--color-ink);
     box-shadow: 0 1px 0 var(--color-rule);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
   }
   .nav.hidden { transform: translateY(-100%); pointer-events: none; }
   .nav.open   { background: var(--color-white); color: var(--color-ink); box-shadow: none; transform: none; }

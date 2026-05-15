@@ -87,7 +87,9 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
   </head>
 
   <body>
-    <div id="js-veil" aria-hidden="true"></div>
+    <div id="js-veil" aria-hidden="true">
+      <span class="veil-mark">VOIDHAUS</span>
+    </div>
     <div class="cursor" id="js-cursor" aria-hidden="true"></div>
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:bg-[var(--color-white)] focus:px-md focus:py-sm focus:text-[var(--color-ink)] focus:border focus:border-[var(--color-ink)]">Skip to content</a>
     <Nav client:load solidNav={solidNav} />
@@ -115,6 +117,13 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
         document.addEventListener('mouseover', e => {
           const t = (e.target as Element).closest('a, button, [role="button"]');
           cursor?.classList.toggle('hover', !!t);
+          if (t) {
+            const isProduct = t.closest('.pc');
+            const isExternal = t instanceof HTMLAnchorElement && t.hostname !== location.hostname;
+            cursor?.setAttribute('data-label', isProduct ? 'View' : isExternal ? 'Open' : '');
+          } else {
+            cursor?.removeAttribute('data-label');
+          }
         });
         (function loop() {
           if (dirty) {
@@ -132,8 +141,21 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
           if (document.documentElement.hasAttribute('data-astro-transition')) {
             veil.remove();
           } else {
-            requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add('out')));
-            veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+            const mark = veil.querySelector('.veil-mark') as HTMLElement | null;
+            if (mark) {
+              mark.style.opacity = '1';
+              setTimeout(() => {
+                mark.style.opacity = '0';
+                mark.style.transform = 'scale(0.92)';
+                setTimeout(() => {
+                  veil.classList.add('out');
+                  veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+                }, 400);
+              }, 800);
+            } else {
+              requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add('out')));
+              veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+            }
           }
         }
 
