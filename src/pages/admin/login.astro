@@ -34,11 +34,41 @@ export const prerender = false;
     }
     button:hover { opacity: 0.85; }
     button:disabled { opacity: 0.4; cursor: not-allowed; }
-    .error { font-size: 0.75rem; color: #ef4444; text-align: center; }
     .field { margin-bottom: 1rem; }
+
+    /* Toast */
+    .toast-container {
+      position: fixed; top: 1.5rem; right: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      z-index: 9999; pointer-events: none;
+    }
+    .toast {
+      padding: 0.875rem 1.25rem; border-radius: 4px;
+      font-size: 0.8rem; letter-spacing: 0.02em;
+      display: flex; align-items: center; gap: 0.6rem;
+      pointer-events: auto; min-width: 260px;
+      transform: translateX(120%); opacity: 0;
+      animation: toast-in 0.3s ease forwards;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .toast.out { animation: toast-out 0.3s ease forwards; }
+    .toast-error { background: #1a1a1a; border: 1px solid #ef4444; color: #fca5a5; }
+    .toast-success { background: #1a1a1a; border: 1px solid #22c55e; color: #86efac; }
+    .toast-info { background: #1a1a1a; border: 1px solid #3b82f6; color: #93c5fd; }
+    .toast-icon { font-size: 1rem; flex-shrink: 0; }
+    .toast-dismiss {
+      margin-left: auto; background: none; border: none; color: inherit;
+      opacity: 0.5; cursor: pointer; font-size: 1rem; padding: 0; width: auto;
+      letter-spacing: 0;
+    }
+    .toast-dismiss:hover { opacity: 1; }
+    @keyframes toast-in { to { transform: translateX(0); opacity: 1; } }
+    @keyframes toast-out { to { transform: translateX(120%); opacity: 0; } }
   </style>
 </head>
 <body>
+  <div class="toast-container" id="toast-container"></div>
+
   <form class="login-card" id="login-form">
     <span class="brand">VOIDHAUS</span>
     <h1>Admin Access</h1>
@@ -51,47 +81,71 @@ export const prerender = false;
       <input type="password" id="password" name="password" placeholder="••••••••" required />
     </div>
     <button type="submit" id="submit-btn">Enter</button>
-    <p class="error" id="error" style="display:none"></p>
   </form>
 
   <script type="module">
     import { ConvexHttpClient } from "https://esm.sh/convex@1.39.1/browser";
 
-    const CONVEX_URL = document.querySelector('meta[name="convex-url"]')?.content
-      || window.__CONVEX_URL__
-      || "";
+    // Toast system
+    function toast(message, type = "info") {
+      const container = document.getElementById("toast-container");
+      const icons = { error: "✕", success: "✓", info: "ℹ" };
+      const el = document.createElement("div");
+      el.className = `toast toast-${type}`;
+      el.innerHTML = `
+        <span class="toast-icon">${icons[type]}</span>
+        <span>${message}</span>
+        <button class="toast-dismiss" aria-label="Dismiss">×</button>
+      `;
+      container.appendChild(el);
+      el.querySelector(".toast-dismiss").addEventListener("click", () => dismiss(el));
+      setTimeout(() => dismiss(el), 5000);
+    }
+
+    function dismiss(el) {
+      if (el.classList.contains("out")) return;
+      el.classList.add("out");
+      el.addEventListener("animationend", () => el.remove());
+    }
+
+    const CONVEX_URL = window.__CONVEX_URL__ || "";
+    if (!CONVEX_URL) {
+      toast("Backend not configured. Contact support.", "error");
+    }
 
     const convex = new ConvexHttpClient(CONVEX_URL);
 
     // Check if already logged in
     const existingToken = document.cookie.match(/vh-admin-session=([^;]+)/)?.[1];
     if (existingToken) {
-      window.location.href = "/admin";
+      toast("Already authenticated. Redirecting…", "success");
+      setTimeout(() => { window.location.href = "/admin"; }, 800);
     }
 
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("submit-btn");
-      const error = document.getElementById("error");
       btn.disabled = true;
-      error.style.display = "none";
 
-      const email = document.getElementById("email").value;
+      const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
+
+      if (!email) { toast("Please enter your email address.", "error"); btn.disabled = false; return; }
+      if (!password) { toast("Please enter your password.", "error"); btn.disabled = false; return; }
+
+      toast("Authenticating…", "info");
 
       try {
         const result = await convex.mutation("auth:login", { email, password });
         if (result.error) {
-          error.textContent = result.error;
-          error.style.display = "block";
+          toast("Invalid email or password. Please try again.", "error");
         } else {
-          // Set session cookie
           document.cookie = `vh-admin-session=${result.token}; path=/admin; max-age=${7 * 24 * 60 * 60}; samesite=strict`;
-          window.location.href = "/admin";
+          toast(`Welcome back, ${result.name || "Admin"}.`, "success");
+          setTimeout(() => { window.location.href = "/admin"; }, 1000);
         }
       } catch (err) {
-        error.textContent = "Connection error";
-        error.style.display = "block";
+        toast("Unable to reach the server. Check your connection.", "error");
       } finally {
         btn.disabled = false;
       }
