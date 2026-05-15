@@ -20,21 +20,27 @@ export const POST: APIRoute = async ({ request }) => {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-  } catch (err: any) {
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return new Response(`Webhook Error: ${message}`, { status: 400 });
   }
 
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const shipping = session.shipping_details?.address;
+    const session = event.data.object;
+    const customerDetails = session.customer_details;
+    const shippingDetails = (session as unknown as Record<string, unknown>).shipping_details as
+      | { name?: string; address?: Record<string, string | null> }
+      | undefined;
+
+    const shipping = shippingDetails?.address;
 
     await convex.mutation(api.orders.fulfill, {
       stripeSessionId: session.id,
-      stripePaymentIntentId: session.payment_intent as string,
-      customerEmail: session.customer_details?.email ?? undefined,
+      stripePaymentIntentId: (session.payment_intent as string) ?? "",
+      customerEmail: customerDetails?.email ?? undefined,
       shippingAddress: shipping
         ? {
-            name: session.shipping_details?.name ?? "",
+            name: shippingDetails?.name ?? "",
             line1: shipping.line1 ?? "",
             line2: shipping.line2 ?? undefined,
             city: shipping.city ?? "",
