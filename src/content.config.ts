@@ -5,7 +5,10 @@ import { api } from "../convex/_generated/api";
 const products = defineCollection({
   loader: async () => {
     const url = import.meta.env.CONVEX_URL || import.meta.env.PUBLIC_CONVEX_URL;
-    if (!url) throw new Error("CONVEX_URL not set");
+    if (!url) {
+      console.warn("[content] CONVEX_URL not set, skipping product fetch");
+      return [];
+    }
     const client = new ConvexHttpClient(url);
     const data = await client.query(api.products.list, {});
     return data.map((p) => ({
