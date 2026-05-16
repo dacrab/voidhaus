@@ -1,31 +1,18 @@
 ---
 export const prerender = false;
-import Layout from '@layouts/Layout.astro';
+import AdminLayout from '@layouts/AdminLayout.astro';
 ---
 
-<Layout title="Products — Admin — VOIDHAUS" solidNav>
-  <div class="admin-shell">
-    <aside class="admin-nav">
-      <span class="admin-brand label">VOIDHAUS Admin</span>
-      <nav class="admin-links">
-        <a href="/admin" class="label">Dashboard</a>
-        <a href="/admin/products" class="label active">Products</a>
-        <a href="/admin/orders" class="label">Orders</a>
-        <a href="/admin/coupons" class="label">Coupons</a>
-        <a href="/admin/messages" class="label">Messages</a>
-      </nav>
-    </aside>
-    <main class="admin-main">
-      <div class="admin-header">
-        <h1 class="admin-title">Products</h1>
-        <a href="/admin/products/new" class="add-btn label">+ Add Product</a>
-      </div>
-      <div id="products-list">
-        <p class="label muted">Loading…</p>
-      </div>
-    </main>
+<AdminLayout title="Products" active="products">
+  <div style="display:flex; justify-content:flex-end; margin-bottom:1.5rem;">
+    <a href="/admin/products/new" class="admin-btn admin-btn-primary">+ Add Product</a>
   </div>
-</Layout>
+  <div class="admin-card">
+    <div id="products-list">
+      <p class="muted" style="font-size:0.8rem;">Loading…</p>
+    </div>
+  </div>
+</AdminLayout>
 
 <script>
   import { ConvexHttpClient } from "convex/browser";
@@ -37,27 +24,20 @@ import Layout from '@layouts/Layout.astro';
     const products = await convex.query(api.products.list, { activeOnly: false });
     const wrap = document.getElementById("products-list")!;
 
-    wrap.innerHTML = `<table class="products-table">
+    wrap.innerHTML = `<table class="admin-table">
       <thead><tr>
-        <th class="label">Num</th>
-        <th class="label">Name</th>
-        <th class="label">Category</th>
-        <th class="label">Price</th>
-        <th class="label">Stock</th>
-        <th class="label">Active</th>
-        <th class="label">Actions</th>
+        <th>Num</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Active</th><th>Actions</th>
       </tr></thead>
-      <tbody>${products.map((p: any) => `<tr data-id="${p._id}">
-        <td class="label">${p.num}</td>
-        <td class="label">${p.name}</td>
-        <td class="label">${p.category}</td>
-        <td class="label">€${p.price.toLocaleString()}</td>
-        <td class="label ${p.stock < 5 ? 'low-stock' : ''}">${p.stock}</td>
-        <td class="label">${p.active ? '✓' : '✗'}</td>
-        <td class="label actions">
-          <a href="/admin/products/edit?slug=${p.slug}" class="action-btn">Edit</a>
-          <button class="action-btn toggle-btn" data-id="${p._id}" data-active="${p.active}">${p.active ? 'Deactivate' : 'Activate'}</button>
-          <button class="action-btn stock-btn" data-id="${p._id}">+Stock</button>
+      <tbody>${products.map((p: any) => `<tr>
+        <td>${p.num}</td>
+        <td>${p.name}</td>
+        <td>${p.category}</td>
+        <td>€${p.price.toLocaleString()}</td>
+        <td style="${p.stock < 5 ? 'color:#dc2626;font-weight:600' : ''}">${p.stock}</td>
+        <td>${p.active ? '✓' : '✗'}</td>
+        <td style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+          <a href="/admin/products/edit?slug=${p.slug}" class="admin-btn">Edit</a>
+          <button class="admin-btn toggle-btn" data-id="${p._id}" data-active="${p.active}">${p.active ? 'Deactivate' : 'Activate'}</button>
         </td>
       </tr>`).join('')}</tbody>
     </table>`;
@@ -70,49 +50,6 @@ import Layout from '@layouts/Layout.astro';
         load();
       });
     });
-
-    wrap.querySelectorAll('.stock-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        const id = (e.target as HTMLElement).dataset.id!;
-        const product = products.find((p: any) => p._id === id);
-        const amount = prompt(`Add stock for ${product?.name}:`, '5');
-        if (!amount) return;
-        await convex.mutation(api.products.update, { id: id as any, stock: (product?.stock ?? 0) + parseInt(amount) });
-        load();
-      });
-    });
   }
   load();
 </script>
-
-<style>
-  .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
-  .admin-nav {
-    background: var(--color-ink); color: var(--color-white);
-    padding: var(--spacing-xl) var(--spacing-lg);
-    display: flex; flex-direction: column; gap: var(--spacing-xl);
-    position: sticky; top: 0; height: 100vh;
-  }
-  .admin-brand { font-size: var(--text-sm); opacity: 0.6; }
-  .admin-links { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-  .admin-links a { color: var(--color-white); opacity: 0.7; text-decoration: none; padding: var(--spacing-xs) 0; transition: opacity var(--duration-fast); }
-  .admin-links a:hover, .admin-links a.active { opacity: 1; }
-  .admin-main { padding: var(--spacing-2xl) var(--spacing-xl); }
-  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-xl); }
-  .admin-title { font-size: var(--text-2xl); font-variation-settings: var(--fw-medium); }
-  .add-btn {
-    padding: 8px 16px; background: var(--color-ink); color: var(--color-white);
-    text-decoration: none; transition: opacity var(--duration-fast);
-  }
-  .add-btn:hover { opacity: 0.85; }
-  .products-table { width: 100%; border-collapse: collapse; }
-  .products-table th, .products-table td { text-align: left; padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--color-rule); }
-  .low-stock { color: #dc2626; font-weight: 600; }
-  .actions { display: flex; gap: var(--spacing-xs); }
-  .action-btn {
-    font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
-    padding: 4px 8px; border: 1px solid var(--color-rule); background: none;
-    cursor: pointer; transition: background var(--duration-fast);
-  }
-  .action-btn:hover { background: var(--color-off); }
-</style>

@@ -1,27 +1,15 @@
 ---
 export const prerender = false;
-import Layout from '@layouts/Layout.astro';
+import AdminLayout from '@layouts/AdminLayout.astro';
 ---
 
-<Layout title="Edit Product — Admin — VOIDHAUS" solidNav>
-  <div class="admin-shell">
-    <aside class="admin-nav">
-      <span class="admin-brand label">VOIDHAUS Admin</span>
-      <nav class="admin-links">
-        <a href="/admin" class="label">Dashboard</a>
-        <a href="/admin/products" class="label active">Products</a>
-        <a href="/admin/orders" class="label">Orders</a>
-        <a href="/admin/coupons" class="label">Coupons</a>
-        <a href="/admin/messages" class="label">Messages</a>
-      </nav>
-    </aside>
-    <main class="admin-main">
-      <div class="admin-header">
-        <h1 class="admin-title">Edit Product</h1>
-        <a href="/admin/products" class="label back-link">← Back to Products</a>
-      </div>
-      <div id="loading"><p class="label muted">Loading…</p></div>
-      <form id="edit-form" class="product-form" style="display:none">
+<AdminLayout title="Edit Product" active="products">
+  <div style="margin-bottom:1rem;">
+    <a href="/admin/products" class="admin-btn">← Back to Products</a>
+  </div>
+  <div id="loading"><p class="muted" style="font-size:0.8rem;">Loading…</p></div>
+  <div class="admin-card" id="edit-form-wrap" style="display:none">
+    <form id="edit-form">
         <input type="hidden" id="product-id" />
         <div class="form-grid">
           <div class="field">
@@ -96,14 +84,13 @@ import Layout from '@layouts/Layout.astro';
           </div>
         </div>
         <div class="form-actions">
-          <button type="submit" class="submit-btn label" id="submit-btn">Save Changes</button>
-          <button type="button" class="delete-btn label" id="delete-btn">Delete Product</button>
+          <button type="submit" class="admin-btn admin-btn-primary" id="submit-btn">Save Changes</button>
+          <button type="button" class="admin-btn admin-btn-danger" id="delete-btn">Delete Product</button>
         </div>
         <p id="status" class="status"></p>
       </form>
-    </main>
-  </div>
-</Layout>
+    </div>
+</AdminLayout>
 
 <script>
   import { ConvexHttpClient } from "convex/browser";
@@ -172,7 +159,7 @@ import Layout from '@layouts/Layout.astro';
 
     document.getElementById("loading")!.style.display = "none";
     const form = document.getElementById("edit-form") as HTMLFormElement;
-    form.style.display = "block";
+    document.getElementById("edit-form-wrap")!.style.display = "block";
 
     (document.getElementById("product-id") as HTMLInputElement).value = product._id;
     (document.getElementById("name") as HTMLInputElement).value = product.name;
@@ -245,52 +232,28 @@ import Layout from '@layouts/Layout.astro';
 </script>
 
 <style>
-  .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
-  .admin-nav {
-    background: var(--color-ink); color: var(--color-white);
-    padding: var(--spacing-xl) var(--spacing-lg);
-    display: flex; flex-direction: column; gap: var(--spacing-xl);
-    position: sticky; top: 0; height: 100vh;
-  }
-  .admin-brand { font-size: var(--text-sm); opacity: 0.6; }
-  .admin-links { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-  .admin-links a { color: var(--color-white); opacity: 0.7; text-decoration: none; padding: var(--spacing-xs) 0; transition: opacity var(--duration-fast); }
-  .admin-links a:hover, .admin-links a.active { opacity: 1; }
-  .admin-main { padding: var(--spacing-2xl) var(--spacing-xl); max-width: 900px; }
-  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-xl); }
-  .admin-title { font-size: var(--text-2xl); font-variation-settings: var(--fw-medium); }
-  .back-link { opacity: var(--op-muted); transition: opacity var(--duration-fast); }
-  .back-link:hover { opacity: 1; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field.full { grid-column: 1 / -1; }
-  .field label { opacity: 0.6; }
+  .field label { font-size: 0.7rem; color: var(--admin-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; }
   .field input, .field select, .field textarea {
-    background: none; border: 1px solid var(--color-rule); padding: 10px 12px;
-    font-size: 14px; font-family: inherit; color: var(--color-ink); outline: none;
-    transition: border-color var(--duration-fast);
+    background: #fafafa; border: 1px solid #e5e5e5; padding: 0.6rem 0.75rem;
+    font-size: 0.85rem; font-family: inherit; border-radius: 4px; outline: none;
+    transition: border-color 0.15s;
   }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--color-ink); }
-  .form-actions { display: flex; gap: var(--spacing-md); margin-top: var(--spacing-xl); }
-  .size-stock-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #1c1b19; }
+  .form-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+  .size-stock-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .size-stock-item { display: flex; align-items: center; gap: 6px; }
-  .size-label { font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.6; min-width: 30px; }
-  .size-stock-input { width: 60px; background: none; border: 1px solid var(--color-rule); padding: 6px 8px; font-size: 13px; color: var(--color-ink); outline: none; text-align: center; }
-  .size-stock-input:focus { border-color: var(--color-ink); }
-  .file-input { font-size: 13px; margin-top: 4px; }
-  .upload-status { font-size: 12px; opacity: 0.7; margin-left: 8px; }
-  .submit-btn {
-    padding: 12px 24px; background: var(--color-ink); color: var(--color-white);
-    border: none; cursor: pointer; transition: opacity var(--duration-fast);
+  .size-label { font-size: 0.7rem; text-transform: uppercase; color: #6b7280; min-width: 30px; }
+  .size-stock-input {
+    width: 60px; background: #fafafa; border: 1px solid #e5e5e5; padding: 0.4rem;
+    font-size: 0.8rem; border-radius: 4px; text-align: center; outline: none;
   }
-  .submit-btn:hover { opacity: 0.85; }
-  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .delete-btn {
-    padding: 12px 24px; background: none; color: #dc2626;
-    border: 1px solid #dc2626; cursor: pointer; transition: background var(--duration-fast);
-  }
-  .delete-btn:hover { background: #fef2f2; }
-  .status { margin-top: var(--spacing-md); font-size: 14px; }
+  .size-stock-input:focus { border-color: #1c1b19; }
+  .file-input { font-size: 0.8rem; margin-top: 4px; }
+  .upload-status { font-size: 0.75rem; color: #6b7280; }
+  .status { margin-top: 1rem; font-size: 0.8rem; }
   .status.success { color: #16a34a; }
   .status.error { color: #dc2626; }
 </style>
