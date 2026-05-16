@@ -17,10 +17,6 @@
   let scrolled = $state(false);
   let hidden = $state(false);
 
-  $effect(() => {
-    scrolled = solidNav || window.scrollY > 40;
-  });
-
   const links = [
     { href: '/collection', label: 'Curated Collection' },
     { href: '/lookbook', label: 'Lookbook' },
@@ -31,16 +27,16 @@
 
   onMount(() => {
     path = window.location.pathname;
-    document.addEventListener('astro:page-load', () => {
-      path = window.location.pathname;
-    });
+    scrolled = solidNav || window.scrollY > 40;
+
+    const onPageLoad = () => { path = window.location.pathname; };
+    document.addEventListener('astro:page-load', onPageLoad);
 
     const syncCart = () => { cartCount = getCart().length; };
     syncCart();
     window.addEventListener('vh:cart-updated', syncCart);
 
     let lastY = 0;
-    scrolled = solidNav;
     const onScroll = () => {
       const y = window.scrollY;
       scrolled = solidNav || y > 40;
@@ -48,6 +44,12 @@
       lastY = y;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      document.removeEventListener('astro:page-load', onPageLoad);
+      window.removeEventListener('vh:cart-updated', syncCart);
+      window.removeEventListener('scroll', onScroll);
+    };
   });
 
   function openCart() { window.dispatchEvent(new Event('vh:open-cart')); }
