@@ -4,142 +4,90 @@ import AdminLayout from '@layouts/AdminLayout.astro';
 ---
 
 <AdminLayout title="Add Product" active="products">
-  <div style="margin-bottom:1rem;">
-    <a href="/admin/products" class="admin-btn">← Back to Products</a>
-  </div>
-  <div class="admin-card">
-    <form id="product-form" class="product-form">
-        <div class="form-grid">
-          <div class="field">
-            <label class="label" for="name">Name</label>
-            <input type="text" id="name" name="name" required placeholder="Obsidian Coat" />
-          </div>
-          <div class="field">
-            <label class="label" for="slug">Slug</label>
-            <input type="text" id="slug" name="slug" required placeholder="obsidian-coat" />
-          </div>
-          <div class="field">
-            <label class="label" for="num">Number</label>
-            <input type="text" id="num" name="num" required placeholder="013" />
-          </div>
-          <div class="field">
-            <label class="label" for="price">Price (€)</label>
-            <input type="number" id="price" name="price" required placeholder="2400" />
-          </div>
-          <div class="field">
-            <label class="label" for="category">Category</label>
-            <select id="category" name="category" required>
-              <option value="Outerwear">Outerwear</option>
-              <option value="Tailoring">Tailoring</option>
-              <option value="Ready-to-wear">Ready-to-wear</option>
-              <option value="Knitwear">Knitwear</option>
-              <option value="Tops">Tops</option>
-              <option value="Footwear">Footwear</option>
-              <option value="Accessories">Accessories</option>
-            </select>
-          </div>
-          <div class="field">
-            <label class="label" for="stock">Stock</label>
-            <input type="number" id="stock" name="stock" required placeholder="10" />
-          </div>
-          <div class="field">
-            <label class="label" for="material">Material</label>
-            <input type="text" id="material" name="material" required placeholder="Virgin wool, silk lining" />
-          </div>
-          <div class="field">
-            <label class="label" for="origin">Origin</label>
-            <input type="text" id="origin" name="origin" required placeholder="Milan, Italy" />
-          </div>
-          <div class="field full">
-            <label class="label" for="desc">Description</label>
-            <textarea id="desc" name="desc" rows="3" required placeholder="Product description..."></textarea>
-          </div>
-          <div class="field">
-            <label class="label" for="sizes">Sizes (comma-separated)</label>
-            <input type="text" id="sizes" name="sizes" required placeholder="XS, S, M, L, XL" />
-          </div>
-          <div class="field">
-            <label class="label" for="img">Image key</label>
-            <input type="text" id="img" name="img" required placeholder="coat-primary" />
-          </div>
-          <div class="field">
-            <label class="label" for="img2">Secondary image key (optional)</label>
-            <input type="text" id="img2" name="img2" placeholder="coat-secondary" />
-          </div>
+  <a href="/admin/products" class="text-[0.7rem] uppercase tracking-wide px-3 py-1.5 border border-zinc-200 rounded bg-white hover:bg-zinc-50 no-underline text-zinc-600 inline-block mb-5">← Back</a>
+  <div class="bg-white border border-zinc-200 rounded-lg p-6">
+    <form id="product-form">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="name">Name</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="name" name="name" required placeholder="Obsidian Coat" />
         </div>
-        <button type="submit" class="admin-btn admin-btn-primary" id="submit-btn">Create Product</button>
-        <p id="status" class="status"></p>
-      </form>
-    </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="slug">Slug</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="slug" name="slug" required placeholder="obsidian-coat" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="num">Number</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="num" name="num" required placeholder="013" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="price">Price (€)</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="number" id="price" name="price" required placeholder="2400" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="category">Category</label>
+          <select class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" id="category" name="category" required>
+            <option value="Outerwear">Outerwear</option><option value="Tailoring">Tailoring</option><option value="Ready-to-wear">Ready-to-wear</option><option value="Knitwear">Knitwear</option><option value="Tops">Tops</option><option value="Footwear">Footwear</option><option value="Accessories">Accessories</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="stock">Stock</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="number" id="stock" name="stock" required placeholder="10" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="material">Material</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="material" name="material" required placeholder="Virgin wool" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="origin">Origin</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="origin" name="origin" required placeholder="Milan, Italy" />
+        </div>
+        <div class="flex flex-col gap-1 sm:col-span-2">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="desc">Description</label>
+          <textarea class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" id="desc" name="desc" rows="3" required placeholder="Product description..."></textarea>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="sizes">Sizes (comma-separated)</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="sizes" name="sizes" required placeholder="XS, S, M, L, XL" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="img">Image key</label>
+          <input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="img" name="img" required placeholder="coat-primary" />
+        </div>
+      </div>
+      <button type="submit" class="text-xs uppercase tracking-wide px-5 py-2.5 bg-zinc-900 text-white rounded hover:bg-zinc-800 transition-colors mt-6" id="submit-btn">Create Product</button>
+      <p id="status" class="text-sm mt-3"></p>
+    </form>
+  </div>
 </AdminLayout>
 
 <script>
   import { ConvexHttpClient } from "convex/browser";
   import { api } from "../../../../convex/_generated/api";
-
   const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
 
-  // Auto-generate slug from name
   document.getElementById("name")!.addEventListener("input", (e) => {
-    const name = (e.target as HTMLInputElement).value;
-    const slugField = document.getElementById("slug") as HTMLInputElement;
-    if (!slugField.dataset.manual) {
-      slugField.value = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    }
+    const slug = document.getElementById("slug") as HTMLInputElement;
+    if (!slug.dataset.manual) slug.value = (e.target as HTMLInputElement).value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   });
-  document.getElementById("slug")!.addEventListener("input", (e) => {
-    (e.target as HTMLInputElement).dataset.manual = "true";
-  });
+  document.getElementById("slug")!.addEventListener("input", (e) => { (e.target as HTMLInputElement).dataset.manual = "true"; });
 
   document.getElementById("product-form")!.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const form = e.target as HTMLFormElement;
     const btn = document.getElementById("submit-btn") as HTMLButtonElement;
     const status = document.getElementById("status")!;
-    btn.disabled = true;
-    btn.textContent = "Creating…";
-
+    btn.disabled = true; btn.textContent = "Creating…";
     try {
-      const data = new FormData(form);
-      await convex.mutation(api.products.create, {
-        name: data.get("name") as string,
-        slug: data.get("slug") as string,
-        num: data.get("num") as string,
-        price: Number(data.get("price")),
-        category: data.get("category") as string,
-        material: data.get("material") as string,
-        origin: data.get("origin") as string,
-        desc: data.get("desc") as string,
-        sizes: (data.get("sizes") as string).split(",").map((s) => s.trim()),
-        img: data.get("img") as string,
-        img2: (data.get("img2") as string) || undefined,
-        stock: Number(data.get("stock")),
-      });
-      status.textContent = "✓ Product created";
-      status.className = "status success";
-      form.reset();
-    } catch (err: any) {
-      status.textContent = `✗ ${err.message}`;
-      status.className = "status error";
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Create Product";
-    }
+      const d = new FormData(e.target as HTMLFormElement);
+      const sizes = (d.get("sizes") as string).split(",").map(s => s.trim());
+      const stock = Number(d.get("stock"));
+      const perSize = Math.max(1, Math.floor(stock / sizes.length));
+      const sizeStock: Record<string, number> = {}; let remaining = stock;
+      sizes.forEach(s => { const q = Math.min(perSize, remaining); sizeStock[s] = q; remaining -= q; });
+      if (remaining > 0) sizeStock[sizes[0]] += remaining;
+      await convex.mutation(api.products.create, { name: d.get("name") as string, slug: d.get("slug") as string, num: d.get("num") as string, price: Number(d.get("price")), category: d.get("category") as string, material: d.get("material") as string, origin: d.get("origin") as string, desc: d.get("desc") as string, sizes, sizeStock, img: d.get("img") as string });
+      status.textContent = "✓ Created"; status.style.color = "#16a34a"; (e.target as HTMLFormElement).reset();
+    } catch (err: any) { status.textContent = "✗ " + err.message; status.style.color = "#dc2626"; }
+    finally { btn.disabled = false; btn.textContent = "Create Product"; }
   });
 </script>
-
-<style>
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field.full { grid-column: 1 / -1; }
-  .field label { font-size: 0.7rem; color: var(--admin-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; }
-  .field input, .field select, .field textarea {
-    background: #fafafa; border: 1px solid #e5e5e5; padding: 0.6rem 0.75rem;
-    font-size: 0.85rem; font-family: inherit; border-radius: 4px; outline: none;
-    transition: border-color 0.15s;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: #1c1b19; }
-  .status { margin-top: 1rem; font-size: 0.8rem; }
-  .status.success { color: #16a34a; }
-  .status.error { color: #dc2626; }
-</style>

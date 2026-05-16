@@ -7,64 +7,89 @@ const convexUrl = import.meta.env.PUBLIC_CONVEX_URL || '';
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="convex-url" content={convexUrl} />
   <title>Admin Login — VOIDHAUS</title>
   <style>
-    * { margin: 0; box-sizing: border-box; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+    *, *::before, *::after { margin: 0; box-sizing: border-box; }
     body {
-      font-family: system-ui, sans-serif;
-      background: #1c1b19; color: #f8f6f2;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0a0a; color: #fafafa;
       min-height: 100vh; display: flex; align-items: center; justify-content: center;
     }
     .login-card {
-      width: min(380px, 90vw); padding: 3rem 2rem;
-      display: flex; flex-direction: column; gap: 1.5rem;
+      width: min(400px, 90vw); padding: 3rem 2.5rem;
+      display: flex; flex-direction: column; gap: 2rem;
     }
-    .brand { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.4; }
-    h1 { font-size: 1.5rem; font-weight: 300; letter-spacing: -0.02em; }
-    label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; display: block; margin-bottom: 0.4rem; }
+    .brand { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.3; font-weight: 500; }
+    h1 { font-size: 1.6rem; font-weight: 300; letter-spacing: -0.03em; }
+    label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.4; display: block; margin-bottom: 0.5rem; font-weight: 500; }
     input {
-      width: 100%; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.15);
-      color: #f8f6f2; font-size: 1rem; padding: 0.75rem 0; outline: none;
-      transition: border-color 0.2s;
+      width: 100%; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: #fafafa; font-size: 0.95rem; padding: 0.75rem 0; outline: none;
+      font-family: inherit; transition: border-color 0.3s;
     }
-    input:focus { border-color: rgba(255,255,255,0.5); }
-    button {
-      width: 100%; padding: 0.875rem; background: #f8f6f2; color: #1c1b19;
+    input:focus { border-color: rgba(255,255,255,0.4); }
+    input::placeholder { color: rgba(255,255,255,0.2); }
+    .field { margin-bottom: 0.5rem; }
+    button[type="submit"] {
+      width: 100%; padding: 1rem; background: #fafafa; color: #0a0a0a;
       border: none; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
-      cursor: pointer; transition: opacity 0.2s;
+      font-weight: 500; font-family: inherit;
+      cursor: pointer; transition: opacity 0.2s, transform 0.2s;
+      margin-top: 0.5rem;
     }
-    button:hover { opacity: 0.85; }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
-    .field { margin-bottom: 1rem; }
+    button[type="submit"]:hover { opacity: 0.9; transform: translateY(-1px); }
+    button[type="submit"]:active { transform: translateY(0); }
+    button[type="submit"]:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
+    /* Toasts */
     .toast-container {
-      position: fixed; top: 1.5rem; right: 1.5rem;
-      display: flex; flex-direction: column; gap: 0.5rem;
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
       z-index: 9999; pointer-events: none;
     }
     .toast {
-      padding: 0.875rem 1.25rem; border-radius: 6px;
-      font-size: 0.8rem; letter-spacing: 0.02em;
-      display: flex; align-items: center; gap: 0.6rem;
-      pointer-events: auto; min-width: 260px; max-width: 360px;
-      transform: translateX(120%); opacity: 0;
-      animation: toast-in 0.35s cubic-bezier(0.16,1,0.3,1) forwards;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      pointer-events: auto;
+      padding: 0.85rem 1.5rem;
+      border-radius: 100px;
+      font-size: 0.8rem; font-weight: 400; letter-spacing: 0.01em;
+      display: flex; align-items: center; gap: 0.75rem;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      transform: translateY(20px) scale(0.95); opacity: 0;
+      animation: toast-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 0.5px 0 rgba(255,255,255,0.05);
     }
-    .toast.out { animation: toast-out 0.25s ease forwards; }
-    .toast-error { background: #1c1c1c; border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; }
-    .toast-success { background: #1c1c1c; border: 1px solid rgba(34,197,94,0.4); color: #86efac; }
-    .toast-info { background: #1c1c1c; border: 1px solid rgba(255,255,255,0.1); color: #d4d4d4; }
-    .toast-icon { flex-shrink: 0; }
-    .toast-dismiss {
-      margin-left: auto; background: none; border: none; color: inherit;
-      opacity: 0.4; cursor: pointer; font-size: 1.1rem; padding: 0; width: auto;
-      letter-spacing: 0; line-height: 1;
+    .toast.out {
+      animation: toast-out 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
     }
-    .toast-dismiss:hover { opacity: 1; }
-    @keyframes toast-in { to { transform: translateX(0); opacity: 1; } }
-    @keyframes toast-out { to { transform: translateX(120%); opacity: 0; } }
+    .toast-error {
+      background: rgba(30, 10, 10, 0.85);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+    .toast-success {
+      background: rgba(10, 30, 15, 0.85);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      color: #86efac;
+    }
+    .toast-info {
+      background: rgba(20, 20, 20, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #a1a1aa;
+    }
+    .toast-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    }
+    .toast-error .toast-dot { background: #ef4444; }
+    .toast-success .toast-dot { background: #22c55e; }
+    .toast-info .toast-dot { background: #71717a; }
+
+    @keyframes toast-in {
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes toast-out {
+      to { transform: translateY(10px) scale(0.95); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -85,65 +110,64 @@ const convexUrl = import.meta.env.PUBLIC_CONVEX_URL || '';
   </form>
 
   <script is:inline define:vars={{ convexUrl }}>
-    // Toast
     function toast(message, type) {
       const container = document.getElementById("toast-container");
-      const icons = { error: "✕", success: "✓", info: "→" };
+      container.querySelectorAll(".toast").forEach(function(t) { dismiss(t); });
       const el = document.createElement("div");
       el.className = "toast toast-" + type;
-      el.innerHTML = '<span class="toast-icon">' + icons[type] + '</span><span>' + message + '</span><button class="toast-dismiss" aria-label="Dismiss">×</button>';
+      el.innerHTML = '<span class="toast-dot"></span><span>' + message + '</span>';
       container.appendChild(el);
-      el.querySelector(".toast-dismiss").addEventListener("click", function() { dismiss(el); });
-      setTimeout(function() { dismiss(el); }, 4000);
+      setTimeout(function() { dismiss(el); }, 3500);
     }
     function dismiss(el) {
-      if (el.classList.contains("out")) return;
+      if (!el || el.classList.contains("out")) return;
       el.classList.add("out");
       el.addEventListener("animationend", function() { el.remove(); });
     }
 
-    // Convex HTTP mutation via fetch
-    async function convexMutation(path, args) {
-      const res = await fetch(convexUrl + "/api/mutation", {
+    async function convexAction(path, args) {
+      const res = await fetch(convexUrl + "/api/action", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ path: path, args: args, format: "json" }),
       });
-      if (!res.ok) throw new Error("Request failed: " + res.status);
+      if (!res.ok) throw new Error("Request failed");
       const data = await res.json();
       if (data.status === "error") throw new Error(data.errorMessage);
       return data.value;
     }
 
-    // If already logged in, just go to admin
     if (document.cookie.match(/vh-admin-session=([^;]+)/)) {
       window.location.replace("/admin");
     }
 
     document.getElementById("login-form").addEventListener("submit", async function(e) {
       e.preventDefault();
-      var btn = document.getElementById("submit-btn");
+      const btn = document.getElementById("submit-btn");
       btn.disabled = true;
 
-      var email = document.getElementById("email").value.trim();
-      var password = document.getElementById("password").value;
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-      if (!email) { toast("Please enter your email address.", "error"); btn.disabled = false; return; }
-      if (!password) { toast("Please enter your password.", "error"); btn.disabled = false; return; }
+      if (!email || !password) {
+        toast("Please fill in all fields", "error");
+        btn.disabled = false;
+        return;
+      }
 
       toast("Signing in…", "info");
 
       try {
-        var result = await convexMutation("auth:login", { email: email, password: password });
+        const result = await convexAction("auth:login", { email: email, password: password });
         if (result.error) {
-          toast("Invalid email or password.", "error");
+          toast("Invalid credentials", "error");
         } else {
           document.cookie = "vh-admin-session=" + result.token + "; path=/admin; max-age=" + (7*24*60*60) + "; samesite=strict";
-          toast("Welcome back, " + (result.name || "Admin") + ".", "success");
-          setTimeout(function() { window.location.href = "/admin"; }, 1000);
+          toast("Welcome back, " + (result.name || "Admin"), "success");
+          setTimeout(function() { window.location.href = "/admin"; }, 800);
         }
       } catch (err) {
-        toast("Unable to connect. Check your network.", "error");
+        toast("Connection failed — try again", "error");
       } finally {
         btn.disabled = false;
       }
