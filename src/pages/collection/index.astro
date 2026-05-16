@@ -1,8 +1,10 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import ProductCard from '@components/ProductCard.astro';
-import { PRODUCTS, CATEGORIES } from '@data/products';
+import { getProducts, CATEGORIES } from '@data/products';
 import { SITE } from '@data/site';
+
+const PRODUCTS = await getProducts();
 ---
 
 <Layout title="Collection" solidNav={true}>
