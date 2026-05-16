@@ -17,15 +17,17 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const { request } = e;
-  if (request.method !== 'GET') return;
-  // Skip API routes and admin
   const url = new URL(request.url);
+
+  // Only cache http/https GET requests from our origin
+  if (request.method !== 'GET') return;
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
   if (url.pathname.startsWith('/api') || url.pathname.startsWith('/admin')) return;
 
   e.respondWith(
     caches.match(request).then((cached) => {
       const fetched = fetch(request).then((res) => {
-        if (res.ok) {
+        if (res.ok && res.type === 'basic') {
           const clone = res.clone();
           caches.open(CACHE).then((c) => c.put(request, clone));
         }

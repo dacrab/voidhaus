@@ -1,11 +1,13 @@
 ---
 export const prerender = false;
+const convexUrl = import.meta.env.PUBLIC_CONVEX_URL || '';
 ---
 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="convex-url" content={convexUrl} />
   <title>Admin Login — VOIDHAUS</title>
   <style>
     * { margin: 0; box-sizing: border-box; }
@@ -36,30 +38,29 @@ export const prerender = false;
     button:disabled { opacity: 0.4; cursor: not-allowed; }
     .field { margin-bottom: 1rem; }
 
-    /* Toast */
     .toast-container {
       position: fixed; top: 1.5rem; right: 1.5rem;
       display: flex; flex-direction: column; gap: 0.5rem;
       z-index: 9999; pointer-events: none;
     }
     .toast {
-      padding: 0.875rem 1.25rem; border-radius: 4px;
+      padding: 0.875rem 1.25rem; border-radius: 6px;
       font-size: 0.8rem; letter-spacing: 0.02em;
       display: flex; align-items: center; gap: 0.6rem;
-      pointer-events: auto; min-width: 260px;
+      pointer-events: auto; min-width: 260px; max-width: 360px;
       transform: translateX(120%); opacity: 0;
-      animation: toast-in 0.3s ease forwards;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      animation: toast-in 0.35s cubic-bezier(0.16,1,0.3,1) forwards;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
-    .toast.out { animation: toast-out 0.3s ease forwards; }
-    .toast-error { background: #1a1a1a; border: 1px solid #ef4444; color: #fca5a5; }
-    .toast-success { background: #1a1a1a; border: 1px solid #22c55e; color: #86efac; }
-    .toast-info { background: #1a1a1a; border: 1px solid #3b82f6; color: #93c5fd; }
-    .toast-icon { font-size: 1rem; flex-shrink: 0; }
+    .toast.out { animation: toast-out 0.25s ease forwards; }
+    .toast-error { background: #1c1c1c; border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; }
+    .toast-success { background: #1c1c1c; border: 1px solid rgba(34,197,94,0.4); color: #86efac; }
+    .toast-info { background: #1c1c1c; border: 1px solid rgba(255,255,255,0.1); color: #d4d4d4; }
+    .toast-icon { flex-shrink: 0; }
     .toast-dismiss {
       margin-left: auto; background: none; border: none; color: inherit;
-      opacity: 0.5; cursor: pointer; font-size: 1rem; padding: 0; width: auto;
-      letter-spacing: 0;
+      opacity: 0.4; cursor: pointer; font-size: 1.1rem; padding: 0; width: auto;
+      letter-spacing: 0; line-height: 1;
     }
     .toast-dismiss:hover { opacity: 1; }
     @keyframes toast-in { to { transform: translateX(0); opacity: 1; } }
@@ -67,85 +68,83 @@ export const prerender = false;
   </style>
 </head>
 <body>
-  <div class="toast-container" id="toast-container"></div>
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-  <form class="login-card" id="login-form">
+  <form class="login-card" id="login-form" autocomplete="on">
     <span class="brand">VOIDHAUS</span>
     <h1>Admin Access</h1>
     <div class="field">
       <label for="email">Email</label>
-      <input type="email" id="email" name="email" placeholder="admin@voidhaus.com" required autofocus />
+      <input type="email" id="email" name="email" autocomplete="email" placeholder="admin@voidhaus.com" required autofocus />
     </div>
     <div class="field">
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="••••••••" required />
+      <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required />
     </div>
     <button type="submit" id="submit-btn">Enter</button>
   </form>
 
-  <script type="module">
-    import { ConvexHttpClient } from "https://esm.sh/convex@1.39.1/browser";
-
-    // Toast system
-    function toast(message, type = "info") {
+  <script is:inline define:vars={{ convexUrl }}>
+    // Toast
+    function toast(message, type) {
       const container = document.getElementById("toast-container");
-      const icons = { error: "✕", success: "✓", info: "ℹ" };
+      const icons = { error: "✕", success: "✓", info: "→" };
       const el = document.createElement("div");
-      el.className = `toast toast-${type}`;
-      el.innerHTML = `
-        <span class="toast-icon">${icons[type]}</span>
-        <span>${message}</span>
-        <button class="toast-dismiss" aria-label="Dismiss">×</button>
-      `;
+      el.className = "toast toast-" + type;
+      el.innerHTML = '<span class="toast-icon">' + icons[type] + '</span><span>' + message + '</span><button class="toast-dismiss" aria-label="Dismiss">×</button>';
       container.appendChild(el);
-      el.querySelector(".toast-dismiss").addEventListener("click", () => dismiss(el));
-      setTimeout(() => dismiss(el), 5000);
+      el.querySelector(".toast-dismiss").addEventListener("click", function() { dismiss(el); });
+      setTimeout(function() { dismiss(el); }, 4000);
     }
-
     function dismiss(el) {
       if (el.classList.contains("out")) return;
       el.classList.add("out");
-      el.addEventListener("animationend", () => el.remove());
+      el.addEventListener("animationend", function() { el.remove(); });
     }
 
-    const CONVEX_URL = window.__CONVEX_URL__ || "";
-    if (!CONVEX_URL) {
-      toast("Backend not configured. Contact support.", "error");
+    // Convex HTTP mutation via fetch
+    async function convexMutation(path, args) {
+      const res = await fetch(convexUrl + "/api/mutation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: path, args: args, format: "json" }),
+      });
+      if (!res.ok) throw new Error("Request failed: " + res.status);
+      const data = await res.json();
+      if (data.status === "error") throw new Error(data.errorMessage);
+      return data.value;
     }
 
-    const convex = new ConvexHttpClient(CONVEX_URL);
-
-    // Check if already logged in
-    const existingToken = document.cookie.match(/vh-admin-session=([^;]+)/)?.[1];
-    if (existingToken) {
+    // Redirect if already logged in
+    if (document.cookie.match(/vh-admin-session=([^;]+)/)) {
       toast("Already authenticated. Redirecting…", "success");
-      setTimeout(() => { window.location.href = "/admin"; }, 800);
+      setTimeout(function() { window.location.href = "/admin"; }, 800);
     }
 
-    document.getElementById("login-form").addEventListener("submit", async (e) => {
+    document.getElementById("login-form").addEventListener("submit", async function(e) {
       e.preventDefault();
-      const btn = document.getElementById("submit-btn");
+      var btn = document.getElementById("submit-btn");
       btn.disabled = true;
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+      var email = document.getElementById("email").value.trim();
+      var password = document.getElementById("password").value;
 
       if (!email) { toast("Please enter your email address.", "error"); btn.disabled = false; return; }
       if (!password) { toast("Please enter your password.", "error"); btn.disabled = false; return; }
 
-      toast("Authenticating…", "info");
+      toast("Signing in…", "info");
 
       try {
-        const result = await convex.mutation("auth:login", { email, password });
+        var result = await convexMutation("auth:login", { email: email, password: password });
         if (result.error) {
-          toast("Invalid email or password. Please try again.", "error");
+          toast("Invalid email or password.", "error");
         } else {
-          document.cookie = `vh-admin-session=${result.token}; path=/admin; max-age=${7 * 24 * 60 * 60}; samesite=strict`;
-          toast(`Welcome back, ${result.name || "Admin"}.`, "success");
-          setTimeout(() => { window.location.href = "/admin"; }, 1000);
+          document.cookie = "vh-admin-session=" + result.token + "; path=/admin; max-age=" + (7*24*60*60) + "; samesite=strict";
+          toast("Welcome back, " + (result.name || "Admin") + ".", "success");
+          setTimeout(function() { window.location.href = "/admin"; }, 1000);
         }
       } catch (err) {
-        toast("Unable to reach the server. Check your connection.", "error");
+        toast("Unable to connect. Check your network.", "error");
       } finally {
         btn.disabled = false;
       }
