@@ -1,0 +1,41 @@
+---
+export const prerender = false;
+import AdminLayout from '@layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Messages" active="messages">
+  <div id="messages-list">
+    <p class="text-sm text-zinc-400">Loading…</p>
+  </div>
+</AdminLayout>
+
+<script>
+  import { ConvexHttpClient } from "convex/browser";
+  import { api } from "../../../convex/_generated/api";
+
+  const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
+
+  async function load() {
+    const messages = await convex.query(api.messages.list, {});
+    const wrap = document.getElementById("messages-list")!;
+    if (!messages.length) { wrap.innerHTML = '<p class="text-sm text-zinc-400">No messages yet.</p>'; return; }
+
+    wrap.innerHTML = messages.map((m: any) => `
+      <div class="bg-white border border-zinc-200 rounded-lg p-5 mb-3 ${m.read ? 'opacity-50' : ''}">
+        <div class="flex items-center gap-2 text-sm flex-wrap mb-1">
+          <strong>${m.name}</strong>
+          <span class="text-zinc-400">&lt;${m.email}&gt;</span>
+          <span class="text-zinc-400 ml-auto text-xs">${new Date(m._creationTime).toLocaleDateString()}</span>
+        </div>
+        <div class="text-xs text-zinc-400 mb-2">${m.subject}</div>
+        <p class="text-sm leading-relaxed">${m.message}</p>
+        ${!m.read ? `<button class="text-[0.7rem] uppercase tracking-wide px-3 py-1 border border-zinc-200 rounded bg-white hover:bg-zinc-50 mt-3 mark-read-btn" data-id="${m._id}">Mark Read</button>` : ''}
+      </div>
+    `).join('');
+
+    wrap.querySelectorAll('.mark-read-btn').forEach(btn => btn.addEventListener('click', async (e) => {
+      await convex.mutation(api.messages.markRead, { id: (e.target as HTMLElement).dataset.id as any }); load();
+    }));
+  }
+  load();
+</script>

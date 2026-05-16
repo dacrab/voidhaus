@@ -53,14 +53,19 @@ const { slug, num, name, price, img, img2, category, imgWidth = 800 } = Astro.pr
 </article>
 
 <style>
+.pc-media {
+  transition: transform 0.9s var(--ease-out), box-shadow 0.9s var(--ease-out);
+}
 .pc-img img {
   object-fit: cover;
   object-position: center top;
-  transition: transform var(--duration-slowest) var(--ease-img), opacity 0.5s ease;
+  transition: opacity 0.8s ease;
 }
 @media (hover: hover) {
-  .pc a:hover .pc-primary img { transform: scale(1.04); }
-  .pc a:hover .pc-alt         { opacity: 1; }
-  .pc a:hover .pc-alt img     { transform: scale(1.02); }
+  .pc a:hover .pc-media {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgb(26 24 22 / 0.06);
+  }
+  .pc a:hover .pc-alt { opacity: 1; transition: opacity 1.2s var(--ease-img); }
 }
 </style>

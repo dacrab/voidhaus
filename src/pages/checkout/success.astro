@@ -1,0 +1,37 @@
+---
+export const prerender = false;
+import Layout from '@layouts/Layout.astro';
+import PageHeader from '@components/PageHeader.astro';
+---
+
+<Layout title="Order Confirmed — VOIDHAUS" description="Your order has been placed.">
+  <PageHeader title="Order Confirmed" />
+  <section class="success-section">
+    <p class="success-msg">Thank you. Your selection has been confirmed and will be dispatched within 5–10 business days.</p>
+    <p class="success-sub label">A confirmation email has been sent to your address.</p>
+    <a href="/collection" class="label continue-link">Continue Browsing →</a>
+  </section>
+</Layout>
+
+<style>
+  .success-section {
+    max-width: 600px;
+    margin: var(--spacing-4xl) auto;
+    padding: 0 var(--spacing-lg);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+  .success-msg { font-size: var(--text-base); line-height: 1.8; }
+  .success-sub { opacity: var(--op-muted); }
+  .continue-link {
+    display: inline-block;
+    margin-top: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-rule);
+    color: var(--color-ink);
+    opacity: var(--op-muted);
+    transition: opacity var(--duration-base);
+  }
+  .continue-link:hover { opacity: 1; }
+</style>

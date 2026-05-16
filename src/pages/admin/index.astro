@@ -1,0 +1,68 @@
+---
+export const prerender = false;
+import AdminLayout from '@layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Dashboard" active="dashboard">
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white border border-zinc-200 rounded-lg p-5">
+      <div class="text-2xl font-semibold tracking-tight" id="product-count">—</div>
+      <div class="text-[0.65rem] text-zinc-400 uppercase tracking-wide mt-1">Products</div>
+    </div>
+    <div class="bg-white border border-zinc-200 rounded-lg p-5">
+      <div class="text-2xl font-semibold tracking-tight" id="order-count">—</div>
+      <div class="text-[0.65rem] text-zinc-400 uppercase tracking-wide mt-1">Orders</div>
+    </div>
+    <div class="bg-white border border-zinc-200 rounded-lg p-5">
+      <div class="text-2xl font-semibold tracking-tight" id="revenue">—</div>
+      <div class="text-[0.65rem] text-zinc-400 uppercase tracking-wide mt-1">Revenue</div>
+    </div>
+    <div class="bg-white border border-zinc-200 rounded-lg p-5">
+      <div class="text-2xl font-semibold tracking-tight" id="low-stock">—</div>
+      <div class="text-[0.65rem] text-zinc-400 uppercase tracking-wide mt-1">Low Stock</div>
+    </div>
+  </div>
+
+  <div class="bg-white border border-zinc-200 rounded-lg p-5">
+    <h2 class="text-sm font-semibold mb-4">Recent Orders</h2>
+    <div id="recent-orders">
+      <p class="text-sm text-zinc-400">Loading…</p>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  import { ConvexHttpClient } from "convex/browser";
+  import { api } from "../../../convex/_generated/api";
+
+  const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
+
+  async function load() {
+    const [products, orders] = await Promise.all([
+      convex.query(api.products.list, {}),
+      convex.query(api.orders.list, {}),
+    ]);
+
+    document.getElementById("product-count")!.textContent = String(products.length);
+    document.getElementById("order-count")!.textContent = String(orders.length);
+    const paid = orders.filter((o: any) => ["paid", "shipped", "delivered"].includes(o.status));
+    document.getElementById("revenue")!.textContent = `€${paid.reduce((s: number, o: any) => s + o.total, 0).toLocaleString()}`;
+    document.getElementById("low-stock")!.textContent = String(products.filter((p: any) => p.stock < 5).length);
+
+    const wrap = document.getElementById("recent-orders")!;
+    const recent = orders.slice(0, 5);
+    if (!recent.length) { wrap.innerHTML = '<p class="text-sm text-zinc-400">No orders yet.</p>'; return; }
+    wrap.innerHTML = `<table class="w-full text-sm"><thead><tr class="border-b border-zinc-100">
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Date</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Email</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Total</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Status</th>
+    </tr></thead><tbody>${recent.map((o: any) => `<tr class="border-b border-zinc-50">
+      <td class="px-3 py-3">${new Date(o._creationTime).toLocaleDateString()}</td>
+      <td class="px-3 py-3">${o.customerEmail || '—'}</td>
+      <td class="px-3 py-3">€${o.total.toLocaleString()}</td>
+      <td class="px-3 py-3 font-medium ${o.status === 'paid' ? 'text-green-600' : o.status === 'pending' ? 'text-amber-600' : 'text-blue-600'}">${o.status}</td>
+    </tr>`).join('')}</tbody></table>`;
+  }
+  load();
+</script>

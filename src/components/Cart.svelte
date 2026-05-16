@@ -7,12 +7,42 @@
   const modal = createModal();
 
   let open = $state(false);
-  let items = $state<CartItem[]>([]);
+  let items = $state.raw<CartItem[]>([]);
   let panelEl = $state<HTMLElement | undefined>();
+  let checking = $state(false);
+  let couponCode = $state('');
+  let checkoutError = $state('');
 
   const total = $derived(
     formatPrice(items.reduce((s, i) => s + i.price, 0))
   );
+
+  async function checkout() {
+    checking = true;
+    checkoutError = '';
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(i => ({ slug: i.slug, size: i.size })),
+          couponCode: couponCode.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        saveCart([]);
+        window.location.href = data.url;
+      } else if (data.error) {
+        checkoutError = data.error;
+      }
+    } catch (e) {
+      console.error('Checkout failed:', e);
+      checkoutError = 'Something went wrong';
+    } finally {
+      checking = false;
+    }
+  }
 
   function openCart() {
     open = true;
@@ -61,7 +91,7 @@
     class="backdrop cart-backdrop"
     role="presentation"
     onclick={closeCart}
-    transition:fade={{ duration: 300 }}
+    transition:fade={{ duration: 450 }}
   ></div>
 
   <div
@@ -116,8 +146,21 @@
           <span class="label muted">Estimated total</span>
           <span class="total serif">€ {total}</span>
         </div>
+        <div class="coupon-row">
+          <input
+            class="coupon-input label"
+            type="text"
+            placeholder="Promo code"
+            bind:value={couponCode}
+          />
+        </div>
         <p class="ship-note label muted">Complimentary worldwide shipping · Duty-free</p>
-        <button class="checkout-btn label">Complete Selection</button>
+        <button class="checkout-btn label" onclick={checkout} disabled={checking}>
+          {checking ? 'Processing…' : 'Complete Selection'}
+        </button>
+        {#if checkoutError}
+          <p class="checkout-error label">{checkoutError}</p>
+        {/if}
       </div>
     {/if}
   </div>
@@ -137,7 +180,7 @@
 
   .panel-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: var(--spacing-lg) var(--spacing-lg) 1.25rem;
+    padding: var(--spacing-xl) var(--spacing-lg) 1.5rem;
   }
 
   .empty {
@@ -163,7 +206,7 @@
 
   .item {
     display: grid; grid-template-columns: 80px 1fr;
-    gap: 1.25rem; padding: 1.25rem var(--spacing-lg); align-items: start;
+    gap: 1.5rem; padding: 1.5rem var(--spacing-lg); align-items: start;
   }
 
   .item-img-wrap { aspect-ratio: 3/4; overflow: hidden; background: var(--color-off); }
@@ -182,8 +225,8 @@
   .item-name { font-size: var(--text-sm); font-variation-settings: var(--fw-normal); color: var(--color-ink); display: block; line-height: 1.3; }
 
   .footer {
-    padding: 1.25rem var(--spacing-lg) var(--spacing-xl);
-    display: flex; flex-direction: column; gap: var(--spacing-md);
+    padding: 1.5rem var(--spacing-lg) var(--spacing-2xl);
+    display: flex; flex-direction: column; gap: var(--spacing-lg);
     border-top: 1px solid var(--color-rule);
   }
 
@@ -196,7 +239,19 @@
 
   .checkout-btn {
     width: 100%; background: var(--color-ink); color: var(--color-white);
-    border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button); transition: background var(--duration-fast);
+    border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button); transition: background var(--duration-base);
   }
   .checkout-btn:hover { background: var(--color-ink-soft); }
+  .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .coupon-row { display: flex; gap: var(--spacing-xs); }
+  .coupon-input {
+    flex: 1; background: none; border: 1px solid var(--color-rule);
+    padding: var(--spacing-sm) var(--spacing-md); font-size: max(16px, 0.75rem);
+    color: var(--color-ink); outline: none; text-transform: uppercase;
+    transition: border-color var(--duration-fast);
+  }
+  .coupon-input:focus { border-color: var(--color-mid); }
+  .coupon-input::placeholder { text-transform: none; color: var(--color-mid); }
+  .checkout-error { color: #dc2626; text-align: center; font-size: 12px; }
 </style>

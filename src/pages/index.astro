@@ -26,14 +26,14 @@ const featured = PRODUCTS.slice(0, 4);
     <div class="relative z-10 flex flex-col">
       <span class="label js-hero-season ot-secondary hero-season">SS 2026</span>
       <h1 class="hero-title js-hero-title fw-light ot-primary">VOIDHAUS</h1>
-      <div class="wrap flex items-baseline justify-between pb-2xl border-t border-white/15 pt-md">
-        <a href="/collection" class="js-hero-cta ot-primary border-b border-white/40 pb-[0.1rem] transition-[border-color,color] duration-[var(--duration-fast)] hover:border-white hover:text-white">Enter Collection</a>
+      <div class="wrap flex items-baseline justify-between pb-2xl border-t border-white/10 pt-md">
+        <span class="label js-hero-cta ot-muted tracking-[0.3em]">Scroll</span>
         <span class="label js-hero-tagline ot-muted hidden sm:block">Twelve pieces. One position.</span>
       </div>
     </div>
   </section>
 
-  <section class="wrap py-3xl md:py-4xl">
+  <section class="wrap py-4xl md:py-5xl">
     <div class="flex items-center justify-between pb-md">
       <span class="label muted">SS 2026 — New Arrivals</span>
       <a href="/collection" class="label muted muted-link">All ({PRODUCTS.length}) →</a>
@@ -81,7 +81,7 @@ document.addEventListener('astro:page-load', () => {
       else gsap.fromTo(img, { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1.08, duration: DUR.slow, ease: 'power3.out' });
       ScrollTrigger.create({
         trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 2,
-        onUpdate: st => gsap.set(img, { yPercent: st.progress * -10 }),
+        onUpdate: st => gsap.set(img, { yPercent: st.progress * -5 }),
       });
     }
 
@@ -147,10 +147,10 @@ document.addEventListener('astro:page-load', () => {
 .editorial {
   position: relative;
   height: 75svh; min-height: 420px;
-  margin-block: 5rem;
+  margin-block: 7rem;
   overflow: hidden;
 }
-@media (min-width: 768px) { .editorial { height: 85svh; margin-block: 7rem; } }
+@media (min-width: 768px) { .editorial { height: 85svh; margin-block: 10rem; } }
 
 .ed-scrim {
   background: linear-gradient(135deg, var(--scrim-heavy) 0%, var(--scrim-light) 60%, transparent 100%);
