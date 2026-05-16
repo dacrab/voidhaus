@@ -3,11 +3,11 @@ import Layout from '@layouts/Layout.astro';
 import { Picture } from 'astro:assets';
 import ProductCard from '@components/ProductCard.astro';
 import CTAStrip from '@components/CTAStrip.astro';
-import { getProducts } from '@data/products';
+import { getCollection } from 'astro:content';
 import { IMAGES } from '@assets/images';
 
-const PRODUCTS = await getProducts();
-const featured = PRODUCTS.slice(0, 4);
+const products = await getCollection('products');
+const featured = products.slice(0, 4);
 ---
 
 <Layout>
@@ -37,11 +37,11 @@ const featured = PRODUCTS.slice(0, 4);
   <section class="wrap py-4xl md:py-5xl">
     <div class="flex items-center justify-between pb-md">
       <span class="label muted">SS 2026 — New Arrivals</span>
-      <a href="/collection" class="label muted muted-link">All ({PRODUCTS.length}) →</a>
+      <a href="/collection" class="label muted muted-link">All ({products.length}) →</a>
     </div>
     <div class="rule"></div>
     <div class="product-grid featured-grid">
-      {featured.map(p => <ProductCard {...p} />)}
+      {featured.map(p => <ProductCard {...p.data} />)}
     </div>
   </section>
 

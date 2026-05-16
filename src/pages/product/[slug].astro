@@ -1,16 +1,20 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { Picture } from 'astro:assets';
-import { getProducts, SHARED_DETAILS } from '@data/products';
+import { getCollection } from 'astro:content';
+import { SHARED_DETAILS } from '@data/products';
 import SizeGuide from '@components/SizeGuide.svelte';
 import { IMAGES } from '@assets/images';
 
 export async function getStaticPaths() {
-  const products = await getProducts();
-  return products.map(p => ({ params: { slug: p.slug }, props: { product: p, products } }));
+  const products = await getCollection('products');
+  return products.map(entry => ({
+    params: { slug: entry.data.slug },
+    props: { product: entry.data, allProducts: products.map(e => e.data) },
+  }));
 }
 
-const { product: p, products: PRODUCTS } = Astro.props;
+const { product: p, allProducts } = Astro.props;
 
 const details: [string, string][] = [
   ['Material', p.material],
@@ -18,9 +22,9 @@ const details: [string, string][] = [
   ...SHARED_DETAILS,
 ];
 
-const idx  = PRODUCTS.findIndex(x => x.slug === p.slug);
-const prev = PRODUCTS[idx - 1] ?? null;
-const next = PRODUCTS[idx + 1] ?? null;
+const idx  = allProducts.findIndex(x => x.slug === p.slug);
+const prev = allProducts[idx - 1] ?? null;
+const next = allProducts[idx + 1] ?? null;
 ---
 
 <Layout title={p.name} description={p.desc} type="product" solidNav={true}>
