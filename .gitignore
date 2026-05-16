@@ -1,5 +1,7 @@
 # build output
 dist/
+.vercel/
+
 # generated types
 .astro/
 
@@ -25,3 +27,7 @@ pnpm-debug.log*
 # IDE
 .vscode/
 
+
+.env.local
+.vercel
+.env*.local

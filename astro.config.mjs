@@ -3,10 +3,12 @@ import { defineConfig, fontProviders } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
 
 export default defineConfig({
   site: 'https://voidhaus.vercel.app',
   output: 'static',
+  adapter: vercel(),
 
   vite: {
     plugins: [tailwindcss()],
@@ -22,15 +24,13 @@ export default defineConfig({
   },
 
   image: {
-    service: import.meta.env.DEV
-      ? { entrypoint: 'astro/assets/services/noop' }
-      : { entrypoint: 'astro/assets/services/sharp' },
+    service: { entrypoint: 'astro/assets/services/sharp' },
   },
 
   fonts: [
     {
       provider: fontProviders.fontsource(),
-      name: 'DM Sans',
+      name: 'Instrument Sans',
       cssVariable: '--font-sans',
       weights: [200, 300, 400, 500],
       styles: ['normal'],

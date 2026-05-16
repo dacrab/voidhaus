@@ -40,6 +40,7 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
     <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
     <link rel="canonical"        href={canonical} />
     <link rel="sitemap"          href="/sitemap-index.xml" />
+    <link rel="manifest"         href="/manifest.json" />
     <Font cssVariable="--font-sans"  preload />
     <Font cssVariable="--font-serif" preload />
     <ClientRouter />
@@ -82,14 +83,17 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
     })} />
 
     <script is:inline>document.documentElement.classList.remove('no-js');</script>
+    <script is:inline define:vars={{ convexUrl: import.meta.env.PUBLIC_CONVEX_URL || '' }}>window.__CONVEX_URL__ = convexUrl;</script>
   </head>
 
   <body>
-    <div id="js-veil" aria-hidden="true"></div>
+    <div id="js-veil" aria-hidden="true">
+      <span class="veil-mark">VOIDHAUS</span>
+    </div>
     <div class="cursor" id="js-cursor" aria-hidden="true"></div>
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:bg-[var(--color-white)] focus:px-md focus:py-sm focus:text-[var(--color-ink)] focus:border focus:border-[var(--color-ink)]">Skip to content</a>
     <Nav client:load solidNav={solidNav} />
-    <Cart client:load />
+    <Cart client:idle />
 
     <main id="main">
       <slot />
@@ -113,6 +117,13 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
         document.addEventListener('mouseover', e => {
           const t = (e.target as Element).closest('a, button, [role="button"]');
           cursor?.classList.toggle('hover', !!t);
+          if (t) {
+            const isProduct = t.closest('.pc');
+            const isExternal = t instanceof HTMLAnchorElement && t.hostname !== location.hostname;
+            cursor?.setAttribute('data-label', isProduct ? 'View' : isExternal ? 'Open' : '');
+          } else {
+            cursor?.removeAttribute('data-label');
+          }
         });
         (function loop() {
           if (dirty) {
@@ -130,8 +141,21 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
           if (document.documentElement.hasAttribute('data-astro-transition')) {
             veil.remove();
           } else {
-            requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add('out')));
-            veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+            const mark = veil.querySelector('.veil-mark') as HTMLElement | null;
+            if (mark) {
+              mark.style.opacity = '1';
+              setTimeout(() => {
+                mark.style.opacity = '0';
+                mark.style.transform = 'scale(0.92)';
+                setTimeout(() => {
+                  veil.classList.add('out');
+                  veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+                }, 400);
+              }, 800);
+            } else {
+              requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add('out')));
+              veil.addEventListener('transitionend', () => veil.remove(), { once: true });
+            }
           }
         }
 
@@ -188,5 +212,8 @@ const ogImage   = image.startsWith('http') ? image : new URL(image, baseUrl).hre
     </footer>
   <Analytics />
   <SpeedInsights />
+  <script is:inline>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+  </script>
   </body>
 </html>

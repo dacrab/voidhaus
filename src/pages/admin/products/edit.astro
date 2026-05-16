@@ -1,0 +1,100 @@
+---
+export const prerender = false;
+import AdminLayout from '@layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Edit Product" active="products">
+  <a href="/admin/products" class="text-[0.7rem] uppercase tracking-wide px-3 py-1.5 border border-zinc-200 rounded bg-white hover:bg-zinc-50 no-underline text-zinc-600 inline-block mb-5">← Back</a>
+  <div id="loading"><p class="text-sm text-zinc-400">Loading…</p></div>
+  <div class="bg-white border border-zinc-200 rounded-lg p-6 hidden" id="edit-wrap">
+    <form id="edit-form">
+      <input type="hidden" id="product-id" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="name">Name</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="name" name="name" required /></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="slug">Slug</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="slug" name="slug" required /></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="num">Number</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="num" name="num" required /></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="price">Price (€)</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="number" id="price" name="price" required /></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="category">Category</label><select class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" id="category" name="category" required><option value="Outerwear">Outerwear</option><option value="Tailoring">Tailoring</option><option value="Ready-to-wear">Ready-to-wear</option><option value="Knitwear">Knitwear</option><option value="Tops">Tops</option><option value="Footwear">Footwear</option><option value="Accessories">Accessories</option></select></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium">Total Stock</label><input class="bg-zinc-100 border border-zinc-200 rounded px-3 py-2 text-sm" type="number" id="stock" readonly disabled /></div>
+        <div class="flex flex-col gap-1 sm:col-span-2"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium">Per-Size Stock</label><div id="size-stock-grid" class="flex flex-wrap gap-2"></div></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="material">Material</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="material" name="material" required /></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="origin">Origin</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="origin" name="origin" required /></div>
+        <div class="flex flex-col gap-1 sm:col-span-2"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="desc">Description</label><textarea class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" id="desc" name="desc" rows="3" required></textarea></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="sizes">Sizes</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="sizes" name="sizes" required /></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="img">Image key</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="img" name="img" required /></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium" for="img2">Secondary image</label><input class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900" type="text" id="img2" name="img2" /></div>
+        <div class="flex flex-col gap-1"><label class="text-[0.65rem] text-zinc-400 uppercase tracking-wide font-medium">Upload Image</label><input type="file" id="img-upload" accept="image/*" class="text-sm" /><span id="img-upload-status" class="text-xs text-zinc-400"></span></div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button type="submit" class="text-xs uppercase tracking-wide px-5 py-2.5 bg-zinc-900 text-white rounded hover:bg-zinc-800 transition-colors" id="submit-btn">Save Changes</button>
+        <button type="button" class="text-xs uppercase tracking-wide px-5 py-2.5 border border-red-200 rounded text-red-600 hover:bg-red-50 transition-colors" id="delete-btn">Delete</button>
+      </div>
+      <p id="status" class="text-sm mt-3"></p>
+    </form>
+  </div>
+</AdminLayout>
+
+<script>
+  import { ConvexHttpClient } from "convex/browser";
+  import { api } from "../../../../convex/_generated/api";
+  const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
+  const slug = new URLSearchParams(window.location.search).get("slug");
+  let currentSizeStock: Record<string, number> = {};
+  let imgStorageId: string | undefined;
+
+  function renderSizeStock(sizes: string[], sizeStock: Record<string, number>) {
+    const grid = document.getElementById("size-stock-grid")!;
+    grid.innerHTML = sizes.map(s => `<div class="flex items-center gap-1.5"><span class="text-[0.65rem] text-zinc-500 uppercase w-8">${s}</span><input type="number" min="0" class="bg-zinc-50 border border-zinc-200 rounded px-2 py-1 text-sm w-14 text-center outline-none focus:border-zinc-900 size-input" data-size="${s}" value="${sizeStock[s] ?? 0}" /></div>`).join('');
+    grid.querySelectorAll('.size-input').forEach(input => input.addEventListener('change', (e) => {
+      const el = e.target as HTMLInputElement;
+      currentSizeStock[el.dataset.size!] = Number(el.value);
+      (document.getElementById("stock") as HTMLInputElement).value = String(Object.values(currentSizeStock).reduce((a, b) => a + b, 0));
+    }));
+  }
+
+  document.getElementById("img-upload")!.addEventListener("change", async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0]; if (!file) return;
+    const st = document.getElementById("img-upload-status")!; st.textContent = "Uploading…";
+    try { const url = await convex.mutation(api.files.generateUploadUrl, {}); const res = await fetch(url, { method: "POST", headers: { "Content-Type": file.type }, body: file }); imgStorageId = (await res.json()).storageId; st.textContent = "✓ Uploaded"; st.style.color = "#16a34a"; } catch { st.textContent = "✗ Failed"; st.style.color = "#dc2626"; }
+  });
+
+  async function load() {
+    if (!slug) { window.location.href = "/admin/products"; return; }
+    const p = await convex.query(api.products.getBySlug, { slug }); if (!p) { window.location.href = "/admin/products"; return; }
+    document.getElementById("loading")!.style.display = "none";
+    document.getElementById("edit-wrap")!.classList.remove("hidden");
+    (document.getElementById("product-id") as HTMLInputElement).value = p._id;
+    (document.getElementById("name") as HTMLInputElement).value = p.name;
+    (document.getElementById("slug") as HTMLInputElement).value = p.slug;
+    (document.getElementById("num") as HTMLInputElement).value = p.num;
+    (document.getElementById("price") as HTMLInputElement).value = String(p.price);
+    (document.getElementById("category") as HTMLSelectElement).value = p.category;
+    (document.getElementById("stock") as HTMLInputElement).value = String(p.stock);
+    (document.getElementById("material") as HTMLInputElement).value = p.material;
+    (document.getElementById("origin") as HTMLInputElement).value = p.origin;
+    (document.getElementById("desc") as HTMLTextAreaElement).value = p.desc;
+    (document.getElementById("sizes") as HTMLInputElement).value = p.sizes.join(", ");
+    (document.getElementById("img") as HTMLInputElement).value = p.img;
+    (document.getElementById("img2") as HTMLInputElement).value = p.img2 ?? "";
+    currentSizeStock = p.sizeStock ?? {}; renderSizeStock(p.sizes, currentSizeStock);
+  }
+
+  document.getElementById("edit-form")!.addEventListener("submit", async (e) => {
+    e.preventDefault(); const btn = document.getElementById("submit-btn") as HTMLButtonElement; const status = document.getElementById("status")!;
+    btn.disabled = true; btn.textContent = "Saving…";
+    try {
+      const d = new FormData(e.target as HTMLFormElement); const id = (document.getElementById("product-id") as HTMLInputElement).value;
+      const args: any = { id, name: d.get("name"), slug: d.get("slug"), num: d.get("num"), price: Number(d.get("price")), category: d.get("category"), material: d.get("material"), origin: d.get("origin"), desc: d.get("desc"), sizes: (d.get("sizes") as string).split(",").map(s => s.trim()), sizeStock: currentSizeStock, img: d.get("img"), img2: (d.get("img2") as string) || undefined };
+      if (imgStorageId) args.imgStorageId = imgStorageId;
+      await convex.mutation(api.products.update, args); status.textContent = "✓ Saved"; status.style.color = "#16a34a";
+    } catch (err: any) { status.textContent = "✗ " + err.message; status.style.color = "#dc2626"; }
+    finally { btn.disabled = false; btn.textContent = "Save Changes"; }
+  });
+
+  document.getElementById("delete-btn")!.addEventListener("click", async () => {
+    if (!confirm("Delete this product permanently?")) return;
+    await convex.mutation(api.products.remove, { id: (document.getElementById("product-id") as HTMLInputElement).value as any });
+    window.location.href = "/admin/products";
+  });
+  load();
+</script>

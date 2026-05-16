@@ -1,0 +1,57 @@
+---
+export const prerender = false;
+import AdminLayout from '@layouts/AdminLayout.astro';
+---
+
+<AdminLayout title="Products" active="products">
+  <div class="flex justify-end mb-4">
+    <a href="/admin/products/new" class="text-xs uppercase tracking-wide px-4 py-2 bg-zinc-900 text-white rounded no-underline hover:bg-zinc-800 transition-colors">+ Add Product</a>
+  </div>
+  <div class="bg-white border border-zinc-200 rounded-lg p-5">
+    <div id="products-list">
+      <p class="text-sm text-zinc-400">Loading…</p>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  import { ConvexHttpClient } from "convex/browser";
+  import { api } from "../../../convex/_generated/api";
+
+  const convex = new ConvexHttpClient(import.meta.env.PUBLIC_CONVEX_URL);
+
+  async function load() {
+    const products = await convex.query(api.products.list, { activeOnly: false });
+    const wrap = document.getElementById("products-list")!;
+
+    wrap.innerHTML = `<table class="w-full text-sm"><thead><tr class="border-b border-zinc-100">
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Num</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Name</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Category</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Price</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Stock</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Active</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Actions</th>
+    </tr></thead><tbody>${products.map((p: any) => `<tr class="border-b border-zinc-50">
+      <td class="px-3 py-3 text-zinc-400">${p.num}</td>
+      <td class="px-3 py-3 font-medium">${p.name}</td>
+      <td class="px-3 py-3">${p.category}</td>
+      <td class="px-3 py-3">€${p.price.toLocaleString()}</td>
+      <td class="px-3 py-3 ${p.stock < 5 ? 'text-red-600 font-semibold' : ''}">${p.stock}</td>
+      <td class="px-3 py-3">${p.active ? '<span class="text-green-600">✓</span>' : '<span class="text-zinc-400">✗</span>'}</td>
+      <td class="px-3 py-3"><div class="flex gap-2 flex-wrap">
+        <a href="/admin/products/edit?slug=${p.slug}" class="text-[0.7rem] uppercase tracking-wide px-3 py-1 border border-zinc-200 rounded bg-white hover:bg-zinc-50 no-underline text-zinc-600 transition-colors">Edit</a>
+        <button class="text-[0.7rem] uppercase tracking-wide px-3 py-1 border border-zinc-200 rounded bg-white hover:bg-zinc-50 text-zinc-600 transition-colors toggle-btn" data-id="${p._id}" data-active="${p.active}">${p.active ? 'Deactivate' : 'Activate'}</button>
+      </div></td>
+    </tr>`).join('')}</tbody></table>`;
+
+    wrap.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const el = e.target as HTMLElement;
+        await convex.mutation(api.products.update, { id: el.dataset.id as any, active: el.dataset.active !== 'true' });
+        load();
+      });
+    });
+  }
+  load();
+</script>

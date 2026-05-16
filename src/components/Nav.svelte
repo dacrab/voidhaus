@@ -17,10 +17,6 @@
   let scrolled = $state(false);
   let hidden = $state(false);
 
-  $effect(() => {
-    scrolled = solidNav || window.scrollY > 40;
-  });
-
   const links = [
     { href: '/collection', label: 'Curated Collection' },
     { href: '/lookbook', label: 'Lookbook' },
@@ -31,16 +27,16 @@
 
   onMount(() => {
     path = window.location.pathname;
-    document.addEventListener('astro:page-load', () => {
-      path = window.location.pathname;
-    });
+    scrolled = solidNav || window.scrollY > 40;
+
+    const onPageLoad = () => { path = window.location.pathname; };
+    document.addEventListener('astro:page-load', onPageLoad);
 
     const syncCart = () => { cartCount = getCart().length; };
     syncCart();
     window.addEventListener('vh:cart-updated', syncCart);
 
     let lastY = 0;
-    scrolled = solidNav;
     const onScroll = () => {
       const y = window.scrollY;
       scrolled = solidNav || y > 40;
@@ -48,6 +44,12 @@
       lastY = y;
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      document.removeEventListener('astro:page-load', onPageLoad);
+      window.removeEventListener('vh:cart-updated', syncCart);
+      window.removeEventListener('scroll', onScroll);
+    };
   });
 
   function openCart() { window.dispatchEvent(new Event('vh:open-cart')); }
@@ -64,7 +66,7 @@
         if (menuLinks.length) {
           gsap.fromTo(menuLinks,
             { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger: 0.1 }
+            { opacity: 1, y: 0, duration: 0.9, ease: 'expo.out', stagger: 0.18 }
           );
         }
       });
@@ -149,11 +151,9 @@
   @media (min-width: 1024px) { .nav { padding-inline: var(--spacing-3xl); } }
 
   .nav.scrolled {
-    background: rgb(248 246 242 / 0.92);
+    background: rgb(248 246 242 / 0.97);
     color: var(--color-ink);
     box-shadow: 0 1px 0 var(--color-rule);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
   }
   .nav.hidden { transform: translateY(-100%); pointer-events: none; }
   .nav.open   { background: var(--color-white); color: var(--color-ink); box-shadow: none; transform: none; }

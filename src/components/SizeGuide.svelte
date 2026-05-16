@@ -51,7 +51,7 @@
     class="backdrop sg-backdrop"
     role="presentation"
     onclick={closeModal}
-    transition:fade={{ duration: 300 }}
+    transition:fade={{ duration: 450 }}
   ></div>
 
   <div
@@ -62,7 +62,7 @@
     tabindex="-1"
     bind:this={panelEl}
     in:panelIn={{ y: 0.75, scale: true }}
-    out:fade={{ duration: 200 }}
+    out:fade={{ duration: 300 }}
   >
     <div class="sg-head">
       <h2 class="label sg-title" id="sg-title">Size Guide</h2>
@@ -155,8 +155,8 @@
   .sg-title { color: var(--color-ink); }
 
   .sg-body {
-    overflow-y: auto; padding: var(--spacing-lg);
-    display: flex; flex-direction: column; gap: var(--spacing-xl); flex: 1;
+    overflow-y: auto; padding: var(--spacing-xl);
+    display: flex; flex-direction: column; gap: var(--spacing-2xl); flex: 1;
   }
 
   .sg-note { font-size: var(--text-sm); font-variation-settings: var(--fw-normal); line-height: 1.7; color: var(--color-soft); }

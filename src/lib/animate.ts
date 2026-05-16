@@ -7,21 +7,22 @@ gsap.config({ force3D: true });
 
 export { gsap };
 export const EASE = 'expo.out';
-export const DUR = { major: 0.8, minor: 0.6, slow: 1.0 };
-export const STAGGER = 0.12;
+export const DUR = { major: 1.0, minor: 0.8, slow: 1.4 };
+export const STAGGER = 0.16;
 
 let lenis: Lenis | null = null;
 export function getLenis(): Lenis | null { return lenis; }
 
 function initLenis(): void {
   if (lenis || window.matchMedia('(hover: none)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   lenis = new Lenis({
-    duration: 1.2,
+    duration: 1.6,
     easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
   });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add(time => lenis!.raf(time * 1000));
-  gsap.ticker.lagSmoothing(0);
+  gsap.ticker.lagSmoothing(500, 33);
 }
 
 export function initScrollLifecycle(): void {
@@ -43,7 +44,7 @@ export function initScrollLifecycle(): void {
 }
 
 const inView = (el: Element) =>
-  el.getBoundingClientRect().top < window.innerHeight * 0.85;
+  el.getBoundingClientRect().top < window.innerHeight * 0.75;
 
 function reveal(els: HTMLElement[], vars: gsap.TweenVars) {
   gsap.fromTo(els, { opacity: 0, y: 30 }, { opacity: 1, y: 0, clearProps: 'transform,will-change', ...vars });
@@ -81,7 +82,7 @@ export function initPage(ruleSelector?: string): void {
   const scrollBelow = scrollEls.filter(el => !inView(el));
   if (scrollAbove.length) reveal(scrollAbove, { duration: DUR.major, ease: EASE, stagger: STAGGER, delay: heroEls.length ? 0.1 : 0 });
   if (scrollBelow.length) ScrollTrigger.batch(scrollBelow, {
-    start: 'top 88%', once: true,
+    start: 'top 82%', once: true,
     onEnter: els => reveal([...els] as HTMLElement[], { duration: DUR.major, ease: EASE, stagger: STAGGER }),
   });
 
@@ -89,10 +90,10 @@ export function initPage(ruleSelector?: string): void {
   const staggerEls = [...document.querySelectorAll<HTMLElement>('[data-anim="stagger"]')];
   const staggerAbove = staggerEls.filter(inView);
   const staggerBelow = staggerEls.filter(el => !inView(el));
-  if (staggerAbove.length) reveal(staggerAbove, { duration: DUR.minor, ease: EASE, stagger: 0.1 });
+  if (staggerAbove.length) reveal(staggerAbove, { duration: DUR.minor, ease: EASE, stagger: 0.12 });
   if (staggerBelow.length) ScrollTrigger.batch(staggerBelow, {
-    start: 'top 90%', once: true,
-    onEnter: els => reveal([...els] as HTMLElement[], { duration: DUR.minor, ease: EASE, stagger: 0.1 }),
+    start: 'top 85%', once: true,
+    onEnter: els => reveal([...els] as HTMLElement[], { duration: DUR.minor, ease: EASE, stagger: 0.12 }),
   });
 
   ScrollTrigger.refresh();
