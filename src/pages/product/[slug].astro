@@ -1,15 +1,16 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { Picture } from 'astro:assets';
-import { PRODUCTS, SHARED_DETAILS } from '@data/products';
+import { getProducts, SHARED_DETAILS } from '@data/products';
 import SizeGuide from '@components/SizeGuide.svelte';
 import { IMAGES } from '@assets/images';
 
-export function getStaticPaths() {
-  return PRODUCTS.map(p => ({ params: { slug: p.slug }, props: { product: p } }));
+export async function getStaticPaths() {
+  const products = await getProducts();
+  return products.map(p => ({ params: { slug: p.slug }, props: { product: p, products } }));
 }
 
-const { product: p } = Astro.props;
+const { product: p, products: PRODUCTS } = Astro.props;
 
 const details: [string, string][] = [
   ['Material', p.material],

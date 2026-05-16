@@ -3,9 +3,11 @@ import Layout from '@layouts/Layout.astro';
 import { Picture } from 'astro:assets';
 import ProductCard from '@components/ProductCard.astro';
 import CTAStrip from '@components/CTAStrip.astro';
-import { PRODUCTS } from '@data/products';
+import { getProducts } from '@data/products';
 import { SITE } from '@data/site';
 import { IMAGES } from '@assets/images';
+
+const PRODUCTS = await getProducts();
 
 const chapters = [
   {
