@@ -1,25 +1,14 @@
 ---
 export const prerender = false;
-import Layout from '@layouts/Layout.astro';
+import AdminLayout from '@layouts/AdminLayout.astro';
 ---
 
-<Layout title="Add Product — Admin — VOIDHAUS" solidNav>
-  <div class="admin-shell">
-    <aside class="admin-nav">
-      <span class="admin-brand label">VOIDHAUS Admin</span>
-      <nav class="admin-links">
-        <a href="/admin" class="label">Dashboard</a>
-        <a href="/admin/products" class="label active">Products</a>
-        <a href="/admin/orders" class="label">Orders</a>
-        <a href="/admin/messages" class="label">Messages</a>
-      </nav>
-    </aside>
-    <main class="admin-main">
-      <div class="admin-header">
-        <h1 class="admin-title">Add Product</h1>
-        <a href="/admin/products" class="label back-link">← Back to Products</a>
-      </div>
-      <form id="product-form" class="product-form">
+<AdminLayout title="Add Product" active="products">
+  <div style="margin-bottom:1rem;">
+    <a href="/admin/products" class="admin-btn">← Back to Products</a>
+  </div>
+  <div class="admin-card">
+    <form id="product-form" class="product-form">
         <div class="form-grid">
           <div class="field">
             <label class="label" for="name">Name</label>
@@ -78,12 +67,11 @@ import Layout from '@layouts/Layout.astro';
             <input type="text" id="img2" name="img2" placeholder="coat-secondary" />
           </div>
         </div>
-        <button type="submit" class="submit-btn label" id="submit-btn">Create Product</button>
+        <button type="submit" class="admin-btn admin-btn-primary" id="submit-btn">Create Product</button>
         <p id="status" class="status"></p>
       </form>
-    </main>
-  </div>
-</Layout>
+    </div>
+</AdminLayout>
 
 <script>
   import { ConvexHttpClient } from "convex/browser";
@@ -141,40 +129,17 @@ import Layout from '@layouts/Layout.astro';
 </script>
 
 <style>
-  .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
-  .admin-nav {
-    background: var(--color-ink); color: var(--color-white);
-    padding: var(--spacing-xl) var(--spacing-lg);
-    display: flex; flex-direction: column; gap: var(--spacing-xl);
-    position: sticky; top: 0; height: 100vh;
-  }
-  .admin-brand { font-size: var(--text-sm); opacity: 0.6; }
-  .admin-links { display: flex; flex-direction: column; gap: var(--spacing-sm); }
-  .admin-links a { color: var(--color-white); opacity: 0.7; text-decoration: none; padding: var(--spacing-xs) 0; transition: opacity var(--duration-fast); }
-  .admin-links a:hover, .admin-links a.active { opacity: 1; }
-  .admin-main { padding: var(--spacing-2xl) var(--spacing-xl); max-width: 900px; }
-  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-xl); }
-  .admin-title { font-size: var(--text-2xl); font-variation-settings: var(--fw-medium); }
-  .back-link { opacity: var(--op-muted); transition: opacity var(--duration-fast); }
-  .back-link:hover { opacity: 1; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field.full { grid-column: 1 / -1; }
-  .field label { opacity: 0.6; }
+  .field label { font-size: 0.7rem; color: var(--admin-muted, #6b7280); text-transform: uppercase; letter-spacing: 0.05em; }
   .field input, .field select, .field textarea {
-    background: none; border: 1px solid var(--color-rule); padding: 10px 12px;
-    font-size: 14px; font-family: inherit; color: var(--color-ink); outline: none;
-    transition: border-color var(--duration-fast);
+    background: #fafafa; border: 1px solid #e5e5e5; padding: 0.6rem 0.75rem;
+    font-size: 0.85rem; font-family: inherit; border-radius: 4px; outline: none;
+    transition: border-color 0.15s;
   }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--color-ink); }
-  .submit-btn {
-    margin-top: var(--spacing-xl); padding: 12px 24px;
-    background: var(--color-ink); color: var(--color-white); border: none;
-    cursor: pointer; transition: opacity var(--duration-fast);
-  }
-  .submit-btn:hover { opacity: 0.85; }
-  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .status { margin-top: var(--spacing-md); font-size: 14px; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #1c1b19; }
+  .status { margin-top: 1rem; font-size: 0.8rem; }
   .status.success { color: #16a34a; }
   .status.error { color: #dc2626; }
 </style>
