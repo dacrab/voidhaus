@@ -4,12 +4,12 @@ import AdminLayout from '@layouts/AdminLayout.astro';
 ---
 
 <AdminLayout title="Products" active="products">
-  <div style="display:flex; justify-content:flex-end; margin-bottom:1.5rem;">
-    <a href="/admin/products/new" class="admin-btn admin-btn-primary">+ Add Product</a>
+  <div class="flex justify-end mb-4">
+    <a href="/admin/products/new" class="text-xs uppercase tracking-wide px-4 py-2 bg-zinc-900 text-white rounded no-underline hover:bg-zinc-800 transition-colors">+ Add Product</a>
   </div>
-  <div class="admin-card">
+  <div class="bg-white border border-zinc-200 rounded-lg p-5">
     <div id="products-list">
-      <p class="muted" style="font-size:0.8rem;">Loading…</p>
+      <p class="text-sm text-zinc-400">Loading…</p>
     </div>
   </div>
 </AdminLayout>
@@ -24,29 +24,31 @@ import AdminLayout from '@layouts/AdminLayout.astro';
     const products = await convex.query(api.products.list, { activeOnly: false });
     const wrap = document.getElementById("products-list")!;
 
-    wrap.innerHTML = `<table class="admin-table">
-      <thead><tr>
-        <th>Num</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Active</th><th>Actions</th>
-      </tr></thead>
-      <tbody>${products.map((p: any) => `<tr>
-        <td>${p.num}</td>
-        <td>${p.name}</td>
-        <td>${p.category}</td>
-        <td>€${p.price.toLocaleString()}</td>
-        <td style="${p.stock < 5 ? 'color:#dc2626;font-weight:600' : ''}">${p.stock}</td>
-        <td>${p.active ? '✓' : '✗'}</td>
-        <td style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-          <a href="/admin/products/edit?slug=${p.slug}" class="admin-btn">Edit</a>
-          <button class="admin-btn toggle-btn" data-id="${p._id}" data-active="${p.active}">${p.active ? 'Deactivate' : 'Activate'}</button>
-        </td>
-      </tr>`).join('')}</tbody>
-    </table>`;
+    wrap.innerHTML = `<table class="w-full text-sm"><thead><tr class="border-b border-zinc-100">
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Num</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Name</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Category</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Price</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Stock</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Active</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Actions</th>
+    </tr></thead><tbody>${products.map((p: any) => `<tr class="border-b border-zinc-50">
+      <td class="px-3 py-3 text-zinc-400">${p.num}</td>
+      <td class="px-3 py-3 font-medium">${p.name}</td>
+      <td class="px-3 py-3">${p.category}</td>
+      <td class="px-3 py-3">€${p.price.toLocaleString()}</td>
+      <td class="px-3 py-3 ${p.stock < 5 ? 'text-red-600 font-semibold' : ''}">${p.stock}</td>
+      <td class="px-3 py-3">${p.active ? '<span class="text-green-600">✓</span>' : '<span class="text-zinc-400">✗</span>'}</td>
+      <td class="px-3 py-3"><div class="flex gap-2 flex-wrap">
+        <a href="/admin/products/edit?slug=${p.slug}" class="text-[0.7rem] uppercase tracking-wide px-3 py-1 border border-zinc-200 rounded bg-white hover:bg-zinc-50 no-underline text-zinc-600 transition-colors">Edit</a>
+        <button class="text-[0.7rem] uppercase tracking-wide px-3 py-1 border border-zinc-200 rounded bg-white hover:bg-zinc-50 text-zinc-600 transition-colors toggle-btn" data-id="${p._id}" data-active="${p.active}">${p.active ? 'Deactivate' : 'Activate'}</button>
+      </div></td>
+    </tr>`).join('')}</tbody></table>`;
 
     wrap.querySelectorAll('.toggle-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
-        const id = (e.target as HTMLElement).dataset.id!;
-        const active = (e.target as HTMLElement).dataset.active === 'true';
-        await convex.mutation(api.products.update, { id: id as any, active: !active });
+        const el = e.target as HTMLElement;
+        await convex.mutation(api.products.update, { id: el.dataset.id as any, active: el.dataset.active !== 'true' });
         load();
       });
     });

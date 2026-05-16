@@ -5,7 +5,7 @@ import AdminLayout from '@layouts/AdminLayout.astro';
 
 <AdminLayout title="Messages" active="messages">
   <div id="messages-list">
-    <p class="muted" style="font-size:0.8rem;">Loading…</p>
+    <p class="text-sm text-zinc-400">Loading…</p>
   </div>
 </AdminLayout>
 
@@ -18,39 +18,24 @@ import AdminLayout from '@layouts/AdminLayout.astro';
   async function load() {
     const messages = await convex.query(api.messages.list, {});
     const wrap = document.getElementById("messages-list")!;
-
-    if (!messages.length) {
-      wrap.innerHTML = '<p class="muted" style="font-size:0.8rem;">No messages yet.</p>';
-      return;
-    }
+    if (!messages.length) { wrap.innerHTML = '<p class="text-sm text-zinc-400">No messages yet.</p>'; return; }
 
     wrap.innerHTML = messages.map((m: any) => `
-      <div class="admin-card msg-card ${m.read ? 'read' : ''}">
-        <div class="msg-header">
+      <div class="bg-white border border-zinc-200 rounded-lg p-5 mb-3 ${m.read ? 'opacity-50' : ''}">
+        <div class="flex items-center gap-2 text-sm flex-wrap mb-1">
           <strong>${m.name}</strong>
-          <span class="muted">&lt;${m.email}&gt;</span>
-          <span class="muted" style="margin-left:auto;">${new Date(m._creationTime).toLocaleDateString()}</span>
+          <span class="text-zinc-400">&lt;${m.email}&gt;</span>
+          <span class="text-zinc-400 ml-auto text-xs">${new Date(m._creationTime).toLocaleDateString()}</span>
         </div>
-        <div class="msg-subject">${m.subject}</div>
-        <p class="msg-body">${m.message}</p>
-        ${!m.read ? `<button class="admin-btn mark-read-btn" data-id="${m._id}">Mark Read</button>` : ''}
+        <div class="text-xs text-zinc-400 mb-2">${m.subject}</div>
+        <p class="text-sm leading-relaxed">${m.message}</p>
+        ${!m.read ? `<button class="text-[0.7rem] uppercase tracking-wide px-3 py-1 border border-zinc-200 rounded bg-white hover:bg-zinc-50 mt-3 mark-read-btn" data-id="${m._id}">Mark Read</button>` : ''}
       </div>
     `).join('');
 
-    wrap.querySelectorAll('.mark-read-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        await convex.mutation(api.messages.markRead, { id: (e.target as HTMLElement).dataset.id as any });
-        load();
-      });
-    });
+    wrap.querySelectorAll('.mark-read-btn').forEach(btn => btn.addEventListener('click', async (e) => {
+      await convex.mutation(api.messages.markRead, { id: (e.target as HTMLElement).dataset.id as any }); load();
+    }));
   }
   load();
 </script>
-
-<style>
-  .msg-card { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
-  .msg-card.read { opacity: 0.5; }
-  .msg-header { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; flex-wrap: wrap; }
-  .msg-subject { font-size: 0.75rem; color: var(--admin-muted); }
-  .msg-body { font-size: 0.85rem; line-height: 1.6; }
-</style>

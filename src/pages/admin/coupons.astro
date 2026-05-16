@@ -4,24 +4,24 @@ import AdminLayout from '@layouts/AdminLayout.astro';
 ---
 
 <AdminLayout title="Coupons" active="coupons">
-  <div class="admin-card" style="margin-bottom:1.5rem;">
-    <h2 class="section-title">Create Coupon</h2>
-    <form id="coupon-form" class="coupon-form">
-      <input type="text" name="code" placeholder="CODE" required class="admin-input" />
-      <select name="type" required class="admin-input">
+  <div class="bg-white border border-zinc-200 rounded-lg p-5 mb-6">
+    <h2 class="text-sm font-semibold mb-3">Create Coupon</h2>
+    <form id="coupon-form" class="flex gap-2 items-center flex-wrap">
+      <input type="text" name="code" placeholder="CODE" required class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900 w-24 uppercase" />
+      <select name="type" required class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900">
         <option value="percent">% Off</option>
         <option value="fixed">€ Fixed</option>
       </select>
-      <input type="number" name="value" placeholder="Value" required class="admin-input small" />
-      <input type="number" name="minOrder" placeholder="Min €" class="admin-input small" />
-      <input type="number" name="maxUses" placeholder="Max uses" class="admin-input small" />
-      <button type="submit" class="admin-btn admin-btn-primary">Create</button>
+      <input type="number" name="value" placeholder="Value" required class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900 w-20" />
+      <input type="number" name="minOrder" placeholder="Min €" class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900 w-20" />
+      <input type="number" name="maxUses" placeholder="Max uses" class="bg-zinc-50 border border-zinc-200 rounded px-3 py-2 text-sm outline-none focus:border-zinc-900 w-24" />
+      <button type="submit" class="text-xs uppercase tracking-wide px-4 py-2 bg-zinc-900 text-white rounded hover:bg-zinc-800 transition-colors">Create</button>
     </form>
   </div>
 
-  <div class="admin-card">
+  <div class="bg-white border border-zinc-200 rounded-lg p-5">
     <div id="coupons-list">
-      <p class="muted" style="font-size:0.8rem;">Loading…</p>
+      <p class="text-sm text-zinc-400">Loading…</p>
     </div>
   </div>
 </AdminLayout>
@@ -35,58 +35,40 @@ import AdminLayout from '@layouts/AdminLayout.astro';
   async function load() {
     const coupons = await convex.query(api.coupons.list, {});
     const wrap = document.getElementById("coupons-list")!;
+    if (!coupons.length) { wrap.innerHTML = '<p class="text-sm text-zinc-400">No coupons yet.</p>'; return; }
 
-    if (!coupons.length) {
-      wrap.innerHTML = '<p class="muted" style="font-size:0.8rem;">No coupons yet.</p>';
-      return;
-    }
+    wrap.innerHTML = `<table class="w-full text-sm"><thead><tr class="border-b border-zinc-100">
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Code</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Type</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Value</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Min</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Used</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2">Status</th>
+      <th class="text-left text-[0.65rem] font-medium uppercase tracking-wide text-zinc-400 px-3 py-2"></th>
+    </tr></thead><tbody>${coupons.map((c: any) => `<tr class="border-b border-zinc-50">
+      <td class="px-3 py-3 font-mono font-semibold">${c.code}</td>
+      <td class="px-3 py-3">${c.type === 'percent' ? '% Off' : '€ Fixed'}</td>
+      <td class="px-3 py-3">${c.type === 'percent' ? c.value + '%' : '€' + c.value}</td>
+      <td class="px-3 py-3">${c.minOrder ? '€' + c.minOrder : '—'}</td>
+      <td class="px-3 py-3">${c.usedCount}${c.maxUses ? '/' + c.maxUses : ''}</td>
+      <td class="px-3 py-3 ${c.active ? 'text-green-600' : 'text-zinc-400'}">${c.active ? 'Active' : 'Inactive'}</td>
+      <td class="px-3 py-3">${c.active ? `<button class="text-[0.7rem] uppercase px-3 py-1 border border-red-200 rounded text-red-600 hover:bg-red-50 deactivate-btn" data-id="${c._id}">Deactivate</button>` : ''}</td>
+    </tr>`).join('')}</tbody></table>`;
 
-    wrap.innerHTML = `<table class="admin-table">
-      <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Used / Max</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>${coupons.map((c: any) => `<tr>
-        <td style="font-family:monospace;font-weight:600">${c.code}</td>
-        <td>${c.type === 'percent' ? '% Off' : '€ Fixed'}</td>
-        <td>${c.type === 'percent' ? c.value + '%' : '€' + c.value}</td>
-        <td>${c.minOrder ? '€' + c.minOrder : '—'}</td>
-        <td>${c.usedCount}${c.maxUses ? ' / ' + c.maxUses : ''}</td>
-        <td style="color:${c.active ? '#16a34a' : '#6b7280'}">${c.active ? 'Active' : 'Inactive'}</td>
-        <td>${c.active ? `<button class="admin-btn admin-btn-danger deactivate-btn" data-id="${c._id}">Deactivate</button>` : ''}</td>
-      </tr>`).join('')}</tbody>
-    </table>`;
-
-    wrap.querySelectorAll('.deactivate-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        await convex.mutation(api.coupons.deactivate, { id: (e.target as HTMLElement).dataset.id as any });
-        load();
-      });
-    });
+    wrap.querySelectorAll('.deactivate-btn').forEach(btn => btn.addEventListener('click', async (e) => {
+      await convex.mutation(api.coupons.deactivate, { id: (e.target as HTMLElement).dataset.id as any }); load();
+    }));
   }
 
   document.getElementById("coupon-form")!.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const data = new FormData(form);
+    const data = new FormData(e.target as HTMLFormElement);
     await convex.mutation(api.coupons.create, {
-      code: data.get("code") as string,
-      type: data.get("type") as string,
-      value: Number(data.get("value")),
+      code: data.get("code") as string, type: data.get("type") as string, value: Number(data.get("value")),
       minOrder: data.get("minOrder") ? Number(data.get("minOrder")) : undefined,
       maxUses: data.get("maxUses") ? Number(data.get("maxUses")) : undefined,
     });
-    form.reset();
-    load();
+    (e.target as HTMLFormElement).reset(); load();
   });
-
   load();
 </script>
-
-<style>
-  .section-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; }
-  .coupon-form { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-  .admin-input {
-    background: var(--admin-bg); border: 1px solid var(--admin-rule); padding: 0.5rem 0.75rem;
-    font-size: 0.8rem; border-radius: 4px; outline: none; color: var(--admin-ink);
-  }
-  .admin-input:focus { border-color: var(--admin-ink); }
-  .admin-input.small { width: 90px; }
-</style>
