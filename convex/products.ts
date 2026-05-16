@@ -5,17 +5,16 @@ import { internal } from "./_generated/api";
 export const list = query({
   args: { category: v.optional(v.string()), activeOnly: v.optional(v.boolean()) },
   handler: async (ctx, args) => {
-    const products =
-      args.activeOnly === false
-        ? await ctx.db.query("products").collect()
-        : await ctx.db
-            .query("products")
-            .withIndex("by_active", (q) => q.eq("active", true))
-            .collect();
     if (args.category && args.category !== "All") {
-      return products.filter((p) => p.category === args.category);
+      const products = await ctx.db
+        .query("products")
+        .withIndex("by_category", (q) => q.eq("category", args.category!))
+        .collect();
+      return args.activeOnly === false ? products : products.filter((p) => p.active);
     }
-    return products;
+    return args.activeOnly === false
+      ? await ctx.db.query("products").collect()
+      : await ctx.db.query("products").withIndex("by_active", (q) => q.eq("active", true)).collect();
   },
 });
 

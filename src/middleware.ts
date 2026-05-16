@@ -12,23 +12,23 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return context.redirect("/admin/login");
     }
 
-    // Validate session — if Convex is unreachable, allow through
-    // (better to show admin than to lock out on transient errors)
     const convexUrl = import.meta.env.CONVEX_URL;
-    if (convexUrl) {
-      try {
-        const convex = new ConvexHttpClient(convexUrl);
-        const admin = await convex.query(api.auth.validateSession, {
-          token: cookie.value,
-        });
-        if (admin === null) {
-          context.cookies.delete("vh-admin-session", { path: "/admin" });
-          return context.redirect("/admin/login");
-        }
-      } catch (e) {
-        // Log but don't block — transient Convex errors shouldn't lock admin out
-        console.error("Admin session validation error:", e);
+    if (!convexUrl) {
+      return context.redirect("/admin/login");
+    }
+
+    try {
+      const convex = new ConvexHttpClient(convexUrl);
+      const admin = await convex.query(api.auth.validateSession, {
+        token: cookie.value,
+      });
+      if (admin === null) {
+        context.cookies.delete("vh-admin-session", { path: "/admin" });
+        return context.redirect("/admin/login");
       }
+    } catch {
+      // Fail-closed: deny access on any error
+      return context.redirect("/admin/login");
     }
   }
 

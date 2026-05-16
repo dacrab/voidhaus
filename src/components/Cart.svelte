@@ -7,7 +7,7 @@
   const modal = createModal();
 
   let open = $state(false);
-  let items = $state<CartItem[]>([]);
+  let items = $state.raw<CartItem[]>([]);
   let panelEl = $state<HTMLElement | undefined>();
   let checking = $state(false);
   let couponCode = $state('');

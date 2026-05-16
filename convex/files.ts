@@ -1,15 +1,16 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Generate an upload URL for the client to upload directly to Convex storage
+// Upload URL generation — still public mutation but validates session token
 export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    const session = await ctx.db.query("adminSessions").withIndex("by_token", (q) => q.eq("token", args.token)).first();
+    if (!session || Date.now() > session.expiresAt) throw new Error("Unauthorized");
     return await ctx.storage.generateUploadUrl();
   },
 });
 
-// Get a serving URL for a stored file
 export const getUrl = query({
   args: { storageId: v.id("_storage") },
   handler: async (ctx, args) => {
@@ -17,10 +18,11 @@ export const getUrl = query({
   },
 });
 
-// Delete a stored file
 export const remove = mutation({
-  args: { storageId: v.id("_storage") },
+  args: { token: v.string(), storageId: v.id("_storage") },
   handler: async (ctx, args) => {
+    const session = await ctx.db.query("adminSessions").withIndex("by_token", (q) => q.eq("token", args.token)).first();
+    if (!session || Date.now() > session.expiresAt) throw new Error("Unauthorized");
     await ctx.storage.delete(args.storageId);
   },
 });
