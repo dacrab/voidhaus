@@ -115,10 +115,9 @@ const convexUrl = import.meta.env.PUBLIC_CONVEX_URL || '';
       return data.value;
     }
 
-    // Redirect if already logged in
+    // If already logged in, just go to admin
     if (document.cookie.match(/vh-admin-session=([^;]+)/)) {
-      toast("Already authenticated. Redirecting…", "success");
-      setTimeout(function() { window.location.href = "/admin"; }, 800);
+      window.location.replace("/admin");
     }
 
     document.getElementById("login-form").addEventListener("submit", async function(e) {
