@@ -1,10 +1,11 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import ProductCard from '@components/ProductCard.astro';
-import { getProducts, CATEGORIES } from '@data/products';
+import { getCollection } from 'astro:content';
+import { CATEGORIES } from '@data/products';
 import { SITE } from '@data/site';
 
-const PRODUCTS = await getProducts();
+const products = await getCollection('products');
 ---
 
 <Layout title="Collection" solidNav={true}>
@@ -12,7 +13,7 @@ const PRODUCTS = await getProducts();
   <div class="page-header wrap">
     <div class="flex items-baseline justify-between flex-wrap gap-md pb-lg">
       <h1 class="coll-title fw-normal" data-anim="hero">Collection</h1>
-      <span class="label muted" data-anim="hero" data-delay="0.15">{SITE.season} — {PRODUCTS.length} pieces</span>
+      <span class="label muted" data-anim="hero" data-delay="0.15">{SITE.season} — {products.length} pieces</span>
     </div>
     <div class="flex gap-lg md:gap-xl pb-md overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="group" aria-label="Filter by category" data-anim="hero" data-delay="0.2">
       {CATEGORIES.map((f, i) => (
@@ -23,7 +24,7 @@ const PRODUCTS = await getProducts();
   </div>
 
   <div class="product-grid wrap" id="js-grid">
-    {PRODUCTS.map(p => <ProductCard {...p} />)}
+    {products.map(p => <ProductCard {...p.data} />)}
   </div>
 
 </Layout>
