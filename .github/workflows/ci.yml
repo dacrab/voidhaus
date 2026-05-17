@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.user.login == 'dependabot[bot]' && 'dependabot-queue' || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -15,23 +15,18 @@ permissions:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
+    uses: dacrab/.github-workflows/.github/workflows/bun-ci.yml@v1
+    with:
+      node-version: '22'
+      check-cmd: 'bun run type-check'
+      test-cmd: ''
+      build-cmd: 'bun run build'
 
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-
-      - uses: oven-sh/setup-bun@v2
-
-      - run: bun install --frozen-lockfile
-
-      - name: Type check
-        run: bun run type-check
-
-      - name: Build
-        run: bun run build
-        env:
-          CONVEX_URL: ${{ secrets.CONVEX_URL }}
+  auto-merge:
+    needs: ci
+    permissions:
+      pull-requests: write
+      contents: write
+    uses: dacrab/.github-workflows/.github/workflows/dependabot-auto-merge.yml@v1
+    with:
+      target: minor
