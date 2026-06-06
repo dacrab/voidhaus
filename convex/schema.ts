@@ -70,7 +70,7 @@ export default defineSchema({
 
   coupons: defineTable({
     code: v.string(),
-    type: v.string(),
+    type: v.union(v.literal("percent"), v.literal("fixed")),
     value: v.number(),
     minOrder: v.optional(v.number()),
     maxUses: v.optional(v.number()),
@@ -94,4 +94,21 @@ export default defineSchema({
     token: v.string(),
     expiresAt: v.number(),
   }).index("by_token", ["token"]),
+
+  stockists: defineTable({
+    region: v.string(),
+    stores: v.array(
+      v.object({
+        city: v.string(),
+        name: v.string(),
+        address: v.string(),
+        country: v.string(),
+      })
+    ),
+  }),
+
+  siteConfig: defineTable({
+    key: v.string(),
+    value: v.any(),
+  }).index("by_key", ["key"]),
 });

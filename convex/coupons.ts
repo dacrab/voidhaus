@@ -45,7 +45,7 @@ export const use = mutation({
 export const create = mutation({
   args: {
     code: v.string(),
-    type: v.string(),
+    type: v.union(v.literal("percent"), v.literal("fixed")),
     value: v.number(),
     minOrder: v.optional(v.number()),
     maxUses: v.optional(v.number()),

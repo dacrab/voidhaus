@@ -2,11 +2,10 @@ import { v } from "convex/values";
 import { query, action, internalQuery, internalMutation, internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import bcrypt from "bcryptjs";
+import crypto from "node:crypto";
 
 function generateToken(): string {
-  const bytes = new Uint8Array(48);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  return crypto.randomBytes(48).toString("hex");
 }
 
 export const login = action({
@@ -50,14 +49,6 @@ export const validateSession = query({
     const admin = await ctx.db.get(session.adminId);
     if (!admin) return null;
     return { email: admin.email, name: admin.name };
-  },
-});
-
-export const logout = internalMutation({
-  args: { token: v.string() },
-  handler: async (ctx, args) => {
-    const session = await ctx.db.query("adminSessions").withIndex("by_token", (q) => q.eq("token", args.token)).first();
-    if (session) await ctx.db.delete(session._id);
   },
 });
 

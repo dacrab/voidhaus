@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://voidhaus.vercel.app/sitemap-index.xml

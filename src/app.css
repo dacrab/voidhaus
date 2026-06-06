@@ -1,0 +1,387 @@
+@import "tailwindcss";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/cormorant";
+
+/* ─── Theme tokens (Tailwind v4) ─────────────────────────────────────────── */
+@theme {
+  --color-white:    #111110;
+  --color-off:      #1a1a18;
+  --color-rule:     #2a2a28;
+  --color-mid:      #555553;
+  --color-soft:     #777773;
+  --color-ink:      #e8e7e4;
+  --color-ink-soft: #b0afac;
+
+  --spacing-xs:  0.5rem;
+  --spacing-sm:  0.75rem;
+  --spacing-md:  1rem;
+  --spacing-lg:  1.5rem;
+  --spacing-xl:  2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  --spacing-4xl: 6rem;
+  --spacing-5xl: 10rem;
+
+  --font-family-sans:  'Space Grotesk Variable', sans-serif;
+  --font-family-serif: 'Cormorant Variable', serif;
+
+  --font-size-xs:   0.6875rem;
+  --font-size-sm:   0.8125rem;
+  --font-size-base: 1rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.25rem;
+
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-img:    cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --duration-fast:    0.25s;
+  --duration-base:    0.4s;
+  --duration-slower:  0.7s;
+}
+
+/* ─── Non-theme tokens ───────────────────────────────────────────────────── */
+:root {
+  /* Variable font axes */
+  --fw-light:    'wght' 250;
+  --fw-normal:   'wght' 350;
+  --fw-medium:   'wght' 450;
+  --fw-semibold: 'wght' 550;
+
+  /* Letter spacing */
+  --ls-display:  -0.05em;
+  --ls-label:    0.15em;
+  --ls-button:   0.10em;
+  --ls-wide:     0.06em;
+
+  /* Noise texture — colder, higher contrast */
+  --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+
+  /* Overlay / scrim — inverted for dark bg */
+  --ot-primary:   rgb(255 255 255 / 0.92);
+  --ot-secondary: rgb(255 255 255 / 0.55);
+  --ot-muted:     rgb(255 255 255 / 0.35);
+  --scrim-heavy:  rgb(0 0 0 / 0.75);
+  --scrim-medium: rgb(0 0 0 / 0.50);
+  --scrim-light:  rgb(0 0 0 / 0.25);
+  --backdrop:     rgb(0 0 0 / 0.70);
+
+  /* Opacity steps */
+  --op-disabled:  0.25;
+  --op-muted:     0.35;
+  --op-hover:     0.55;
+
+  /* Layout */
+  --nav-h:       4.25rem;
+  --page-top:    calc(var(--nav-h) + 3rem);
+  --page-top-lg: calc(var(--nav-h) + 4rem);
+
+  /* Display type scale */
+  --text-display: clamp(2.5rem, 8vw, 6rem);
+
+  /*
+   * ── Compatibility aliases ──────────────────────────────────────────────
+   * Svelte components use --text-*, --radius-full, --font-sans/serif.
+   */
+  --font-sans:  var(--font-family-sans);
+  --font-serif: var(--font-family-serif);
+
+  --text-xs:   0.6875rem;
+  --text-sm:   0.8125rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+
+  --radius-full: 9999px;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  button, input, select, textarea, fieldset { border-radius: 0; }
+
+  html {
+    background-color: var(--color-white);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-variation-settings: var(--fw-normal);
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body   { overflow-x: hidden; }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: var(--grain);
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.20;
+  }
+  a      { color: inherit; text-decoration: none; }
+  img, video { display: block; max-width: 100%; }
+  button { font-family: inherit; }
+
+  :focus-visible { outline: 1px solid var(--color-ink); outline-offset: 2px; }
+  ::-webkit-scrollbar { width: 1px; }
+  ::-webkit-scrollbar-thumb { background: var(--color-rule); }
+  ::selection { background: var(--color-ink); color: var(--color-white); }
+
+  picture { display: block; width: 100%; height: 100%; }
+  picture img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+}
+
+/* ─── Components ─────────────────────────────────────────────────────────── */
+@layer components {
+
+  /* Veil */
+  #js-veil {
+    position: fixed; inset: 0;
+    background: #000;
+    z-index: 10000; pointer-events: none; opacity: 1;
+    transition: opacity 0.9s var(--ease-out);
+    display: flex; align-items: center; justify-content: center;
+  }
+  #js-veil.out { opacity: 0; }
+  .veil-mark {
+    font-size: var(--font-size-sm);
+    font-variation-settings: var(--fw-semibold);
+    letter-spacing: var(--ls-label);
+    text-transform: uppercase;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  }
+
+  /* ── Typography ── */
+  .label {
+    font-size: var(--font-size-xs);
+    font-variation-settings: var(--fw-medium);
+    letter-spacing: var(--ls-label);
+    text-transform: uppercase;
+    color: var(--color-soft);
+  }
+  .serif {
+    font-family: var(--font-serif);
+    font-variation-settings: var(--fw-medium);
+  }
+
+  /* Font weight utilities */
+  .fw-light  { font-variation-settings: var(--fw-light); }
+  .fw-normal { font-variation-settings: var(--fw-normal); }
+  .fw-medium { font-variation-settings: var(--fw-medium); }
+
+  /* ── Opacity ── */
+  .op-30 { opacity: 0.3; }
+  .op-35 { opacity: 0.35; }
+  .muted { opacity: var(--op-muted); }
+
+  /* ── Layout ── */
+  .wrap  { width: 100%; padding-inline: clamp(var(--spacing-lg), 5vw, var(--spacing-4xl)); }
+  .rule  { width: 100%; height: 1px; background: var(--color-rule); flex-shrink: 0; }
+  .scrim { position: absolute; inset: 0; pointer-events: none; }
+
+  .page-header {
+    padding-top: var(--page-top);
+    padding-bottom: var(--spacing-2xl);
+  }
+  @media (min-width: 768px) { .page-header { padding-top: var(--page-top-lg); } }
+
+  .backdrop { position: fixed; inset: 0; z-index: var(--backdrop-z, 100); }
+
+  /* ── Interactive ── */
+  .muted-link { opacity: var(--op-muted); transition: opacity var(--duration-fast); }
+  .muted-link:hover { opacity: 1; }
+
+  .ghost-btn {
+    background: none; border: none; padding: 0;
+    color: var(--color-ink); opacity: var(--op-muted);
+    transition: opacity var(--duration-fast);
+  }
+  .ghost-btn:hover { opacity: 1; }
+
+  /* ── Product grid ── */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--color-soft);
+    border-inline: 1px solid var(--color-soft);
+    border-bottom: 1px solid var(--color-soft);
+  }
+  @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  /* ── Card info ── */
+  .card-info {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: var(--spacing-md) var(--spacing-md) 1.25rem;
+    gap: var(--spacing-xs); border-top: 1px solid var(--color-soft);
+  }
+  @media (min-width: 768px) { .card-info { padding: 1.25rem var(--spacing-lg) 1.75rem; } }
+  .card-info-l { display: flex; flex-direction: column; gap: var(--spacing-xs); min-width: 0; }
+  .card-name {
+    font-size: var(--font-size-sm); font-variation-settings: var(--fw-normal);
+    color: var(--color-ink); margin-top: var(--spacing-xs);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card-price { white-space: nowrap; flex-shrink: 0; }
+
+  /* ── PageHeader ── */
+  .ph-inner {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding-bottom: var(--spacing-lg); gap: var(--spacing-md);
+  }
+  .ph-left { display: flex; flex-direction: column; gap: var(--spacing-xs); }
+  .ph-title {
+    font-size: var(--text-display);
+    font-variation-settings: var(--fw-light);
+    letter-spacing: -0.04em; line-height: 1;
+  }
+
+  /* ── CTA strip ── */
+  .cta { padding-block: var(--spacing-lg) var(--spacing-3xl); }
+  .cta-inner {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: var(--spacing-sm); padding-block: var(--spacing-lg);
+  }
+
+  /* ── Overlay text colours ── */
+  .ot-primary   { color: var(--ot-primary); }
+  .ot-secondary { color: var(--ot-secondary); }
+  .ot-muted     { color: var(--ot-muted); }
+
+  /* ── Shared btn-outline ── */
+  .btn-outline {
+    display: flex; align-items: center; justify-content: space-between;
+    background: none; border: 1px solid var(--color-ink);
+    color: var(--color-ink); padding: var(--spacing-md) 1.25rem; width: 100%;
+    position: relative; overflow: hidden;
+    transition: color 0.6s var(--ease-out);
+  }
+  .btn-outline::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--color-ink);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.8s var(--ease-out);
+    z-index: 0;
+  }
+  .btn-outline > * { position: relative; z-index: 1; }
+  .btn-outline:hover { color: #111; }
+  .btn-outline:hover::before { transform: scaleX(1); }
+}
+
+/* ─── Animations ──────────────────────────────────────────────────────────── */
+
+/* Image reveals */
+.js-hero-img {
+  animation: fade-scale-in 0.7s var(--ease-out) 0.15s both;
+}
+.js-main-img {
+  animation: main-fade-in 0.7s var(--ease-out) 0.15s both;
+}
+@keyframes fade-scale-in {
+  from { opacity: 0; transform: scale(1.12); }
+  to   { opacity: 1; transform: scale(1.06); }
+}
+@keyframes main-fade-in {
+  from { opacity: 0; transform: scale(1.04); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+html:not(.no-js) :is(.js-atelier-img, .js-img) {
+  animation: fade-scale-in 0.7s var(--ease-out) 0.15s both;
+}
+
+/* Data-anim initial states + transitions */
+html:not(.no-js) [data-anim="hero"],
+html:not(.no-js) [data-anim="scroll"],
+html:not(.no-js) [data-anim="stagger"],
+html:not(.no-js) .js-hero-season,
+html:not(.no-js) .js-hero-tagline,
+html:not(.no-js) .js-hero-title,
+html:not(.no-js) .js-hero-cta,
+html:not(.no-js) [data-pdp-info] > * {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+
+html:not(.no-js) [data-anim="hero"].in-view,
+html:not(.no-js) [data-anim="scroll"].in-view,
+html:not(.no-js) [data-anim="stagger"].in-view,
+html:not(.no-js) .js-hero-season.in-view,
+html:not(.no-js) .js-hero-tagline.in-view,
+html:not(.no-js) .js-hero-title.in-view,
+html:not(.no-js) .js-hero-cta.in-view,
+html:not(.no-js) [data-pdp-info] > *.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Rule grow animation */
+html:not(.no-js) .js-rule {
+  transform: scaleX(0);
+  transition: transform 0.8s var(--ease-out);
+}
+html:not(.no-js) .js-rule.in-view {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html:not(.no-js) [data-anim],
+  html:not(.no-js) .js-hero-img,
+  html:not(.no-js) .js-main-img,
+  html:not(.no-js) .js-atelier-img,
+  html:not(.no-js) .js-img,
+  html:not(.no-js) .js-hero-season,
+  html:not(.no-js) .js-hero-tagline,
+  html:not(.no-js) .js-hero-title,
+  html:not(.no-js) .js-hero-cta,
+  html:not(.no-js) [data-pdp-info] > * {
+    will-change: opacity, transform;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not(.no-js) [data-anim],
+  html:not(.no-js) .js-hero-img,
+  html:not(.no-js) .js-main-img,
+  html:not(.no-js) .js-atelier-img,
+  html:not(.no-js) .js-img,
+  html:not(.no-js) .js-hero-season,
+  html:not(.no-js) .js-hero-tagline,
+  html:not(.no-js) .js-hero-title,
+  html:not(.no-js) .js-hero-cta,
+  html:not(.no-js) [data-pdp-info] > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ─── View transitions ───────────────────────────────────────────────────── */
+::view-transition-old(root) { animation: 0.45s var(--ease-in) both _vt-out; }
+::view-transition-new(root) { animation: 0.5s var(--ease-in-out) 0.15s both _vt-in; opacity: 0; }
+
+@keyframes _vt-out {
+  from { opacity: 1; filter: blur(0); }
+  to   { opacity: 0; filter: blur(2px); }
+}
+@keyframes _vt-in {
+  from { opacity: 0; filter: blur(2px); }
+  to   { opacity: 1; filter: blur(0); }
+}
+
+::view-transition-group(*) {
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: var(--duration-slower);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(*) { animation-duration: 0.01ms; }
+}
