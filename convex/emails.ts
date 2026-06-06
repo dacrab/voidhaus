@@ -19,7 +19,6 @@ export const sendOrderConfirmation = internalAction({
   handler: async (_, args) => {
     const resendKey = process.env.RESEND_API_KEY;
     if (!resendKey) {
-      console.log("RESEND_API_KEY not set, skipping email. Would send to:", args.customerEmail);
       return;
     }
 
@@ -68,10 +67,8 @@ export const triggerRebuild = internalAction({
   handler: async () => {
     const hookUrl = process.env.VERCEL_DEPLOY_HOOK;
     if (!hookUrl) {
-      console.log("VERCEL_DEPLOY_HOOK not set, skipping rebuild trigger");
       return;
     }
     await fetch(hookUrl, { method: "POST" });
-    console.log("Triggered Vercel rebuild");
   },
 });

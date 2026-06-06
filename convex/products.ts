@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 export const list = query({
@@ -114,8 +114,7 @@ export const remove = mutation({
   },
 });
 
-// Decrement stock for a specific size
-export const decrementSizeStock = mutation({
+export const decrementSizeStock = internalMutation({
   args: { id: v.id("products"), size: v.string(), quantity: v.number() },
   handler: async (ctx, args) => {
     const product = await ctx.db.get(args.id);
@@ -127,3 +126,5 @@ export const decrementSizeStock = mutation({
     await ctx.db.patch(args.id, { sizeStock, stock });
   },
 });
+
+

@@ -1,12 +1,12 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { api } from "./_generated/api";
 
-// Upload URL generation — still public mutation but validates session token
 export const generateUploadUrl = mutation({
   args: { token: v.string() },
   handler: async (ctx, args) => {
-    const session = await ctx.db.query("adminSessions").withIndex("by_token", (q) => q.eq("token", args.token)).first();
-    if (!session || Date.now() > session.expiresAt) throw new Error("Unauthorized");
+    const valid = await ctx.runQuery(api.auth.validateSession, { token: args.token });
+    if (!valid) throw new Error("Unauthorized");
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -21,8 +21,8 @@ export const getUrl = query({
 export const remove = mutation({
   args: { token: v.string(), storageId: v.id("_storage") },
   handler: async (ctx, args) => {
-    const session = await ctx.db.query("adminSessions").withIndex("by_token", (q) => q.eq("token", args.token)).first();
-    if (!session || Date.now() > session.expiresAt) throw new Error("Unauthorized");
+    const valid = await ctx.runQuery(api.auth.validateSession, { token: args.token });
+    if (!valid) throw new Error("Unauthorized");
     await ctx.storage.delete(args.storageId);
   },
 });

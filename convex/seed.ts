@@ -21,37 +21,10 @@ export const seed = mutation({
     const existing = await ctx.db.query("products").first();
     if (existing) return "Already seeded";
     for (const p of PRODUCTS) {
-      await ctx.db.insert("products", { ...p, active: true } as any);
+      await ctx.db.insert("products", { ...p, sizeStock: p.sizeStock as unknown as Record<string, number>, active: true });
     }
     return `Seeded ${PRODUCTS.length} products`;
   },
 });
 
-// Migration: add sizeStock to existing products that don't have it
-export const migrateSizeStock = mutation({
-  args: {},
-  handler: async (ctx) => {
-    const products = await ctx.db.query("products").collect();
-    let migrated = 0;
-    for (const p of products) {
-      if (!p.sizeStock) {
-        // Distribute stock evenly across sizes
-        const perSize = Math.max(1, Math.floor(p.stock / p.sizes.length));
-        const sizeStock: Record<string, number> = {};
-        let remaining = p.stock;
-        for (const size of p.sizes) {
-          const qty = Math.min(perSize, remaining);
-          sizeStock[size] = qty;
-          remaining -= qty;
-        }
-        // Give remainder to first size
-        if (remaining > 0 && p.sizes.length > 0) {
-          sizeStock[p.sizes[0]] += remaining;
-        }
-        await ctx.db.patch(p._id, { sizeStock });
-        migrated++;
-      }
-    }
-    return `Migrated ${migrated} products`;
-  },
-});
+
