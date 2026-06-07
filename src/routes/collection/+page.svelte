@@ -22,14 +22,18 @@
 
 <div class="wrap">
   <div class="rule"></div>
-  <nav class="flex flex-wrap gap-md py-lg" aria-label="Category filters">
+  <nav class="cat-filters" aria-label="Category filters">
     {#each categories as cat}
       <button
-        class="label transition-opacity duration-[var(--duration-fast)] {activeCategory === cat ? 'text-[var(--color-ink)] opacity-100' : 'muted-link'}"
+        class="cat-filter label"
+        class:cat-filter--active={activeCategory === cat}
         onclick={() => (activeCategory = cat)}
         aria-pressed={activeCategory === cat}
       >
         {cat}
+        {#if activeCategory === cat}
+          <span class="cat-filter-rule" aria-hidden="true"></span>
+        {/if}
       </button>
     {/each}
   </nav>
@@ -48,3 +52,30 @@
     />
   {/each}
 </div>
+
+<style>
+  .cat-filters {
+    display: flex; flex-wrap: wrap; gap: 0;
+    padding-block: var(--spacing-lg);
+  }
+  .cat-filter {
+    position: relative;
+    background: none; border: none; padding: 0.5rem 0;
+    margin-right: var(--spacing-lg);
+    opacity: var(--op-muted);
+    transition: opacity var(--duration-fast);
+    cursor: pointer;
+  }
+  .cat-filter:hover { opacity: 0.6; }
+  .cat-filter--active { opacity: 1; }
+  .cat-filter-rule {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 1px; background: var(--color-ink);
+    animation: rule-in 0.4s var(--ease-out) both;
+    transform-origin: left;
+  }
+  @keyframes rule-in {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+</style>

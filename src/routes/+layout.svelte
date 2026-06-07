@@ -32,7 +32,7 @@
           veil.classList.add('out');
           veil.addEventListener('transitionend', () => veil.remove(), { once: true });
         }, 400);
-      }, 800);
+      }, 900);
     } else {
       requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add('out')));
       veil.addEventListener('transitionend', () => veil.remove(), { once: true });
@@ -61,17 +61,39 @@
   {@render children()}
 </main>
 
-<footer class="border-t border-[var(--color-rule)] mt-3xl">
-  <div class="wrap py-6 pb-8">
-    <div class="rule"></div>
-    <div class="flex items-center justify-between flex-wrap gap-sm pt-lg">
-      <span class="label muted">&copy; {new Date().getFullYear()} {SITE.name}</span>
-      <nav class="flex gap-lg items-center" aria-label="Legal navigation">
-        <a href="/stockists" class="label muted muted-link" style="padding-block:0.5rem">Stockists</a>
-        <a href="/privacy"   class="label muted muted-link" style="padding-block:0.5rem">Privacy</a>
-        <a href="/terms"    class="label muted muted-link" style="padding-block:0.5rem">Terms</a>
+<footer class="footer">
+  <div class="wrap">
+    <div class="rule js-rule"></div>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="label muted">&copy; {new Date().getFullYear()} {SITE.name}</span>
+        <span class="label muted">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
+      </div>
+      <nav class="footer-nav" aria-label="Legal navigation">
+        <a href="/stockists" class="label muted muted-link">Stockists</a>
+        <a href="/privacy"   class="label muted muted-link">Privacy</a>
+        <a href="/terms"    class="label muted muted-link">Terms</a>
+        <a href="/contact" class="label muted muted-link">Contact</a>
       </nav>
-      <span class="label muted hidden sm:block">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
     </div>
   </div>
 </footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-rule);
+    margin-top: var(--spacing-3xl);
+    padding-block: var(--spacing-2xl) var(--spacing-3xl);
+  }
+  .footer-inner {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    flex-wrap: wrap; gap: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+  }
+  .footer-brand {
+    display: flex; flex-direction: column; gap: var(--spacing-xs);
+  }
+  .footer-nav {
+    display: flex; gap: var(--spacing-lg); align-items: center; flex-wrap: wrap;
+  }
+</style>

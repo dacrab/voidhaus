@@ -21,6 +21,12 @@
       const el = document.querySelector<HTMLElement>(sel);
       if (el) { el.style.transitionDelay = `${0.3 + i * 0.15}s`; el.classList.add('in-view'); }
     });
+    // stagger hero brand lines
+    const lines = document.querySelectorAll<HTMLElement>('.hero-brand-line');
+    lines.forEach((el, i) => {
+      el.style.transitionDelay = `${0.4 + i * 0.12}s`;
+      el.classList.add('in-view');
+    });
   }
 
   onMount(runAnimations);
@@ -44,11 +50,16 @@
     height="1013"
   />
   <div class="hero-scrim scrim"></div>
-  <div class="relative z-10 flex flex-col">
+  <div class="relative z-10 flex flex-col h-full">
     <span class="label js-hero-season ot-secondary hero-season">{season}</span>
-    <h1 class="hero-title js-hero-title fw-light ot-primary">VOIDHAUS</h1>
-    <div class="wrap flex items-baseline justify-between pb-2xl border-t border-white/10 pt-md">
-      <span class="label js-hero-cta ot-muted tracking-[0.3em]">Scroll</span>
+    <div class="hero-brand">
+      <div class="hero-brand-line fw-light ot-primary">VOID</div>
+      <div class="hero-brand-line fw-light ot-primary">HAUS</div>
+    </div>
+    <div class="wrap flex items-baseline justify-between pb-2xl border-t border-white/10 pt-md mt-auto">
+      <span class="scroll-indicator label js-hero-cta ot-muted tracking-[0.3em]">
+        <span class="scroll-line"></span>Scroll
+      </span>
       <span class="label js-hero-tagline ot-muted hidden sm:block">Twelve pieces. One position.</span>
     </div>
   </div>
@@ -103,7 +114,7 @@
   .hero-scrim {
     position: absolute; inset: 0; pointer-events: none;
     background:
-      linear-gradient(to bottom, transparent 30%, rgb(0 0 0 / 0.65) 100%),
+      linear-gradient(to bottom, transparent 20%, rgb(0 0 0 / 0.75) 100%),
       linear-gradient(to top, transparent 92%, rgb(0 0 0 / 0.35) 100%);
   }
   .hero-season {
@@ -111,12 +122,24 @@
     top: calc(var(--nav-h) + var(--spacing-lg));
     left: clamp(var(--spacing-lg), 5vw, var(--spacing-4xl));
   }
-  .hero-title {
-    font-size: clamp(3rem, 18vw, 18rem);
-    letter-spacing: -0.06em;
-    line-height: 0.88;
+  .hero-brand {
+    display: flex;
+    flex-direction: column;
     padding-inline: clamp(var(--spacing-lg), 5vw, var(--spacing-4xl));
     padding-bottom: var(--spacing-lg);
+    margin-top: auto;
+  }
+  .hero-brand-line {
+    font-size: var(--text-hero);
+    letter-spacing: -0.06em;
+    line-height: 0.82;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1s var(--ease-out), transform 1s var(--ease-out);
+  }
+  .hero-brand-line:global(.in-view) {
+    opacity: 1;
+    transform: translateY(0);
   }
   .featured-grid { grid-template-columns: repeat(2, 1fr); }
   @media (min-width: 1024px) { .featured-grid { grid-template-columns: repeat(4, 1fr); } }

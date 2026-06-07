@@ -17,5 +17,5 @@
       <span class="label muted self-end pb-1" data-anim="hero" data-delay="0.2">{aside}</span>
     {/if}
   </div>
-  <div class="rule"></div>
+  <div class="rule js-rule"></div>
 </div>
