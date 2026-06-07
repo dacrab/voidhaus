@@ -1,6 +1,6 @@
+import { CONVEX_URL } from '$env/static/private';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '$convex/api';
-import { CONVEX_URL } from '$env/static/private';
 import type { Product } from '$lib/data/products';
 import type { Region } from '$lib/data/stockists';
 
