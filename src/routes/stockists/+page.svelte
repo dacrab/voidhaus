@@ -37,7 +37,7 @@
   <div class="stockist-inquiry" data-anim="scroll">
     <span class="label muted">Atelier inquiries</span>
     <div class="flex items-baseline justify-between flex-wrap gap-sm">
-      <span class="fw-normal text-[var(--color-soft)]">{SITE.ateliers.map(a => `${a.city} — ${a.specialty}`).join(' · ')}</span>
+      <span class="fw-normal text-soft">{SITE.ateliers.map(a => `${a.city} — ${a.specialty}`).join(' · ')}</span>
       <a href="/contact" class="label muted muted-link">Contact →</a>
     </div>
   </div>

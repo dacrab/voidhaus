@@ -48,7 +48,7 @@
   <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl">
     <div class="pdp-images">
       <img
-        class="js-main-img w-full aspect-[3/4] object-cover object-top bg-[var(--color-off)]"
+        class="js-main-img w-full aspect-[3/4] object-cover object-top bg-off"
         src={mainImg}
         alt={product.name}
         width="900"
@@ -56,7 +56,7 @@
       />
       {#if altImg}
         <img
-          class="w-full aspect-[3/4] object-cover object-top bg-[var(--color-off)] mt-1"
+          class="w-full aspect-[3/4] object-cover object-top bg-off mt-1"
           src={altImg}
           alt="{product.name} detail"
           loading="lazy"
@@ -68,12 +68,12 @@
     </div>
 
     <div data-pdp-info>
-      <div class="flex flex-col gap-sm pb-lg border-b border-[var(--color-rule)]" data-anim="hero">
+      <div class="flex flex-col gap-sm pb-lg border-b border-rule" data-anim="hero">
         <span class="label muted">{product.num} / {product.category}</span>
         <span class="serif text-2xl md:text-3xl fw-light">&euro; {formatPrice(product.price)}</span>
       </div>
 
-      <p class="text-[var(--color-soft)] leading-[1.85] py-lg max-w-[52ch]" data-anim="hero" data-delay="0.1">{product.desc}</p>
+      <p class="text-soft leading-[1.85] py-lg max-w-[52ch]" data-anim="hero" data-delay="0.1">{product.desc}</p>
 
       <div class="flex flex-col gap-sm pb-lg" data-anim="hero" data-delay="0.2">
         <span class="label muted">Material</span>
@@ -82,7 +82,7 @@
         <span class="fw-normal">{product.origin}</span>
       </div>
 
-      <div class="flex flex-col gap-sm pb-lg border-b border-[var(--color-rule)]" data-anim="hero" data-delay="0.3">
+      <div class="flex flex-col gap-sm pb-lg border-b border-rule" data-anim="hero" data-delay="0.3">
         <div class="flex items-center justify-between">
           <span class="label muted">Size</span>
           <SizeGuide category={product.category === 'Footwear' ? 'Footwear' : 'Clothing'} />
@@ -102,10 +102,9 @@
 
       <div class="pt-lg" data-anim="hero" data-delay="0.4">
         <button
-          class="btn-outline"
+          class="btn-outline {!selectedSize ? 'op-35 cursor-not-allowed' : ''}"
           onclick={addToCart}
           disabled={!selectedSize}
-          style={selectedSize ? '' : 'opacity:0.35;cursor:not-allowed'}
         >
           <span class="label">{added ? 'Added ✓' : 'Add to Selection'}</span>
           <span class="label">&euro; {formatPrice(product.price)}</span>
@@ -114,9 +113,9 @@
 
       <div class="flex flex-col gap-xs pt-lg" data-anim="hero" data-delay="0.5">
         {#each sharedDetails as [label, value]}
-          <div class="flex justify-between text-sm border-b border-[var(--color-rule)] py-xs">
+          <div class="flex justify-between text-sm border-b border-rule py-xs">
             <span class="label muted">{label}</span>
-            <span class="fw-normal text-[var(--color-soft)]">{value}</span>
+            <span class="fw-normal text-soft">{value}</span>
           </div>
         {/each}
       </div>

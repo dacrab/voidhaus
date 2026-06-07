@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { afterNavigate } from '$app/navigation';
   import { IMAGES } from '$lib/data/images';
   import ProductCard from '$lib/components/ProductCard.svelte';
@@ -16,12 +15,11 @@
 
   function runAnimations() {
     if (!browser) return;
-    const heroTexts = ['.js-hero-title', '.js-hero-season', '.js-hero-cta', '.js-hero-tagline'];
+    const heroTexts = ['.js-hero-season', '.js-hero-cta', '.js-hero-tagline'];
     heroTexts.forEach((sel, i) => {
       const el = document.querySelector<HTMLElement>(sel);
       if (el) { el.style.transitionDelay = `${0.3 + i * 0.15}s`; el.classList.add('in-view'); }
     });
-    // stagger hero brand lines
     const lines = document.querySelectorAll<HTMLElement>('.hero-brand-line');
     lines.forEach((el, i) => {
       el.style.transitionDelay = `${0.4 + i * 0.12}s`;
@@ -29,7 +27,6 @@
     });
   }
 
-  onMount(runAnimations);
   afterNavigate(runAnimations);
 </script>
 
@@ -56,7 +53,7 @@
       <div class="hero-brand-line fw-light ot-primary">VOID</div>
       <div class="hero-brand-line fw-light ot-primary">HAUS</div>
     </div>
-    <div class="wrap flex items-baseline justify-between pb-2xl border-t border-white/10 pt-md mt-auto">
+    <div class="wrap flex items-baseline justify-between pb-2xl border-t border-rule pt-md mt-auto">
       <span class="scroll-indicator label js-hero-cta ot-muted tracking-[0.3em]">
         <span class="scroll-line"></span>Scroll
       </span>
@@ -114,8 +111,8 @@
   .hero-scrim {
     position: absolute; inset: 0; pointer-events: none;
     background:
-      linear-gradient(to bottom, transparent 20%, rgb(0 0 0 / 0.75) 100%),
-      linear-gradient(to top, transparent 92%, rgb(0 0 0 / 0.35) 100%);
+      linear-gradient(to bottom, transparent 20%, var(--scrim-heavy) 100%),
+      linear-gradient(to top, transparent 92%, var(--scrim-light) 100%);
   }
   .hero-season {
     position: absolute;

@@ -23,13 +23,23 @@ export async function getProducts(): Promise<Product[]> {
   }
 }
 
-export async function getProductBySlug(slug: string): Promise<any | null> {
+export async function getProductBySlug(slug: string): Promise<Product | null> {
   const client = getClient();
   if (!client) return PRODUCTS.find(p => p.slug === slug) ?? null;
   try {
     return await client.query(api.products.getBySlug, { slug });
   } catch {
     return PRODUCTS.find(p => p.slug === slug) ?? null;
+  }
+}
+
+export async function getImages(): Promise<Record<string, string> | null> {
+  const client = getClient();
+  if (!client) return null;
+  try {
+    return await client.query(api.images.list);
+  } catch {
+    return null;
   }
 }
 

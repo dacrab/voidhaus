@@ -25,4 +25,4 @@ export const IMAGES: Record<string, string> = {
   'trousers-secondary': '/img/4-secondary.jpg',
   'wool-trousers-primary': '/img/11-primary.jpg',
   'wool-trousers-secondary': '/img/11-secondary.jpg',
-} as const;
+};

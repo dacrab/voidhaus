@@ -112,7 +112,7 @@
         <a href="/collection" class="label empty-link" onclick={closeCart}>Browse Collection →</a>
       </div>
     {:else}
-      <ul class="items" role="list">
+      <ul class="items">
         {#each items as item (item.slug + item.size)}
           <li class="item">
             <a href="/product/{item.slug}" class="item-img-link" onclick={closeCart}>
@@ -233,5 +233,5 @@
   .checkout-btn:hover { background: var(--color-ink-soft); }
   .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  .checkout-error { color: #dc2626; text-align: center; font-size: 12px; }
+  .checkout-error { color: var(--color-error); text-align: center; font-size: 12px; }
 </style>
