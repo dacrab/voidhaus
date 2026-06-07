@@ -45,7 +45,7 @@
           </div>
           <span class="label muted" style="margin-top: var(--spacing-xs)">{chapter.subtitle}</span>
           <h2 class="serif text-3xl md:text-4xl fw-light leading-[1.1]">{chapter.title}</h2>
-          <p class="text-[var(--color-soft)] leading-[1.85] pt-sm max-w-[48ch]">{chapter.text}</p>
+          <p class="text-soft leading-[1.85] pt-sm max-w-[48ch]">{chapter.text}</p>
         </div>
         <div class="mt-xl">
           <a href="/collection?{chapter.id}" class="label muted muted-link">View collection →</a>
@@ -79,8 +79,7 @@
   }
   @media (min-width: 768px) {
     .chapter { display: grid; grid-template-columns: 1fr 1fr; }
-    .chapter.odd { direction: rtl; }
-    .chapter.odd > * { direction: ltr; }
+    .chapter.odd .chapter-img-wrap { order: 1; }
     .chapter-img-wrap { aspect-ratio: auto; height: 100%; max-height: 80svh; }
   }
 </style>

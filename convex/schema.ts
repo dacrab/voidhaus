@@ -111,4 +111,9 @@ export default defineSchema({
     key: v.string(),
     value: v.any(),
   }).index("by_key", ["key"]),
+
+  images: defineTable({
+    key: v.string(),
+    url: v.string(),
+  }).index("by_key", ["key"]),
 });

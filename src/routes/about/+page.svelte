@@ -18,7 +18,7 @@
   <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl items-start py-2xl md:py-3xl">
     <div class="overflow-hidden">
       <img
-        class="js-atelier-img w-full aspect-[4/5] object-cover bg-[var(--color-off)]"
+        class="js-atelier-img w-full aspect-[4/5] object-cover bg-off"
         src={atelier}
         alt="Voidhaus atelier"
         loading="lazy"
@@ -36,10 +36,10 @@
         </p>
       </div>
       <div class="flex flex-col gap-md" data-anim="hero" data-delay="0.2">
-        <p class="text-[var(--color-soft)] leading-[1.85] max-w-[52ch]">
+        <p class="text-soft leading-[1.85] max-w-[52ch]">
           Voidhaus exists at the intersection of restraint and intent. Each piece begins as a question — What remains when everything unnecessary is taken away? — and ends as an answer worn close to the body.
         </p>
-        <p class="text-[var(--color-soft)] leading-[1.85] max-w-[52ch]">
+        <p class="text-soft leading-[1.85] max-w-[52ch]">
           Our ateliers in Milan, Antwerp, Florence, and Tokyo share a single discipline: no excess, no compromise, no ornament without purpose. The result is a wardrobe that exists outside of time — twelve pieces, four cities, one position.
         </p>
       </div>

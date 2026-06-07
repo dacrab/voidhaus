@@ -26,7 +26,7 @@ export interface Product {
   desc: string;
   sizes: string[];
   img: string;
-  img2: string;
+  img2?: string;
 }
 
 export const PRODUCTS: Product[] = [

@@ -16,7 +16,7 @@
 
 <article class="pc" data-category={category}>
   <a class="block" href="/product/{slug}" aria-label="{name} — € {price.toLocaleString('en-US')}">
-    <div class="pc-media relative aspect-[3/4] overflow-hidden bg-[var(--color-off)]">
+    <div class="pc-media relative aspect-[3/4] overflow-hidden bg-off">
       <img
         class="pc-img pc-primary"
         src={IMAGES[img]}
@@ -55,7 +55,6 @@
 <style>
   .pc {
     transition: opacity 0.5s ease, transform 0.5s ease;
-    will-change: opacity, transform;
     position: relative;
   }
   .pc-img {
@@ -76,7 +75,7 @@
     width: 1.5rem; height: 1px; background: var(--ot-primary);
   }
   .pc-indicator-label {
-    color: var(--ot-primary) !important;
+    color: var(--ot-primary);
     font-size: 0.625rem;
   }
   @media (hover: hover) {

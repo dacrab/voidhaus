@@ -8,9 +8,13 @@
   let sent = $state(false);
   let error = $state('');
 
+  let submitting = $state(false);
+
   async function handleSubmit(e: Event) {
     e.preventDefault();
+    if (submitting) return;
     error = '';
+    submitting = true;
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -25,10 +29,10 @@
       }
     } catch {
       error = 'Network error. Please try again.';
+    } finally {
+      submitting = false;
     }
   }
-
-  
 </script>
 
 <svelte:head>
@@ -44,7 +48,7 @@
       {#if sent}
         <div class="flex flex-col gap-sm">
           <span class="label fw-medium">Message sent</span>
-          <p class="text-[var(--color-soft)] leading-[1.85]">Thank you for reaching out. We will respond within two business days.</p>
+          <p class="text-soft leading-[1.85]">Thank you for reaching out. We will respond within two business days.</p>
         </div>
       {:else}
         <form class="flex flex-col gap-lg" onsubmit={handleSubmit}>
@@ -61,12 +65,12 @@
           <div class="flex flex-col gap-sm">
             <label class="label muted" for="contact-message">Message</label>
             <textarea id="contact-message" bind:value={message} required rows="5"
-              class="form-input" style="min-height:10rem"></textarea>
+              class="form-input min-h-[10rem]"></textarea>
           </div>
           {#if error}
             <p class="label text-red-400">{error}</p>
           {/if}
-          <button type="submit" class="btn-outline" style="max-width:16rem">
+          <button type="submit" class="btn-outline max-w-[16rem]" disabled={submitting}>
             <span class="label">Send</span>
           </button>
         </form>
@@ -85,12 +89,12 @@
       <div class="flex flex-col gap-sm">
         <span class="label muted">Address</span>
         {#each SITE.address as line}
-          <span class="fw-normal text-[var(--color-soft)]">{line}</span>
+          <span class="fw-normal text-soft">{line}</span>
         {/each}
       </div>
       <div class="flex flex-col gap-sm">
         <span class="label muted">Hours</span>
-        <span class="fw-normal text-[var(--color-soft)]">{SITE.hours}</span>
+        <span class="fw-normal text-soft">{SITE.hours}</span>
       </div>
     </div>
   </div>

@@ -50,6 +50,7 @@
   <div
     class="backdrop sg-backdrop"
     role="presentation"
+    aria-hidden="true"
     onclick={closeModal}
     transition:fade={{ duration: 450 }}
   ></div>
@@ -77,7 +78,7 @@
       </p>
 
       {#if category === 'Footwear'}
-        <div style="overflow-x:auto">
+        <div class="sg-scroll">
         <table class="sg-table">
           <thead><tr>
             <th class="label" scope="col">EU</th><th class="label" scope="col">UK</th>
@@ -94,7 +95,7 @@
         </table>
         </div>
       {:else}
-        <div style="overflow-x:auto">
+        <div class="sg-scroll">
         <table class="sg-table">
           <thead><tr>
             <th class="label" scope="col">Size</th><th class="label" scope="col">IT/EU</th>
@@ -184,4 +185,5 @@
     transition: border-color var(--duration-fast);
   }
   .sg-link:hover { border-bottom-color: var(--color-ink); }
+  .sg-scroll { overflow-x: auto; }
 </style>

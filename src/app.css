@@ -36,11 +36,11 @@
   --ease-in:        cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out:    cubic-bezier(0.4, 0, 0.2, 1);
   --ease-luxury:    cubic-bezier(0.22, 1, 0.36, 1);
+  --color-error:    #dc2626;
 
   --duration-fast:    0.25s;
   --duration-base:    0.4s;
   --duration-slower:  0.7s;
-  --duration-slow:    1.2s;
 }
 
 /* ─── Non-theme tokens ───────────────────────────────────────────────────── */
@@ -82,7 +82,6 @@
   /* Display type scale */
   --text-display: clamp(2.5rem, 8vw, 6rem);
   --text-hero:    clamp(3rem, 18vw, 18rem);
-  --text-hero-sm: clamp(0.65rem, 1.2vw, 0.8125rem);
 
   /*
    * ── Compatibility aliases ──────────────────────────────────────────────
@@ -134,9 +133,6 @@
   ::-webkit-scrollbar-thumb { background: var(--color-rule); }
   ::selection { background: var(--color-ink); color: var(--color-white); }
 
-  picture { display: block; width: 100%; height: 100%; }
-  picture img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
-
   /* Smooth scroll — luxury pacing */
   html { scroll-behavior: smooth; }
 }
@@ -182,7 +178,6 @@
   .fw-medium { font-variation-settings: var(--fw-medium); }
 
   /* ── Opacity ── */
-  .op-15 { opacity: 0.15; }
   .op-30 { opacity: 0.3; }
   .op-35 { opacity: 0.35; }
   .muted { opacity: var(--op-muted); }
@@ -378,11 +373,8 @@ html:not(.no-js) :is(.js-atelier-img, .js-img) {
 
 /* Data-anim initial states + transitions */
 html:not(.no-js) [data-anim="hero"],
-html:not(.no-js) [data-anim="scroll"],
-html:not(.no-js) [data-anim="stagger"],
 html:not(.no-js) .js-hero-season,
 html:not(.no-js) .js-hero-tagline,
-html:not(.no-js) .js-hero-title,
 html:not(.no-js) .js-hero-cta,
 html:not(.no-js) [data-pdp-info] > * {
   opacity: 0;
@@ -397,7 +389,6 @@ html:not(.no-js) [data-anim="scroll"].in-view,
 html:not(.no-js) [data-anim="stagger"].in-view,
 html:not(.no-js) .js-hero-season.in-view,
 html:not(.no-js) .js-hero-tagline.in-view,
-html:not(.no-js) .js-hero-title.in-view,
 html:not(.no-js) .js-hero-cta.in-view,
 html:not(.no-js) [data-pdp-info] > *.in-view {
   opacity: 1;
@@ -421,7 +412,6 @@ html:not(.no-js) .js-rule.in-view {
   html:not(.no-js) .js-img,
   html:not(.no-js) .js-hero-season,
   html:not(.no-js) .js-hero-tagline,
-  html:not(.no-js) .js-hero-title,
   html:not(.no-js) .js-hero-cta,
   html:not(.no-js) [data-pdp-info] > * {
     will-change: opacity, transform;
@@ -436,7 +426,6 @@ html:not(.no-js) .js-rule.in-view {
   html:not(.no-js) .js-img,
   html:not(.no-js) .js-hero-season,
   html:not(.no-js) .js-hero-tagline,
-  html:not(.no-js) .js-hero-title,
   html:not(.no-js) .js-hero-cta,
   html:not(.no-js) [data-pdp-info] > * {
     opacity: 1 !important;
@@ -458,7 +447,7 @@ html:not(.no-js) .js-rule.in-view {
 }
 
 ::view-transition-group(*) {
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-timing-function: var(--ease-luxury);
   animation-duration: var(--duration-slower);
 }
 @media (prefers-reduced-motion: reduce) {

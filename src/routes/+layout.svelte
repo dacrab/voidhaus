@@ -45,14 +45,14 @@
   <meta name="robots" content="index, follow" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content={SITE.name} />
-  <link rel="canonical" href="https://voidhaus.vercel.app/" />
+  <link rel="canonical" href="{SITE.url}" />
 </svelte:head>
 
 <div id="js-veil" aria-hidden="true">
   <span class="veil-mark">VOIDHAUS</span>
 </div>
 
-<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:bg-[var(--color-white)] focus:px-md focus:py-sm focus:text-[var(--color-ink)] focus:border focus:border-[var(--color-ink)]">Skip to content</a>
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:bg-white focus:px-md focus:py-sm focus:text-ink focus:border focus:border-ink">Skip to content</a>
 
 <Nav solidNav={false} />
 <Cart />

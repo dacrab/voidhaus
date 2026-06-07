@@ -1,5 +1,6 @@
 export const SITE = {
   name:           'VOIDHAUS',
+  url:            'https://voidhaus.com',
   season:         'SS 2026',
   tagline:        'Dark luxury fashion. Twelve pieces. Four ateliers. One position.',
   email: {
