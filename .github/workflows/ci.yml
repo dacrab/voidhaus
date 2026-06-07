@@ -27,5 +27,13 @@ jobs:
       - run: bun install --frozen-lockfile
       - name: Check
         run: bun run type-check
+        env:
+          CONVEX_URL: ${{ secrets.CONVEX_URL }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       - name: Build
         run: bun run build
+        env:
+          CONVEX_URL: ${{ secrets.CONVEX_URL }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
