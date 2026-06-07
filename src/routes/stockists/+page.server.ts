@@ -1,9 +1,9 @@
-import type { PageLoad } from './$types';
+import type { PageServerLoad } from './$types';
 import { getStockists } from '$lib/utils/convex';
 
 export const prerender = true;
 
-export const load: PageLoad = async () => {
+export const load: PageServerLoad = async () => {
   const stockists = await getStockists();
   return { stockists };
 };
