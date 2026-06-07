@@ -1,6 +1,9 @@
-import { writeFileSync } from 'fs';
+import { writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const SITE = 'https://voidhaus.vercel.app';
+const DIR = resolve(fileURLToPath(import.meta.url), '../../static');
+const SITE = 'https://voidhaus.com';
 const pages = [
   '',
   '/collection',
