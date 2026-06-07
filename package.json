@@ -17,9 +17,9 @@
     "@fontsource-variable/cormorant": "^5.2.8",
     "@fontsource-variable/space-grotesk": "^5.2.10",
     "@sveltejs/adapter-vercel": "^6.3.3",
-    "convex": "^1.39.1",
+    "convex": "^1.40.0",
     "stripe": "^22.2.0",
-    "svelte": "^5.56.0"
+    "svelte": "^5.56.3"
   },
   "devDependencies": {
     "@sveltejs/kit": "^2.57.0",
