@@ -34,6 +34,10 @@
           aria-hidden="true"
         />
       {/if}
+      <div class="pc-indicator">
+        <span class="pc-indicator-line"></span>
+        <span class="pc-indicator-label label">View</span>
+      </div>
     </div>
     <div class="card-info">
       <div class="card-info-l">
@@ -52,16 +56,39 @@
   .pc {
     transition: opacity 0.5s ease, transform 0.5s ease;
     will-change: opacity, transform;
+    position: relative;
   }
   .pc-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center top;
-    transition: opacity 0.8s ease;
+    transition: opacity 0.8s ease, transform 1.2s var(--ease-out);
+  }
+  .pc-indicator {
+    position: absolute; bottom: var(--spacing-md); right: var(--spacing-md);
+    display: flex; align-items: center; gap: var(--spacing-sm);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+  }
+  .pc-indicator-line {
+    width: 1.5rem; height: 1px; background: var(--ot-primary);
+  }
+  .pc-indicator-label {
+    color: var(--ot-primary) !important;
+    font-size: 0.625rem;
   }
   @media (hover: hover) {
     .pc a:hover .pc-media { box-shadow: 0 0 0 1px var(--color-ink); }
-    .pc a:hover .pc-alt { opacity: 1; transition: opacity 1.2s var(--ease-img); }
+    .pc a:hover .pc-alt {
+      opacity: 1;
+      transition: opacity 1.2s var(--ease-img);
+    }
+    .pc a:hover .pc-primary { transform: scale(1.03); }
+    .pc a:hover .pc-indicator {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>

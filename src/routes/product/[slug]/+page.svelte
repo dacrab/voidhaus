@@ -114,7 +114,7 @@
 
       <div class="flex flex-col gap-xs pt-lg" data-anim="hero" data-delay="0.5">
         {#each sharedDetails as [label, value]}
-          <div class="flex justify-between text-sm">
+          <div class="flex justify-between text-sm border-b border-[var(--color-rule)] py-xs">
             <span class="label muted">{label}</span>
             <span class="fw-normal text-[var(--color-soft)]">{value}</span>
           </div>
@@ -138,15 +138,3 @@
     </div>
   </section>
 {/if}
-
-<style>
-  .size-btn {
-    min-width: 3rem; padding: 0.625rem 0.875rem;
-    border: 1px solid var(--color-rule); background: none;
-    font-family: var(--font-sans); font-size: var(--text-sm);
-    font-variation-settings: var(--fw-normal); color: var(--color-soft);
-    transition: border-color var(--duration-fast), color var(--duration-fast), background var(--duration-fast);
-  }
-  .size-btn:hover { border-color: var(--color-ink); color: var(--color-ink); }
-  .size-btn--active { border-color: var(--color-ink); color: var(--color-ink); background: var(--color-off); }
-</style>

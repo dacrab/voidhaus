@@ -31,14 +31,16 @@
   --font-size-lg:   1.125rem;
   --font-size-xl:   1.25rem;
 
-  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-img:    cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-img:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in:        cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-luxury:    cubic-bezier(0.22, 1, 0.36, 1);
 
   --duration-fast:    0.25s;
   --duration-base:    0.4s;
   --duration-slower:  0.7s;
+  --duration-slow:    1.2s;
 }
 
 /* ─── Non-theme tokens ───────────────────────────────────────────────────── */
@@ -55,20 +57,20 @@
   --ls-button:   0.10em;
   --ls-wide:     0.06em;
 
-  /* Noise texture — colder, higher contrast */
+  /* Noise texture */
   --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
 
-  /* Overlay / scrim — inverted for dark bg */
+  /* Overlay / scrim */
   --ot-primary:   rgb(255 255 255 / 0.92);
   --ot-secondary: rgb(255 255 255 / 0.55);
   --ot-muted:     rgb(255 255 255 / 0.35);
-  --scrim-heavy:  rgb(0 0 0 / 0.75);
-  --scrim-medium: rgb(0 0 0 / 0.50);
+  --scrim-heavy:  rgb(0 0 0 / 0.80);
+  --scrim-medium: rgb(0 0 0 / 0.55);
   --scrim-light:  rgb(0 0 0 / 0.25);
   --backdrop:     rgb(0 0 0 / 0.70);
 
   /* Opacity steps */
-  --op-disabled:  0.25;
+  --op-disabled:  0.15;
   --op-muted:     0.35;
   --op-hover:     0.55;
 
@@ -79,10 +81,11 @@
 
   /* Display type scale */
   --text-display: clamp(2.5rem, 8vw, 6rem);
+  --text-hero:    clamp(3rem, 18vw, 18rem);
+  --text-hero-sm: clamp(0.65rem, 1.2vw, 0.8125rem);
 
   /*
    * ── Compatibility aliases ──────────────────────────────────────────────
-   * Svelte components use --text-*, --radius-full, --font-sans/serif.
    */
   --font-sans:  var(--font-family-sans);
   --font-serif: var(--font-family-serif);
@@ -120,7 +123,7 @@
     background: var(--grain);
     pointer-events: none;
     z-index: 9998;
-    opacity: 0.20;
+    opacity: 0.25;
   }
   a      { color: inherit; text-decoration: none; }
   img, video { display: block; max-width: 100%; }
@@ -133,6 +136,9 @@
 
   picture { display: block; width: 100%; height: 100%; }
   picture img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
+  /* Smooth scroll — luxury pacing */
+  html { scroll-behavior: smooth; }
 }
 
 /* ─── Components ─────────────────────────────────────────────────────────── */
@@ -143,7 +149,7 @@
     position: fixed; inset: 0;
     background: #000;
     z-index: 10000; pointer-events: none; opacity: 1;
-    transition: opacity 0.9s var(--ease-out);
+    transition: opacity 1.2s var(--ease-out);
     display: flex; align-items: center; justify-content: center;
   }
   #js-veil.out { opacity: 0; }
@@ -154,7 +160,7 @@
     text-transform: uppercase;
     color: #fff;
     opacity: 0;
-    transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
   }
 
   /* ── Typography ── */
@@ -176,6 +182,7 @@
   .fw-medium { font-variation-settings: var(--fw-medium); }
 
   /* ── Opacity ── */
+  .op-15 { opacity: 0.15; }
   .op-30 { opacity: 0.3; }
   .op-35 { opacity: 0.35; }
   .muted { opacity: var(--op-muted); }
@@ -194,8 +201,20 @@
   .backdrop { position: fixed; inset: 0; z-index: var(--backdrop-z, 100); }
 
   /* ── Interactive ── */
-  .muted-link { opacity: var(--op-muted); transition: opacity var(--duration-fast); }
+  .muted-link {
+    opacity: var(--op-muted);
+    transition: opacity var(--duration-fast);
+    position: relative;
+  }
   .muted-link:hover { opacity: 1; }
+  .muted-link::after {
+    content: '';
+    position: absolute; bottom: -2px; left: 0;
+    width: 0; height: 1px;
+    background: currentColor;
+    transition: width var(--duration-slower) var(--ease-out);
+  }
+  .muted-link:hover::after { width: 100%; }
 
   .ghost-btn {
     background: none; border: none; padding: 0;
@@ -273,13 +292,73 @@
   .btn-outline > * { position: relative; z-index: 1; }
   .btn-outline:hover { color: #111; }
   .btn-outline:hover::before { transform: scaleX(1); }
+
+  /* ── Scroll indicator ── */
+  .scroll-indicator {
+    display: inline-flex; align-items: center; gap: var(--spacing-sm);
+    animation: scroll-pulse 2.5s var(--ease-in-out) infinite;
+  }
+  .scroll-line {
+    width: 1.5rem; height: 1px; background: currentColor;
+    position: relative; overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--color-ink);
+    animation: scroll-line 2.5s var(--ease-in-out) infinite;
+    transform: translateX(-100%);
+  }
+  @keyframes scroll-line {
+    0%   { transform: translateX(-100%); }
+    50%  { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+  }
+  @keyframes scroll-pulse {
+    0%, 100% { opacity: var(--op-muted); }
+    50%      { opacity: 0.6; }
+  }
+
+  /* ── Chapter progress ── */
+  .chapter-progress {
+    display: flex; align-items: center; gap: var(--spacing-xs);
+  }
+  .chapter-progress .dot {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--color-soft); transition: background var(--duration-fast);
+  }
+  .chapter-progress .dot.active { background: var(--color-ink); }
+
+  /* ── Size btn premium ── */
+  .size-btn {
+    min-width: 3rem; padding: 0.625rem 0.875rem;
+    border: 1px solid var(--color-rule); background: none;
+    font-family: var(--font-sans); font-size: var(--text-sm);
+    font-variation-settings: var(--fw-normal); color: var(--color-soft);
+    transition:
+      border-color var(--duration-slower) var(--ease-out),
+      color var(--duration-slower) var(--ease-out),
+      background var(--duration-slower) var(--ease-out);
+    position: relative;
+  }
+  .size-btn:hover { border-color: var(--color-ink); color: var(--color-ink); }
+  .size-btn--active {
+    border-color: var(--color-ink); color: var(--color-ink);
+    background: var(--color-off);
+  }
+  .size-btn--active::after {
+    content: '✓';
+    position: absolute; top: -6px; right: -6px;
+    font-size: 9px; line-height: 1;
+    color: var(--color-ink);
+  }
 }
 
 /* ─── Animations ──────────────────────────────────────────────────────────── */
 
 /* Image reveals */
 .js-hero-img {
-  animation: fade-scale-in 0.7s var(--ease-out) 0.15s both;
+  animation: fade-scale-in 0.9s var(--ease-out) 0.15s both;
 }
 .js-main-img {
   animation: main-fade-in 0.7s var(--ease-out) 0.15s both;
@@ -308,7 +387,9 @@ html:not(.no-js) .js-hero-cta,
 html:not(.no-js) [data-pdp-info] > * {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+  transition:
+    opacity 1s var(--ease-out),
+    transform 1s var(--ease-out);
 }
 
 html:not(.no-js) [data-anim="hero"].in-view,
@@ -326,7 +407,7 @@ html:not(.no-js) [data-pdp-info] > *.in-view {
 /* Rule grow animation */
 html:not(.no-js) .js-rule {
   transform: scaleX(0);
-  transition: transform 0.8s var(--ease-out);
+  transition: transform 1s var(--ease-out);
 }
 html:not(.no-js) .js-rule.in-view {
   transform: scaleX(1);
@@ -364,15 +445,15 @@ html:not(.no-js) .js-rule.in-view {
 }
 
 /* ─── View transitions ───────────────────────────────────────────────────── */
-::view-transition-old(root) { animation: 0.45s var(--ease-in) both _vt-out; }
-::view-transition-new(root) { animation: 0.5s var(--ease-in-out) 0.15s both _vt-in; opacity: 0; }
+::view-transition-old(root) { animation: 0.5s var(--ease-in) both _vt-out; }
+::view-transition-new(root) { animation: 0.6s var(--ease-in-out) 0.2s both _vt-in; opacity: 0; }
 
 @keyframes _vt-out {
   from { opacity: 1; filter: blur(0); }
-  to   { opacity: 0; filter: blur(2px); }
+  to   { opacity: 0; filter: blur(3px); }
 }
 @keyframes _vt-in {
-  from { opacity: 0; filter: blur(2px); }
+  from { opacity: 0; filter: blur(3px); }
   to   { opacity: 1; filter: blur(0); }
 }
 

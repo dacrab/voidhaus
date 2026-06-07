@@ -1,5 +1,7 @@
 <script lang="ts">
   import PageHeader from '$lib/components/PageHeader.svelte';
+  import { SITE } from '$lib/data/site';
+
   let { data } = $props();
   const regions = $derived(data.stockists);
 </script>
@@ -12,22 +14,71 @@
 
 <div class="wrap">
   <div class="rule"></div>
-  <div class="py-2xl md:py-3xl flex flex-col gap-3xl">
+  <div class="stockists-grid">
     {#each regions as region}
-      <section data-anim="scroll">
-        <span class="label muted">{region.region}</span>
-        <div class="flex flex-col pt-lg">
+      <section class="stockist-region" data-anim="scroll">
+        <span class="label muted stockist-region-label">{region.region}</span>
+        <div class="stockist-stores">
           {#each region.stores as store}
-            <div class="flex flex-col gap-xs py-md border-b border-[var(--color-rule)]">
-              <div class="flex items-baseline justify-between gap-md">
-                <span class="fw-medium">{store.name}</span>
+            <div class="stockist-store">
+              <div class="stockist-store-header">
+                <span class="stockist-name">{store.name}</span>
                 <span class="label muted">{store.city}</span>
               </div>
-              <span class="text-sm text-[var(--color-soft)]">{store.address}, {store.country}</span>
+              <span class="stockist-address">{store.address}, {store.country}</span>
             </div>
           {/each}
         </div>
       </section>
     {/each}
   </div>
+
+  <div class="rule"></div>
+  <div class="stockist-inquiry" data-anim="scroll">
+    <span class="label muted">Atelier inquiries</span>
+    <div class="flex items-baseline justify-between flex-wrap gap-sm">
+      <span class="fw-normal text-[var(--color-soft)]">{SITE.ateliers.map(a => `${a.city} — ${a.specialty}`).join(' · ')}</span>
+      <a href="/contact" class="label muted muted-link">Contact →</a>
+    </div>
+  </div>
 </div>
+
+<style>
+  .stockists-grid {
+    padding-block: var(--spacing-2xl) var(--spacing-3xl);
+    display: flex; flex-direction: column; gap: var(--spacing-4xl);
+  }
+  @media (min-width: 768px) { .stockists-grid { gap: var(--spacing-5xl); } }
+  .stockist-region-label {
+    display: block;
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .stockist-stores {
+    display: grid;
+    gap: 1px;
+    background: var(--color-rule);
+    border: 1px solid var(--color-rule);
+  }
+  @media (min-width: 768px) { .stockist-stores { grid-template-columns: repeat(2, 1fr); } }
+  .stockist-store {
+    background: var(--color-white);
+    padding: var(--spacing-lg);
+    display: flex; flex-direction: column; gap: var(--spacing-xs);
+  }
+  .stockist-store-header {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-md);
+  }
+  .stockist-name {
+    font-variation-settings: var(--fw-normal);
+    color: var(--color-ink);
+  }
+  .stockist-address {
+    font-size: var(--text-sm);
+    color: var(--color-soft);
+  }
+  .stockist-inquiry {
+    padding-block: var(--spacing-lg) var(--spacing-3xl);
+    display: flex; flex-direction: column; gap: var(--spacing-md);
+  }
+</style>
