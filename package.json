@@ -7,8 +7,8 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build && bun scripts/sitemap.js",
+    "dev": "doppler run -- vite dev",
+    "build": "doppler run -- vite build && bun scripts/sitemap.js",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "type-check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
