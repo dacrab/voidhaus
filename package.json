@@ -16,6 +16,7 @@
   "dependencies": {
     "@fontsource-variable/cormorant": "^5.2.8",
     "@fontsource-variable/space-grotesk": "^5.2.10",
+    "@sentry/sveltekit": "^10.56.0",
     "@sveltejs/adapter-vercel": "^6.3.3",
     "convex": "^1.40.0",
     "stripe": "^22.2.0",
