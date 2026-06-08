@@ -1,0 +1,3 @@
+setup:
+  project: voidhaus
+  config: dev_app
