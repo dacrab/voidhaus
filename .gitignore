@@ -31,3 +31,5 @@ pnpm-debug.log*
 convex/_generated/api.d.ts
 convex/_generated/api.js
 convex/_generated/dataModel.d.ts
+.vercel
+.env*.local
