@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "doppler run -- vite dev",
-    "build": "doppler run -- vite build && bun scripts/sitemap.js",
+    "build": "vite build && bun scripts/sitemap.js",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "type-check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
