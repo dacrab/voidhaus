@@ -1,6 +1,5 @@
 import { v } from "convex/values";
-import { internal } from "./_generated/api";
-import { internalMutation, mutation, query } from "./_generated/server";
+import { internalMutation, query } from "./_generated/server";
 
 function totalStock(stock: Record<string, number>): number {
   return Object.values(stock).reduce((sum, n) => sum + n, 0);
@@ -43,76 +42,6 @@ export const getBySlug = query({
       img2Url = await ctx.storage.getUrl(product.img2StorageId);
     }
     return { ...product, imgUrl, img2Url };
-  },
-});
-
-export const create = mutation({
-  args: {
-    slug: v.string(),
-    num: v.string(),
-    name: v.string(),
-    price: v.number(),
-    category: v.string(),
-    material: v.string(),
-    origin: v.string(),
-    desc: v.string(),
-    sizes: v.array(v.string()),
-    sizeStock: v.record(v.string(), v.number()),
-    img: v.string(),
-    img2: v.optional(v.string()),
-    imgStorageId: v.optional(v.id("_storage")),
-    img2StorageId: v.optional(v.id("_storage")),
-  },
-  handler: async (ctx, args) => {
-    const stock = totalStock(args.sizeStock);
-    const id = await ctx.db.insert("products", { ...args, stock, active: true });
-    await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
-    return id;
-  },
-});
-
-export const update = mutation({
-  args: {
-    id: v.id("products"),
-    slug: v.optional(v.string()),
-    num: v.optional(v.string()),
-    name: v.optional(v.string()),
-    price: v.optional(v.number()),
-    category: v.optional(v.string()),
-    material: v.optional(v.string()),
-    origin: v.optional(v.string()),
-    desc: v.optional(v.string()),
-    sizes: v.optional(v.array(v.string())),
-    sizeStock: v.optional(v.record(v.string(), v.number())),
-    img: v.optional(v.string()),
-    img2: v.optional(v.string()),
-    imgStorageId: v.optional(v.id("_storage")),
-    img2StorageId: v.optional(v.id("_storage")),
-    active: v.optional(v.boolean()),
-  },
-  handler: async (ctx, args) => {
-    const { id, ...fields } = args;
-    const updates: Record<string, unknown> = {};
-    for (const [k, val] of Object.entries(fields)) {
-      if (val !== undefined) updates[k] = val;
-    }
-    // Recompute total stock if sizeStock changed
-    if (updates.sizeStock) {
-      updates.stock = totalStock(updates.sizeStock as Record<string, number>);
-    }
-    await ctx.db.patch(id, updates);
-    const nonStockChange = Object.keys(updates).some((k) => k !== "stock" && k !== "sizeStock");
-    if (nonStockChange) {
-      await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
-    }
-  },
-});
-
-export const remove = mutation({
-  args: { id: v.id("products") },
-  handler: async (ctx, args) => {
-    await ctx.db.delete(args.id);
-    await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
   },
 });
 

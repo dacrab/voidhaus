@@ -9,7 +9,6 @@
  */
 
 import type * as auth from "../auth.js";
-import type * as auth_actions from "../auth_actions.js";
 import type * as coupons from "../coupons.js";
 import type * as emails from "../emails.js";
 import type * as files from "../files.js";
@@ -29,7 +28,6 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
-  auth_actions: typeof auth_actions;
   coupons: typeof coupons;
   emails: typeof emails;
   files: typeof files;

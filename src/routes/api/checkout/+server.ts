@@ -78,7 +78,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
       if (!result.valid) {
         return json({ error: result.error }, { status: 400 });
       }
-      couponId = result.couponId as Id<"coupons"> | undefined;
+      couponId = result.couponId;
 
       const stripeCoupon = await stripe.coupons.create(
         result.type === "percent"

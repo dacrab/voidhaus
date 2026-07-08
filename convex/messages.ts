@@ -1,13 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
-
-// TODO: used by admin UI
-export const list = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("messages").order("desc").collect();
-  },
-});
+import { mutation } from "./_generated/server";
 
 export const create = mutation({
   args: {
@@ -18,13 +10,5 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("messages", { ...args, read: false });
-  },
-});
-
-// TODO: used by admin UI
-export const markRead = mutation({
-  args: { id: v.id("messages") },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, { read: true });
   },
 });

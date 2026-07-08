@@ -11,7 +11,7 @@
   const sharedDetails = $derived(data.sharedDetails);
   const images = $derived(data.images);
   const mainImg = $derived(images[product.img]);
-  const altImg = $derived(product.img2 && images[product.img2] ? images[product.img2] : '');
+  const altImg = $derived(product.img2 ? images[product.img2] ?? '' : '');
   const related = $derived(allProducts.filter((p: Product) => p.category === product.category && p.slug !== product.slug).slice(0, 3));
 
   let selectedSize = $state('');

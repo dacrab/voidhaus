@@ -28,9 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const customerDetails = session.customer_details;
-    const shippingDetails = (session as unknown as Record<string, unknown>).shipping_details as
-      | { name?: string; address?: Record<string, string | null> }
-      | undefined;
+    const shippingDetails = session.collected_information?.shipping_details;
 
     const shipping = shippingDetails?.address;
 

@@ -44,19 +44,26 @@ export const sendOrderConfirmation = internalAction({
       </div>
     `;
 
-    await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "VOIDHAUS <orders@voidhaus.com>",
-        to: args.customerEmail,
-        subject: "Order Confirmed — VOIDHAUS",
-        html,
-      }),
-    });
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "VOIDHAUS <orders@voidhaus.com>",
+          to: args.customerEmail,
+          subject: "Order Confirmed — VOIDHAUS",
+          html,
+        }),
+      });
+      if (!res.ok) {
+        console.error("Resend email failed:", res.status, await res.text());
+      }
+    } catch (err) {
+      console.error("Failed to send order confirmation email:", err);
+    }
   },
 });
 
@@ -68,6 +75,13 @@ export const triggerRebuild = internalAction({
     if (!hookUrl) {
       return;
     }
-    await fetch(hookUrl, { method: "POST" });
+    try {
+      const res = await fetch(hookUrl, { method: "POST" });
+      if (!res.ok) {
+        console.error("Vercel deploy hook failed:", res.status, await res.text());
+      }
+    } catch (err) {
+      console.error("Failed to trigger Vercel rebuild:", err);
+    }
   },
 });
