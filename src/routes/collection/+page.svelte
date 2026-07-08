@@ -1,6 +1,7 @@
 <script lang="ts">
   import ProductCard from '$lib/components/ProductCard.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
+  import type { Product } from '$lib/data/products';
 
   let { data } = $props();
   const products = $derived(data.products);
@@ -10,7 +11,7 @@
   let filtered = $derived(
     activeCategory === 'All'
       ? products
-      : products.filter((p: any) => p.category === activeCategory)
+      : products.filter((p: Product) => p.category === activeCategory)
   );
 </script>
 

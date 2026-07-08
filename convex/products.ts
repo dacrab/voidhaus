@@ -2,6 +2,10 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { internalMutation, mutation, query } from "./_generated/server";
 
+function totalStock(stock: Record<string, number>): number {
+  return Object.values(stock).reduce((sum, n) => sum + n, 0);
+}
+
 export const list = query({
   args: { category: v.optional(v.string()), activeOnly: v.optional(v.boolean()) },
   handler: async (ctx, args) => {
@@ -60,7 +64,7 @@ export const create = mutation({
     img2StorageId: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
-    const stock = Object.values(args.sizeStock).reduce((s, n) => s + n, 0);
+    const stock = totalStock(args.sizeStock);
     const id = await ctx.db.insert("products", { ...args, stock, active: true });
     await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
     return id;
@@ -94,7 +98,7 @@ export const update = mutation({
     }
     // Recompute total stock if sizeStock changed
     if (updates.sizeStock) {
-      updates.stock = Object.values(updates.sizeStock as Record<string, number>).reduce((s, n) => s + n, 0);
+      updates.stock = totalStock(updates.sizeStock as Record<string, number>);
     }
     await ctx.db.patch(id, updates);
     const nonStockChange = Object.keys(updates).some((k) => k !== "stock" && k !== "sizeStock");
@@ -120,7 +124,7 @@ export const decrementSizeStock = internalMutation({
     const sizeStock = { ...product.sizeStock };
     const current = sizeStock[args.size] ?? 0;
     sizeStock[args.size] = Math.max(0, current - args.quantity);
-    const stock = Object.values(sizeStock).reduce((s, n) => s + n, 0);
+    const stock = totalStock(sizeStock);
     await ctx.db.patch(args.id, { sizeStock, stock });
   },
 });

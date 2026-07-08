@@ -1,12 +1,11 @@
 import { v } from "convex/values";
-import { api } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
+import { requireAdmin } from "./lib/auth";
 
 export const generateUploadUrl = mutation({
   args: { token: v.string() },
   handler: async (ctx, args) => {
-    const valid = await ctx.runQuery(api.auth.validateSession, { token: args.token });
-    if (!valid) throw new Error("Unauthorized");
+    await requireAdmin(ctx, args.token);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -21,8 +20,7 @@ export const getUrl = query({
 export const remove = mutation({
   args: { token: v.string(), storageId: v.id("_storage") },
   handler: async (ctx, args) => {
-    const valid = await ctx.runQuery(api.auth.validateSession, { token: args.token });
-    if (!valid) throw new Error("Unauthorized");
+    await requireAdmin(ctx, args.token);
     await ctx.storage.delete(args.storageId);
   },
 });

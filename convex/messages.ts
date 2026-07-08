@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+// TODO: used by admin UI
 export const list = query({
   args: {},
   handler: async (ctx) => {
@@ -20,6 +21,7 @@ export const create = mutation({
   },
 });
 
+// TODO: used by admin UI
 export const markRead = mutation({
   args: { id: v.id("messages") },
   handler: async (ctx, args) => {
