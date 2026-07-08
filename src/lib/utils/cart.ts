@@ -1,13 +1,17 @@
-const KEY = 'vh-cart';
+const KEY = "vh-cart";
 
 export type CartItem = {
-  slug: string; name: string; price: number;
-  size: string; img: string; num: string;
+  slug: string;
+  name: string;
+  price: number;
+  size: string;
+  img: string;
+  num: string;
 };
 
 export function getCart(): CartItem[] {
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '[]');
+    return JSON.parse(localStorage.getItem(KEY) ?? "[]");
   } catch {
     return [];
   }
@@ -15,9 +19,9 @@ export function getCart(): CartItem[] {
 
 export function saveCart(items: CartItem[]): void {
   localStorage.setItem(KEY, JSON.stringify(items));
-  window.dispatchEvent(new Event('vh:cart-updated'));
+  window.dispatchEvent(new Event("vh:cart-updated"));
 }
 
 export function formatPrice(num: number): string {
-  return num.toLocaleString('en-US', { minimumFractionDigits: 0 });
+  return num.toLocaleString("en-US", { minimumFractionDigits: 0 });
 }

@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { mutation, query } from "./_generated/server";
 
 export const list = query({
   args: { status: v.optional(v.string()) },
@@ -38,7 +38,7 @@ export const create = mutation({
         price: v.number(),
         size: v.string(),
         quantity: v.number(),
-      })
+      }),
     ),
     total: v.number(),
     currency: v.string(),
@@ -72,15 +72,13 @@ export const fulfill = mutation({
         state: v.optional(v.string()),
         postalCode: v.string(),
         country: v.string(),
-      })
+      }),
     ),
   },
   handler: async (ctx, args) => {
     const order = await ctx.db
       .query("orders")
-      .withIndex("by_session", (q) =>
-        q.eq("stripeSessionId", args.stripeSessionId)
-      )
+      .withIndex("by_session", (q) => q.eq("stripeSessionId", args.stripeSessionId))
       .first();
     if (!order) return null;
     await ctx.db.patch(order._id, {
@@ -91,7 +89,9 @@ export const fulfill = mutation({
     });
     for (const item of order.items) {
       await ctx.runMutation(internal.products.decrementSizeStock, {
-        id: item.productId, size: item.size, quantity: item.quantity,
+        id: item.productId,
+        size: item.size,
+        quantity: item.quantity,
       });
     }
     // Send confirmation email

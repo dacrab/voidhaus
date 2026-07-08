@@ -1,9 +1,9 @@
-import { json } from '@sveltejs/kit';
-import Stripe from 'stripe';
-import { api } from '$convex/api';
-import type { Id } from '$convex/dataModel';
-import { getConvex, getStripe } from '$lib/utils/api';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import type Stripe from "stripe";
+import { api } from "$convex/api";
+import type { Id } from "$convex/dataModel";
+import { getConvex, getStripe } from "$lib/utils/api";
+import type { RequestHandler } from "./$types";
 
 export const prerender = false;
 
@@ -13,7 +13,7 @@ interface CheckoutRequestBody {
 }
 
 interface OrderItem {
-  productId: Id<'products'>;
+  productId: Id<"products">;
   slug: string;
   name: string;
   price: number;
@@ -29,22 +29,22 @@ export const POST: RequestHandler = async ({ request, url }) => {
     const { items, couponCode } = body;
 
     if (!items?.length) {
-      return json({ error: 'No items' }, { status: 400 });
+      return json({ error: "No items" }, { status: 400 });
     }
 
-    const lineItems: Stripe.Checkout.SessionCreateParams['line_items'] = [];
+    const lineItems: Stripe.Checkout.SessionCreateParams["line_items"] = [];
     const orderItems: OrderItem[] = [];
 
     for (const item of items) {
       const product = await convex.query(api.products.getBySlug, { slug: item.slug });
-      if (!product || !product.active) continue;
+      if (!product?.active) continue;
 
       const sizeAvailable = product.sizeStock?.[item.size] ?? 0;
       if (sizeAvailable < 1) continue;
 
       lineItems.push({
         price_data: {
-          currency: 'eur',
+          currency: "eur",
           product_data: {
             name: product.name,
             description: `Size ${item.size}`,
@@ -66,11 +66,11 @@ export const POST: RequestHandler = async ({ request, url }) => {
     }
 
     if (!lineItems.length) {
-      return json({ error: 'No valid items' }, { status: 400 });
+      return json({ error: "No valid items" }, { status: 400 });
     }
 
-    let discounts: Stripe.Checkout.SessionCreateParams['discounts'] = undefined;
-    let couponId: Id<'coupons'> | undefined;
+    let discounts: Stripe.Checkout.SessionCreateParams["discounts"];
+    let couponId: Id<"coupons"> | undefined;
     const orderTotal = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
 
     if (couponCode) {
@@ -78,27 +78,44 @@ export const POST: RequestHandler = async ({ request, url }) => {
       if (!result.valid) {
         return json({ error: result.error }, { status: 400 });
       }
-      couponId = result.couponId as Id<'coupons'> | undefined;
+      couponId = result.couponId as Id<"coupons"> | undefined;
 
       const stripeCoupon = await stripe.coupons.create(
-        result.type === 'percent'
-          ? { percent_off: result.value ?? 0, duration: 'once' as const }
-          : { amount_off: (result.discount ?? 0) * 100, currency: 'eur', duration: 'once' as const }
+        result.type === "percent"
+          ? { percent_off: result.value ?? 0, duration: "once" as const }
+          : { amount_off: (result.discount ?? 0) * 100, currency: "eur", duration: "once" as const },
       );
       discounts = [{ coupon: stripeCoupon.id }];
     }
 
     const origin = url.origin;
     const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
+      mode: "payment",
       line_items: lineItems,
       ...(discounts ? { discounts } : {}),
       shipping_address_collection: {
-        allowed_countries: ['US', 'GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'CH', 'SE', 'DK', 'NO', 'JP', 'AU', 'CA'],
+        allowed_countries: [
+          "US",
+          "GB",
+          "DE",
+          "FR",
+          "IT",
+          "ES",
+          "NL",
+          "BE",
+          "AT",
+          "CH",
+          "SE",
+          "DK",
+          "NO",
+          "JP",
+          "AU",
+          "CA",
+        ],
       },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout/cancel`,
-      metadata: { couponId: couponId ?? '', orderItems: JSON.stringify(orderItems) },
+      metadata: { couponId: couponId ?? "", orderItems: JSON.stringify(orderItems) },
     });
 
     if (couponId) {
@@ -107,16 +124,16 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
     await convex.mutation(api.orders.create, {
       stripeSessionId: session.id,
-      customerEmail: '',
+      customerEmail: "",
       items: orderItems,
       total: orderTotal,
-      currency: 'eur',
+      currency: "eur",
     });
 
     return json({ url: session.url }, { status: 200 });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Checkout error:', err);
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("Checkout error:", err);
     return json({ error: message }, { status: 500 });
   }
 };

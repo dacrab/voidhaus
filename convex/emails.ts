@@ -1,6 +1,5 @@
 import { v } from "convex/values";
-import { action, internalAction } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { internalAction } from "./_generated/server";
 
 // Called after order is fulfilled (paid). Sends confirmation email via Resend.
 export const sendOrderConfirmation = internalAction({
@@ -12,7 +11,7 @@ export const sendOrderConfirmation = internalAction({
         size: v.string(),
         price: v.number(),
         quantity: v.number(),
-      })
+      }),
     ),
     total: v.number(),
   },

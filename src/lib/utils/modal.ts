@@ -1,17 +1,15 @@
-import { trapFocus } from './focusTrap';
+import { trapFocus } from "./focusTrap";
 
 export function createModal() {
   let prevFocus: HTMLElement | null = null;
-  let prevOverflow = '';
+  let prevOverflow = "";
 
   function open(panelEl?: HTMLElement) {
     prevFocus = document.activeElement as HTMLElement;
     prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     if (panelEl) {
-      requestAnimationFrame(() =>
-        panelEl.querySelector<HTMLElement>('button,a[href],[tabindex]')?.focus()
-      );
+      requestAnimationFrame(() => panelEl.querySelector<HTMLElement>("button,a[href],[tabindex]")?.focus());
     }
   }
 
@@ -22,7 +20,10 @@ export function createModal() {
 
   function handleKeydown(panelEl: HTMLElement | undefined, e: KeyboardEvent) {
     if (!panelEl) return false;
-    if (e.key === 'Escape') { e.preventDefault(); return true; }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      return true;
+    }
     trapFocus(panelEl, e);
     return false;
   }

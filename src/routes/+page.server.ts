@@ -1,6 +1,6 @@
-import type { PageServerLoad } from './$types';
-import { getProducts } from '$lib/utils/convex';
-import { SITE } from '$lib/data/site';
+import { SITE } from "$lib/data/site";
+import { getProducts } from "$lib/utils/convex";
+import type { PageServerLoad } from "./$types";
 
 export const prerender = true;
 

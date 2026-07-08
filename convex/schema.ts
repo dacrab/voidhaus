@@ -39,7 +39,7 @@ export default defineSchema({
         price: v.number(),
         size: v.string(),
         quantity: v.number(),
-      })
+      }),
     ),
     total: v.number(),
     currency: v.string(),
@@ -53,7 +53,7 @@ export default defineSchema({
         state: v.optional(v.string()),
         postalCode: v.string(),
         country: v.string(),
-      })
+      }),
     ),
   })
     .index("by_session", ["stripeSessionId"])
@@ -103,7 +103,7 @@ export default defineSchema({
         name: v.string(),
         address: v.string(),
         country: v.string(),
-      })
+      }),
     ),
   }),
 
