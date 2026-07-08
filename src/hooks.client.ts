@@ -1,11 +1,12 @@
 import * as Sentry from "@sentry/sveltekit";
 import type { HandleClientError } from "@sveltejs/kit";
-import { PUBLIC_SENTRY_DSN } from "$env/static/public";
 
-if (PUBLIC_SENTRY_DSN) {
+const dsn = import.meta.env.PUBLIC_SENTRY_DSN;
+
+if (dsn) {
   Sentry.init({
-    dsn: PUBLIC_SENTRY_DSN,
-    environment: process.env.VERCEL_ENV || process.env.NODE_ENV || "development",
+    dsn,
+    environment: import.meta.env.MODE || "development",
     tracesSampleRate: 0.1,
   });
 }
