@@ -1,7 +1,6 @@
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
-
 import { STOCKISTS } from "../src/lib/data/stockists";
+import { mutation } from "./_generated/server";
 
 export const seed = mutation({
   args: { force: v.optional(v.boolean()) },

@@ -1,10 +1,13 @@
 import { v } from "convex/values";
-import { query, internalQuery, internalMutation } from "./_generated/server";
+import { internalMutation, internalQuery, query } from "./_generated/server";
 
 export const getAdminByEmail = internalQuery({
   args: { email: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db.query("admins").withIndex("by_email", (q) => q.eq("email", args.email)).first();
+    return await ctx.db
+      .query("admins")
+      .withIndex("by_email", (q) => q.eq("email", args.email))
+      .first();
   },
 });
 
@@ -22,7 +25,10 @@ export const createSession = internalMutation({
 export const validateSession = query({
   args: { token: v.string() },
   handler: async (ctx, args) => {
-    const session = await ctx.db.query("adminSessions").withIndex("by_token", (q) => q.eq("token", args.token)).first();
+    const session = await ctx.db
+      .query("adminSessions")
+      .withIndex("by_token", (q) => q.eq("token", args.token))
+      .first();
     if (!session || Date.now() > session.expiresAt) return null;
     const admin = await ctx.db.get(session.adminId);
     if (!admin) return null;
@@ -32,10 +38,14 @@ export const validateSession = query({
 
 export const insertAdmin = internalMutation({
   args: { email: v.string(), passwordHash: v.string(), name: v.string() },
-  handler: async (ctx, args) => { await ctx.db.insert("admins", args); },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("admins", args);
+  },
 });
 
 export const updateAdminHash = internalMutation({
   args: { id: v.id("admins"), passwordHash: v.string() },
-  handler: async (ctx, args) => { await ctx.db.patch(args.id, { passwordHash: args.passwordHash }); },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { passwordHash: args.passwordHash });
+  },
 });

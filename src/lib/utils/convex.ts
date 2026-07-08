@@ -1,8 +1,8 @@
-import { CONVEX_URL } from '$env/static/private';
-import { ConvexHttpClient } from 'convex/browser';
-import { api } from '$convex/api';
-import type { Product } from '$lib/data/products';
-import type { Region } from '$lib/data/stockists';
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "$convex/api";
+import { CONVEX_URL } from "$env/static/private";
+import type { Product } from "$lib/data/products";
+import type { Region } from "$lib/data/stockists";
 
 let _client: ConvexHttpClient | null = null;
 
@@ -34,4 +34,4 @@ export async function getStockists(): Promise<Region[]> {
   return stockists as Region[];
 }
 
-export { CATEGORIES, SHARED_DETAILS } from '$lib/data/products';
+export { CATEGORIES, SHARED_DETAILS } from "$lib/data/products";

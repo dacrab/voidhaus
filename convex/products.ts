@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { query, mutation, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { internalMutation, mutation, query } from "./_generated/server";
 
 export const list = query({
   args: { category: v.optional(v.string()), activeOnly: v.optional(v.boolean()) },
@@ -14,7 +14,10 @@ export const list = query({
     }
     return args.activeOnly === false
       ? await ctx.db.query("products").collect()
-      : await ctx.db.query("products").withIndex("by_active", (q) => q.eq("active", true)).collect();
+      : await ctx.db
+          .query("products")
+          .withIndex("by_active", (q) => q.eq("active", true))
+          .collect();
   },
 });
 
@@ -85,21 +88,16 @@ export const update = mutation({
   },
   handler: async (ctx, args) => {
     const { id, ...fields } = args;
-    const updates: Record<string, any> = {};
+    const updates: Record<string, unknown> = {};
     for (const [k, val] of Object.entries(fields)) {
       if (val !== undefined) updates[k] = val;
     }
     // Recompute total stock if sizeStock changed
     if (updates.sizeStock) {
-      updates.stock = Object.values(updates.sizeStock as Record<string, number>).reduce(
-        (s, n) => s + n,
-        0
-      );
+      updates.stock = Object.values(updates.sizeStock as Record<string, number>).reduce((s, n) => s + n, 0);
     }
     await ctx.db.patch(id, updates);
-    const nonStockChange = Object.keys(updates).some(
-      (k) => k !== "stock" && k !== "sizeStock"
-    );
+    const nonStockChange = Object.keys(updates).some((k) => k !== "stock" && k !== "sizeStock");
     if (nonStockChange) {
       await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
     }
@@ -126,5 +124,3 @@ export const decrementSizeStock = internalMutation({
     await ctx.db.patch(args.id, { sizeStock, stock });
   },
 });
-
-

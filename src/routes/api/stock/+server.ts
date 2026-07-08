@@ -1,18 +1,18 @@
-import { json } from '@sveltejs/kit';
-import { api } from '$convex/api';
-import { getConvex } from '$lib/utils/api';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import { api } from "$convex/api";
+import { getConvex } from "$lib/utils/api";
+import type { RequestHandler } from "./$types";
 
 export const prerender = false;
 
 export const GET: RequestHandler = async ({ url }) => {
   const convex = getConvex();
-  const slug = url.searchParams.get('slug');
+  const slug = url.searchParams.get("slug");
 
   if (slug) {
     const product = await convex.query(api.products.getBySlug, { slug });
     if (!product) {
-      return json({ error: 'Not found' }, { status: 404 });
+      return json({ error: "Not found" }, { status: 404 });
     }
     return json(
       {
@@ -23,8 +23,8 @@ export const GET: RequestHandler = async ({ url }) => {
       },
       {
         status: 200,
-        headers: { 'Cache-Control': 'no-cache' },
-      }
+        headers: { "Cache-Control": "no-cache" },
+      },
     );
   }
 
@@ -36,6 +36,6 @@ export const GET: RequestHandler = async ({ url }) => {
   }));
   return json(stock, {
     status: 200,
-    headers: { 'Cache-Control': 'no-cache' },
+    headers: { "Cache-Control": "no-cache" },
   });
 };

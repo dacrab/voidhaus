@@ -1,7 +1,7 @@
-import { json } from '@sveltejs/kit';
-import { api } from '$convex/api';
-import { getConvex } from '$lib/utils/api';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import { api } from "$convex/api";
+import { getConvex } from "$lib/utils/api";
+import type { RequestHandler } from "./$types";
 
 export const prerender = false;
 
@@ -19,19 +19,19 @@ export const POST: RequestHandler = async ({ request }) => {
     const { name, email, subject, message } = body;
 
     if (!name?.trim() || !email?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) || !message?.trim()) {
-      return json({ error: 'Missing fields' }, { status: 400 });
+      return json({ error: "Missing fields" }, { status: 400 });
     }
 
     await convex.mutation(api.messages.create, {
       name: name.trim(),
       email: email.trim(),
-      subject: subject || 'General',
+      subject: subject || "General",
       message: message.trim(),
     });
 
     return json({ ok: true }, { status: 200 });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : 'Unknown error';
+    const msg = err instanceof Error ? err.message : "Unknown error";
     return json({ error: msg }, { status: 500 });
   }
 };

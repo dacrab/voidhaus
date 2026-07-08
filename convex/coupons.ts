@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 export const list = query({
   args: {},
@@ -17,17 +17,12 @@ export const validate = query({
       .first();
     if (!coupon) return { valid: false, error: "Invalid code" };
     if (!coupon.active) return { valid: false, error: "Code expired" };
-    if (coupon.expiresAt && Date.now() > coupon.expiresAt)
-      return { valid: false, error: "Code expired" };
-    if (coupon.maxUses && coupon.usedCount >= coupon.maxUses)
-      return { valid: false, error: "Code fully redeemed" };
+    if (coupon.expiresAt && Date.now() > coupon.expiresAt) return { valid: false, error: "Code expired" };
+    if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) return { valid: false, error: "Code fully redeemed" };
     if (coupon.minOrder && args.orderTotal < coupon.minOrder)
       return { valid: false, error: `Minimum order €${coupon.minOrder}` };
 
-    const discount =
-      coupon.type === "percent"
-        ? Math.round(args.orderTotal * (coupon.value / 100))
-        : coupon.value;
+    const discount = coupon.type === "percent" ? Math.round(args.orderTotal * (coupon.value / 100)) : coupon.value;
 
     return { valid: true, discount, type: coupon.type, value: coupon.value, couponId: coupon._id };
   },

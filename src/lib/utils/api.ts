@@ -1,6 +1,6 @@
-import { CONVEX_URL, STRIPE_SECRET_KEY } from '$env/static/private';
-import { ConvexHttpClient } from 'convex/browser';
-import Stripe from 'stripe';
+import { ConvexHttpClient } from "convex/browser";
+import Stripe from "stripe";
+import { CONVEX_URL, STRIPE_SECRET_KEY } from "$env/static/private";
 
 export function getConvex() {
   return new ConvexHttpClient(CONVEX_URL);
