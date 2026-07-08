@@ -1,30 +1,6 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { mutation, query } from "./_generated/server";
-
-export const list = query({
-  args: { status: v.optional(v.string()) },
-  handler: async (ctx, args) => {
-    if (args.status) {
-      return await ctx.db
-        .query("orders")
-        .withIndex("by_status", (q) => q.eq("status", args.status!))
-        .order("desc")
-        .collect();
-    }
-    return await ctx.db.query("orders").order("desc").collect();
-  },
-});
-
-export const getBySession = query({
-  args: { sessionId: v.string() },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("orders")
-      .withIndex("by_session", (q) => q.eq("stripeSessionId", args.sessionId))
-      .first();
-  },
-});
+import { mutation } from "./_generated/server";
 
 export const create = mutation({
   args: {
@@ -45,16 +21,6 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("orders", { ...args, status: "pending" });
-  },
-});
-
-export const updateStatus = mutation({
-  args: {
-    id: v.id("orders"),
-    status: v.string(),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.id, { status: args.status });
   },
 });
 

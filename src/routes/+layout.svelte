@@ -14,8 +14,10 @@
     dismissVeil();
   });
 
+  let stop: (() => void) | undefined;
   afterNavigate(() => {
-    if (browser) observeAnimations();
+    stop?.();
+    stop = browser ? observeAnimations() : undefined;
   });
 
   function dismissVeil() {

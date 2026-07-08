@@ -18,11 +18,6 @@ export async function getProducts(): Promise<Product[]> {
   return products as Product[];
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
-  const client = getClient();
-  return await client.query(api.products.getBySlug, { slug });
-}
-
 export async function getImages(): Promise<Record<string, string>> {
   const client = getClient();
   return await client.query(api.images.list);
