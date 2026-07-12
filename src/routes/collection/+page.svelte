@@ -1,18 +1,15 @@
 <script lang="ts">
   import ProductCard from '$lib/components/ProductCard.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
-  import type { Product } from '$lib/data/products';
+  import { filterProducts } from '$lib/data/filter';
 
   let { data } = $props();
   const products = $derived(data.products);
   const categories = $derived(data.categories);
 
   let activeCategory = $state('All');
-  let filtered = $derived(
-    activeCategory === 'All'
-      ? products
-      : products.filter((p: Product) => p.category === activeCategory)
-  );
+  let search = $state('');
+  let filtered = $derived(filterProducts(products, search, activeCategory));
 </script>
 
 <svelte:head>
@@ -38,7 +35,21 @@
       </button>
     {/each}
   </nav>
+  <div class="search-wrap">
+    <label for="collection-search" class="sr-only">Search products</label>
+    <input
+      id="collection-search"
+      type="search"
+      bind:value={search}
+      class="search-input label"
+      placeholder="Search by name, material, origin…"
+    />
+  </div>
 </div>
+
+{#if filtered.length === 0}
+  <p class="wrap label muted py-xl">No pieces match your search.</p>
+{/if}
 
 <div class="product-grid" data-anim="scroll">
   {#each filtered as product (product.slug)}
@@ -78,5 +89,21 @@
   @keyframes rule-in {
     from { transform: scaleX(0); }
     to   { transform: scaleX(1); }
+  }
+  .search-wrap {
+    padding-block-end: var(--spacing-lg);
+  }
+  .search-input {
+    background: var(--color-off);
+    border: 1px solid var(--color-rule);
+    color: var(--color-ink);
+    padding: 0.625rem 1rem;
+    width: 100%;
+    max-width: 28rem;
+    outline: none;
+    transition: border-color var(--duration-fast);
+  }
+  .search-input:focus {
+    border-color: var(--color-mid);
   }
 </style>
