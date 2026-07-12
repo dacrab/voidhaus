@@ -1,5 +1,11 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": ["src/**/*.svelte", "src/**/+server.ts", "convex/**/*.ts"],
-  "project": ["src/**/*.{ts,svelte}", "convex/**/*.ts"]
+  "project": ["src/**/*.{ts,svelte}", "convex/**/*.ts"],
+  "ignoreDependencies": [
+    "@fontsource-variable/cormorant",
+    "@fontsource-variable/space-grotesk",
+    "tailwindcss"
+  ],
+  "ignoreBinaries": ["doppler"]
 }

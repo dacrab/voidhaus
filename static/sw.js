@@ -17,7 +17,7 @@ self.addEventListener('fetch', (e) => {
 
   if (request.method !== 'GET') return;
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
-  if (url.pathname.startsWith('/api') || url.pathname.startsWith('/admin')) return;
+  if (url.pathname.startsWith('/api')) return;
 
   const isAsset = /\.(js|css|woff2?|avif|webp|png|jpg|svg|ico)$/.test(url.pathname)
     || url.pathname.startsWith('/_app/');

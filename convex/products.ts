@@ -5,25 +5,9 @@ function totalStock(stock: Record<string, number>): number {
   return Object.values(stock).reduce((sum, n) => sum + n, 0);
 }
 
-export const list = query({
-  args: { category: v.optional(v.string()), activeOnly: v.optional(v.boolean()) },
-  handler: async (ctx, args) => {
-    if (args.category && args.category !== "All") {
-      const products = await ctx.db
-        .query("products")
-        .withIndex("by_category", (q) => q.eq("category", args.category!))
-        .collect();
-      return args.activeOnly === false ? products : products.filter((p) => p.active);
-    }
-    return args.activeOnly === false
-      ? await ctx.db.query("products").collect()
-      : await ctx.db
-          .query("products")
-          .withIndex("by_active", (q) => q.eq("active", true))
-          .collect();
-  },
-});
-
+// Runtime read required by the checkout endpoint (api/checkout) for live
+// inventory/stock checks; the storefront catalog itself is served from the
+// static $lib/data/products module so it is not prerender-dependent.
 export const getBySlug = query({
   args: { slug: v.string() },
   handler: async (ctx, args) => {
@@ -41,7 +25,9 @@ export const getBySlug = query({
     if (product.img2StorageId) {
       img2Url = await ctx.storage.getUrl(product.img2StorageId);
     }
-    return { ...product, imgUrl, img2Url };
+    // sizeStock is retained for server-side inventory checks (checkout).
+    const { stock, _creationTime, ...rest } = product;
+    return { ...rest, imgUrl, img2Url };
   },
 });
 

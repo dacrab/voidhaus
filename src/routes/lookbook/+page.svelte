@@ -48,7 +48,7 @@
           <p class="text-soft leading-[1.85] pt-sm max-w-[48ch]">{chapter.text}</p>
         </div>
         <div class="mt-xl">
-          <a href="/collection?{chapter.id}" class="label muted muted-link">View collection →</a>
+          <a href="/collection" class="label muted muted-link">View collection →</a>
         </div>
       </div>
     </section>

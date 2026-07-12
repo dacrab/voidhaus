@@ -20,7 +20,32 @@ export const create = mutation({
     currency: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("orders", { ...args, status: "pending" });
+    const email = args.customerEmail.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new Error("Invalid customer email");
+    }
+    if (!Array.isArray(args.items) || args.items.length === 0) {
+      throw new Error("Order must contain at least one item");
+    }
+    for (const item of args.items) {
+      if (!item.productId || !item.slug || !item.name || !item.size) {
+        throw new Error("Invalid order item");
+      }
+      if (typeof item.price !== "number" || item.price < 0) {
+        throw new Error("Invalid item price");
+      }
+      if (typeof item.quantity !== "number" || item.quantity < 1) {
+        throw new Error("Invalid item quantity");
+      }
+    }
+    if (typeof args.total !== "number" || args.total < 0) {
+      throw new Error("Invalid order total");
+    }
+    if (args.currency !== "eur") {
+      throw new Error("Unsupported currency");
+    }
+
+    return await ctx.db.insert("orders", { ...args, customerEmail: email, status: "pending" });
   },
 });
 
