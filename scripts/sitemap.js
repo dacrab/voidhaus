@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
+import { PRODUCTS } from "../src/lib/data/products.ts";
+import { SITE } from "../src/lib/data/site.ts";
 
-const SITE = "https://voidhaus.com";
 const pages = [
   "",
   "/collection",
@@ -11,18 +12,7 @@ const pages = [
   "/privacy",
   "/terms",
   "/checkout/success",
-  "/product/ash-trousers",
-  "/product/bone-shirt",
-  "/product/cashmere-knit",
-  "/product/dark-layer-coat",
-  "/product/eclipse-boots",
-  "/product/obsidian-coat",
-  "/product/shadow-dress",
-  "/product/silk-slip",
-  "/product/void-belt",
-  "/product/void-jacket",
-  "/product/void-tote",
-  "/product/wool-trousers",
+  ...PRODUCTS.map((p) => `/product/${p.slug}`),
 ];
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -30,7 +20,7 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
 ${pages
   .map(
     (p) => `  <url>
-    <loc>${SITE}${p}</loc>
+    <loc>${SITE.url}${p}</loc>
     <changefreq>weekly</changefreq>
     <priority>${p === "" ? "1.0" : "0.7"}</priority>
   </url>`,

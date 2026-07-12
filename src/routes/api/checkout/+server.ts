@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/sveltekit";
 import { json } from "@sveltejs/kit";
 import type Stripe from "stripe";
 import { api } from "$convex/api";
@@ -118,22 +119,10 @@ export const POST: RequestHandler = async ({ request, url }) => {
       metadata: { couponId: couponId ?? "", orderItems: JSON.stringify(orderItems) },
     });
 
-    if (couponId) {
-      await convex.mutation(api.coupons.use, { id: couponId });
-    }
-
-    await convex.mutation(api.orders.create, {
-      stripeSessionId: session.id,
-      customerEmail: "",
-      items: orderItems,
-      total: orderTotal,
-      currency: "eur",
-    });
-
     return json({ url: session.url }, { status: 200 });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("Checkout error:", err);
+    captureException(err);
     return json({ error: message }, { status: 500 });
   }
 };

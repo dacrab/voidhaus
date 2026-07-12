@@ -81,20 +81,6 @@ export default defineSchema({
     .index("by_code", ["code"])
     .index("by_active", ["active"]),
 
-  // Admin users for Convex Auth
-  admins: defineTable({
-    email: v.string(),
-    passwordHash: v.string(),
-    name: v.string(),
-  }).index("by_email", ["email"]),
-
-  // Admin sessions
-  adminSessions: defineTable({
-    adminId: v.id("admins"),
-    token: v.string(),
-    expiresAt: v.number(),
-  }).index("by_token", ["token"]),
-
   stockists: defineTable({
     region: v.string(),
     stores: v.array(

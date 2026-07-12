@@ -1,5 +1,6 @@
 <script lang="ts">
   import { IMAGES } from '$lib/data/images';
+  import { formatPrice } from '$lib/utils/cart';
 
   interface Props {
     slug: string;
@@ -15,7 +16,7 @@
 </script>
 
 <article class="pc" data-category={category}>
-  <a class="block" href="/product/{slug}" aria-label="{name} — € {price.toLocaleString('en-US')}">
+  <a class="block" href="/product/{slug}" aria-label="{name} — € {formatPrice(price)}">
     <div class="pc-media relative aspect-[3/4] overflow-hidden bg-off">
       <img
         class="pc-img pc-primary"
@@ -47,7 +48,7 @@
           <span class="label muted">{category}</span>
         {/if}
       </div>
-      <span class="label muted card-price">€ {price.toLocaleString('en-US')}</span>
+      <span class="label muted card-price">€ {formatPrice(price)}</span>
     </div>
   </a>
 </article>
