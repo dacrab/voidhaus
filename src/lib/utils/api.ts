@@ -6,7 +6,11 @@ let _convex: ConvexHttpClient | null = null;
 let _stripe: Stripe | null = null;
 
 export function getConvex(): ConvexHttpClient {
-  if (!_convex) _convex = new ConvexHttpClient(env.CONVEX_URL);
+  if (!_convex) {
+    const url = env.CONVEX_URL;
+    if (!url) throw new Error("CONVEX_URL is not configured");
+    _convex = new ConvexHttpClient(url);
+  }
   return _convex;
 }
 
