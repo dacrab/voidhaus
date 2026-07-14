@@ -8,7 +8,6 @@ export const prerender = false;
 interface ContactRequestBody {
   name?: string;
   email?: string;
-  subject?: string;
   message?: string;
 }
 
@@ -16,7 +15,7 @@ export const POST: RequestHandler = async ({ request }) => {
   const convex = getConvex();
   try {
     const body: ContactRequestBody = await request.json();
-    const { name, email, subject, message } = body;
+    const { name, email, message } = body;
 
     if (!name?.trim() || !email?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) || !message?.trim()) {
       return json({ error: "Missing fields" }, { status: 400 });
@@ -25,7 +24,7 @@ export const POST: RequestHandler = async ({ request }) => {
     await convex.mutation(api.messages.create, {
       name: name.trim(),
       email: email.trim(),
-      subject: subject || "General",
+      subject: "General",
       message: message.trim(),
     });
 

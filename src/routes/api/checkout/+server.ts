@@ -3,7 +3,7 @@ import { json } from "@sveltejs/kit";
 import type Stripe from "stripe";
 import { api } from "$convex/api";
 import type { Id } from "$convex/dataModel";
-import { getConvex, getStripe } from "$lib/utils/api";
+import { getConvex, getStripe, type OrderItem } from "$lib/utils/api";
 import type { RequestHandler } from "./$types";
 
 export const prerender = false;
@@ -11,15 +11,6 @@ export const prerender = false;
 interface CheckoutRequestBody {
   items?: Array<{ slug: string; size: string }>;
   couponCode?: string;
-}
-
-interface OrderItem {
-  productId: Id<"products">;
-  slug: string;
-  name: string;
-  price: number;
-  size: string;
-  quantity: number;
 }
 
 export const POST: RequestHandler = async ({ request, url }) => {

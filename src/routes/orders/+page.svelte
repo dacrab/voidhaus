@@ -1,5 +1,6 @@
 <script lang="ts">
   import PageHeader from "$lib/components/PageHeader.svelte";
+  import { formatPrice as fmtPrice } from "$lib/utils/cart";
 
   let email = $state("");
   let orders: Array<{
@@ -36,18 +37,6 @@
     } finally {
       loading = false;
     }
-  }
-
-  function fmtPrice(n: number): string {
-    return n.toLocaleString("en-US", { minimumFractionDigits: 0 });
-  }
-
-  function fmtDate(ms: number): string {
-    return new Date(ms).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   }
 </script>
 
@@ -93,7 +82,7 @@
         {#each orders as order}
           <div class="order-card">
             <div class="flex justify-between items-center mb-sm">
-              <span class="label">{fmtDate(order.createdAt)}</span>
+              <span class="label">{new Date(order.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
               <span class="label" class:status-paid={order.status === "paid"}>{order.status}</span>
             </div>
             <div class="flex flex-col gap-xs mb-sm">

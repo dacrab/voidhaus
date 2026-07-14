@@ -25,7 +25,7 @@
     { href: '/contact', label: 'Contact' },
   ];
 
-  afterNavigate(() => { path = window?.location?.pathname ?? ''; });
+  afterNavigate(() => { path = window.location.pathname; });
 
   onMount(() => {
     path = window.location.pathname;

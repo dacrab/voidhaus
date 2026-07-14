@@ -10,7 +10,7 @@ export type CartItem = {
 };
 
 export function getCart(): CartItem[] {
-  if (typeof window === 'undefined') return [];
+  if (typeof window === "undefined") return [];
   try {
     return JSON.parse(localStorage.getItem(KEY) ?? "[]");
   } catch {
@@ -19,7 +19,7 @@ export function getCart(): CartItem[] {
 }
 
 export function saveCart(items: CartItem[]): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   localStorage.setItem(KEY, JSON.stringify(items));
   window.dispatchEvent(new Event("vh:cart-updated"));
 }
