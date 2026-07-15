@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { createModal, slideIn } from '$lib/utils/modal';
-  import { getCart, saveCart, formatPrice, type CartItem } from '$lib/utils/cart';
+  import { getCart, saveCart, formatPrice, CART_KEY, type CartItem } from '$lib/utils/cart';
 
   const modal = createModal();
 
@@ -72,11 +72,17 @@
       openCart();
     };
 
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === CART_KEY) items = getCart();
+    };
+
     window.addEventListener('vh:open-cart', openCart);
     window.addEventListener('vh:add-to-cart', onAdd);
+    window.addEventListener('storage', onStorage);
     return () => {
       window.removeEventListener('vh:open-cart', openCart);
       window.removeEventListener('vh:add-to-cart', onAdd);
+      window.removeEventListener('storage', onStorage);
     };
   });
 </script>

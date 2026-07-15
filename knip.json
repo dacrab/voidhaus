@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": ["src/**/*.svelte", "src/**/*.ts"],
-  "project": ["src/**/*.svelte", "src/**/*.ts", "src/**/*.css"]
+  "project": ["src/**/*.svelte", "src/**/*.ts", "src/**/*.css"],
+  "ignoreBinaries": ["doppler", "knip", "biome"]
 }
