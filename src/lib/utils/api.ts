@@ -32,3 +32,7 @@ export function getStripe(): Stripe {
   }
   return _stripe;
 }
+
+export function toError(err: unknown): string {
+  return err instanceof Error ? err.message : "Unknown error";
+}

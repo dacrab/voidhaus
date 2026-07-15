@@ -3,7 +3,7 @@ import { json } from "@sveltejs/kit";
 import type Stripe from "stripe";
 import { api } from "$convex/api";
 import type { Id } from "$convex/dataModel";
-import { getConvex, getStripe, type OrderItem } from "$lib/utils/api";
+import { getConvex, getStripe, type OrderItem, toError } from "$lib/utils/api";
 import type { RequestHandler } from "./$types";
 
 export const prerender = false;
@@ -112,8 +112,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
 
     return json({ url: session.url }, { status: 200 });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unknown error";
     captureException(err);
-    return json({ error: message }, { status: 500 });
+    return json({ error: toError(err) }, { status: 500 });
   }
 };

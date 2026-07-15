@@ -1,20 +1,14 @@
 import { json } from "@sveltejs/kit";
 import { api } from "$convex/api";
-import { getConvex } from "$lib/utils/api";
+import { getConvex, toError } from "$lib/utils/api";
 import type { RequestHandler } from "./$types";
 
 export const prerender = false;
 
-interface ContactRequestBody {
-  name?: string;
-  email?: string;
-  message?: string;
-}
-
 export const POST: RequestHandler = async ({ request }) => {
   const convex = getConvex();
   try {
-    const body: ContactRequestBody = await request.json();
+    const body = (await request.json()) as Record<string, string | undefined>;
     const { name, email, message } = body;
 
     if (!name?.trim() || !email?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) || !message?.trim()) {
@@ -30,7 +24,6 @@ export const POST: RequestHandler = async ({ request }) => {
 
     return json({ ok: true }, { status: 200 });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    return json({ error: msg }, { status: 500 });
+    return json({ error: toError(err) }, { status: 500 });
   }
 };

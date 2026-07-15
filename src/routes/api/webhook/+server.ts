@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import { api } from "$convex/api";
 import type { Id } from "$convex/dataModel";
 import { env } from "$env/dynamic/private";
-import { getConvex, getStripe, type OrderItem } from "$lib/utils/api";
+import { getConvex, getStripe, type OrderItem, toError } from "$lib/utils/api";
 import type { RequestHandler } from "./$types";
 
 export const prerender = false;
@@ -23,8 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return new Response(`Webhook Error: ${message}`, { status: 400 });
+    return new Response(`Webhook Error: ${toError(err)}`, { status: 400 });
   }
 
   try {
@@ -57,9 +56,11 @@ export const POST: RequestHandler = async ({ request }) => {
         currency: "eur",
       });
 
-      const couponId = session.metadata?.couponId;
+      const couponId: Id<"coupons"> | undefined = session.metadata?.couponId
+        ? (session.metadata.couponId as Id<"coupons">)
+        : undefined;
       if (couponId) {
-        await convex.mutation(api.coupons.use, { id: couponId as Id<"coupons"> });
+        await convex.mutation(api.coupons.use, { id: couponId });
       }
 
       await convex.mutation(api.orders.fulfill, {
@@ -70,8 +71,7 @@ export const POST: RequestHandler = async ({ request }) => {
       });
     }
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return json({ error: message }, { status: 500 });
+    return json({ error: toError(err) }, { status: 500 });
   }
 
   return json({ received: true }, { status: 200 });

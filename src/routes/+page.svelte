@@ -4,8 +4,6 @@
   import ProductCard from '$lib/components/ProductCard.svelte';
   import CTAStrip from '$lib/components/CTAStrip.svelte';
 
-  import { browser } from '$app/environment';
-
   let { data } = $props();
   const products = $derived(data.products);
   const featured = $derived(products.slice(0, 4));
@@ -14,7 +12,6 @@
   const season = $derived(data.site.season);
 
   function runAnimations() {
-    if (!browser) return;
     const heroTexts = ['.js-hero-season', '.js-hero-cta', '.js-hero-tagline'];
     heroTexts.forEach((sel, i) => {
       const el = document.querySelector<HTMLElement>(sel);

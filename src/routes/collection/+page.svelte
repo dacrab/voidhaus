@@ -53,15 +53,7 @@
 
 <div class="product-grid" data-anim="scroll">
   {#each filtered as product (product.slug)}
-    <ProductCard
-      slug={product.slug}
-      num={product.num}
-      name={product.name}
-      price={product.price}
-      img={product.img}
-      img2={product.img2}
-      category={product.category}
-    />
+    <ProductCard {...product} />
   {/each}
 </div>
 

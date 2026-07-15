@@ -1,4 +1,4 @@
-const KEY = "vh-cart";
+export const CART_KEY = "vh-cart";
 
 export type CartItem = {
   slug: string;
@@ -12,7 +12,7 @@ export type CartItem = {
 export function getCart(): CartItem[] {
   if (typeof window === "undefined") return [];
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "[]");
+    return JSON.parse(localStorage.getItem(CART_KEY) ?? "[]");
   } catch {
     return [];
   }
@@ -20,7 +20,7 @@ export function getCart(): CartItem[] {
 
 export function saveCart(items: CartItem[]): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(items));
+  localStorage.setItem(CART_KEY, JSON.stringify(items));
   window.dispatchEvent(new Event("vh:cart-updated"));
 }
 
