@@ -1,28 +1,35 @@
 import { captureException } from "@sentry/sveltekit";
 import { json } from "@sveltejs/kit";
 import type Stripe from "stripe";
+import { z } from "zod";
 import { api } from "$convex/api";
 import type { Id } from "$convex/dataModel";
-import { getConvex, getStripe, type OrderItem, toError } from "$lib/utils/api";
+import { getConvex, getStripe, type OrderItem } from "$lib/utils/api";
 import type { RequestHandler } from "./$types";
 
 export const prerender = false;
 
-interface CheckoutRequestBody {
-  items?: Array<{ slug: string; size: string }>;
-  couponCode?: string;
-}
+const CheckoutItemSchema = z.object({
+  slug: z.string().min(1),
+  size: z.string().min(1),
+});
+
+const CheckoutBodySchema = z.object({
+  items: z.array(CheckoutItemSchema).min(1),
+  couponCode: z.string().optional(),
+});
 
 export const POST: RequestHandler = async ({ request, url }) => {
   const stripe = getStripe();
   const convex = getConvex();
   try {
-    const body: CheckoutRequestBody = await request.json();
-    const { items, couponCode } = body;
-
-    if (!items?.length) {
-      return json({ error: "No items" }, { status: 400 });
+    const raw = await request.json();
+    const parsed = CheckoutBodySchema.safeParse(raw);
+    if (!parsed.success) {
+      return json({ error: "Invalid request body" }, { status: 400 });
     }
+
+    const { items, couponCode } = parsed.data;
 
     const lineItems: Stripe.Checkout.SessionCreateParams["line_items"] = [];
     const orderItems: OrderItem[] = [];
@@ -113,6 +120,6 @@ export const POST: RequestHandler = async ({ request, url }) => {
     return json({ url: session.url }, { status: 200 });
   } catch (err: unknown) {
     captureException(err);
-    return json({ error: toError(err) }, { status: 500 });
+    return json({ error: "Checkout failed" }, { status: 500 });
   }
 };

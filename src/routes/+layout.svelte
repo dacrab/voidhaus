@@ -24,7 +24,7 @@
     if (!browser) return;
     const veil = document.getElementById('js-veil');
     if (!veil) return;
-    const mark = veil.querySelector('.veil-mark') as HTMLElement | null;
+    const mark = veil.querySelector<HTMLElement>('.veil-mark');
     if (mark) {
       mark.style.opacity = '1';
       setTimeout(() => {

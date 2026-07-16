@@ -20,6 +20,12 @@ export const create = mutation({
     currency: v.string(),
   },
   handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("orders")
+      .withIndex("by_session", (q) => q.eq("stripeSessionId", args.stripeSessionId))
+      .first();
+    if (existing) return existing._id;
+
     const email = args.customerEmail.trim();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw new Error("Invalid customer email");
