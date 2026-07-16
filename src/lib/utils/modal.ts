@@ -5,7 +5,7 @@ export function createModal() {
   let prevOverflow = "";
 
   function open(panelEl?: HTMLElement) {
-    prevFocus = document.activeElement as HTMLElement;
+    prevFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     if (panelEl) {

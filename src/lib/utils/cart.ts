@@ -1,18 +1,26 @@
+import { z } from "zod";
+
 export const CART_KEY = "vh-cart";
 
-export type CartItem = {
-  slug: string;
-  name: string;
-  price: number;
-  size: string;
-  img: string;
-  num: string;
-};
+export const CartItemSchema = z.object({
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  price: z.number().min(0),
+  size: z.string().min(1),
+  img: z.string().min(1),
+  num: z.string().min(1),
+});
+
+export type CartItem = z.infer<typeof CartItemSchema>;
+
+const CartItemArraySchema = z.array(CartItemSchema);
 
 export function getCart(): CartItem[] {
   if (typeof window === "undefined") return [];
   try {
-    return JSON.parse(localStorage.getItem(CART_KEY) ?? "[]");
+    const raw = JSON.parse(localStorage.getItem(CART_KEY) ?? "[]");
+    const result = CartItemArraySchema.safeParse(raw);
+    return result.success ? result.data : [];
   } catch {
     return [];
   }
