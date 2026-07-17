@@ -74,9 +74,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const rawCouponId = session.metadata?.couponId;
     const couponParsed = rawCouponId ? CouponIdSchema.safeParse(rawCouponId) : null;
-    const couponId: Id<"coupons"> | undefined = couponParsed?.success
-      ? (couponParsed.data as Id<"coupons">)
-      : undefined;
+    const couponId = couponParsed?.success ? (couponParsed.data as Id<"coupons">) : undefined;
     if (couponId) {
       await convex.mutation(api.coupons.use, { id: couponId });
     }

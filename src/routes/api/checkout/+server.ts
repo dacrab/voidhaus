@@ -118,7 +118,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
     });
 
     return json({ url: session.url }, { status: 200 });
-  } catch (err: unknown) {
+  } catch (err) {
     captureException(err);
     return json({ error: "Checkout failed" }, { status: 500 });
   }

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const CART_KEY = "vh-cart";
 
-export const CartItemSchema = z.object({
+const CartItemSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
   price: z.number().min(0),
@@ -32,6 +32,6 @@ export function saveCart(items: CartItem[]): void {
   window.dispatchEvent(new Event("vh:cart-updated"));
 }
 
-export function formatPrice(num: number): string {
+export function formatPrice(num: number) {
   return num.toLocaleString("en-US", { minimumFractionDigits: 0 });
 }

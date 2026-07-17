@@ -1,5 +1,4 @@
 import * as Sentry from "@sentry/sveltekit";
-import type { HandleClientError } from "@sveltejs/kit";
 
 const dsn = import.meta.env.PUBLIC_SENTRY_DSN;
 
@@ -11,4 +10,4 @@ if (dsn) {
   });
 }
 
-export const handleError = Sentry.handleErrorWithSentry() satisfies HandleClientError;
+export const handleError = Sentry.handleErrorWithSentry();
