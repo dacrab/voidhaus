@@ -3,8 +3,6 @@
   import SizeGuide from '$lib/components/SizeGuide.svelte';
   import ProductCard from '$lib/components/ProductCard.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
-  import type { Product } from '$lib/data/products';
-
   let { data } = $props();
   const product = $derived(data.product);
   const allProducts = $derived(data.allProducts);
@@ -12,7 +10,7 @@
   const images = $derived(data.images);
   const mainImg = $derived(images[product.img]);
   const altImg = $derived(product.img2 ? images[product.img2] ?? '' : '');
-  const related = $derived(allProducts.filter((p: Product) => p.category === product.category && p.slug !== product.slug).slice(0, 3));
+  const related = $derived(allProducts.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3));
 
   let selectedSize = $state('');
   let added = $state(false);
