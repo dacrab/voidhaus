@@ -11,7 +11,6 @@ build/
 # environment
 .env
 .env.*
-.env.local
 
 # logs
 npm-debug.log*
@@ -28,8 +27,7 @@ pnpm-debug.log*
 
 # convex
 .convex/
-convex/_generated/api.d.ts
-convex/_generated/api.js
-convex/_generated/dataModel.d.ts
-.vercel
-.env*.local
+convex/_generated/
+
+# generated build artifacts
+static/sitemap.xml

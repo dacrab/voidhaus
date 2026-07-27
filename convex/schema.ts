@@ -33,7 +33,7 @@ export default defineSchema({
     customerEmail: v.string(),
     items: v.array(
       v.object({
-        productId: v.id("products"),
+        productId: v.optional(v.id("products")),
         slug: v.string(),
         name: v.string(),
         price: v.number(),
