@@ -3,7 +3,7 @@ import { json } from "@sveltejs/kit";
 import type Stripe from "stripe";
 import { z } from "zod";
 import { api } from "$convex/api";
-import type { Id } from "$convex/dataModel";
+import { PRODUCTS } from "$lib/data/products";
 import { getConvex, getStripe, type OrderItem } from "$lib/utils/api";
 import type { RequestHandler } from "./$types";
 
@@ -35,11 +35,8 @@ export const POST: RequestHandler = async ({ request, url }) => {
     const orderItems: OrderItem[] = [];
 
     for (const item of items) {
-      const product = await convex.query(api.products.getBySlug, { slug: item.slug });
-      if (!product?.active) continue;
-
-      const sizeAvailable = product.sizeStock?.[item.size] ?? 0;
-      if (sizeAvailable < 1) continue;
+      const product = PRODUCTS.find((p) => p.slug === item.slug);
+      if (!product?.sizes.includes(item.size)) continue;
 
       lineItems.push({
         price_data: {
@@ -55,7 +52,6 @@ export const POST: RequestHandler = async ({ request, url }) => {
       });
 
       orderItems.push({
-        productId: product._id,
         slug: product.slug,
         name: product.name,
         price: product.price,
@@ -69,7 +65,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
     }
 
     let discounts: Stripe.Checkout.SessionCreateParams["discounts"];
-    let couponId: Id<"coupons"> | undefined;
+    let couponId: string | undefined;
     const orderTotal = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
 
     if (couponCode) {

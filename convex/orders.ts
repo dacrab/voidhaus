@@ -8,7 +8,7 @@ export const create = mutation({
     customerEmail: v.string(),
     items: v.array(
       v.object({
-        productId: v.id("products"),
+        productId: v.optional(v.id("products")),
         slug: v.string(),
         name: v.string(),
         price: v.number(),
@@ -85,11 +85,13 @@ export const fulfill = mutation({
       shippingAddress: args.shippingAddress,
     });
     for (const item of order.items) {
-      await ctx.runMutation(internal.products.decrementSizeStock, {
-        id: item.productId,
-        size: item.size,
-        quantity: item.quantity,
-      });
+      if (item.productId) {
+        await ctx.runMutation(internal.products.decrementSizeStock, {
+          id: item.productId,
+          size: item.size,
+          quantity: item.quantity,
+        });
+      }
     }
     // Send confirmation email
     if (args.customerEmail) {

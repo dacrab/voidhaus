@@ -1,4 +1,19 @@
-import { trapFocus } from "./focusTrap";
+const FOCUSABLE =
+  'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+
+function trapFocus(container: HTMLElement, e: KeyboardEvent) {
+  if (e.key !== "Tab") return;
+  const els = [...container.querySelectorAll<HTMLElement>(FOCUSABLE)];
+  if (!els.length) return;
+  const active = document.activeElement;
+  if (e.shiftKey && active === els[0]) {
+    e.preventDefault();
+    els[els.length - 1].focus();
+  } else if (!e.shiftKey && active === els[els.length - 1]) {
+    e.preventDefault();
+    els[0].focus();
+  }
+}
 
 export function createModal() {
   let prevFocus: HTMLElement | null = null;
@@ -31,14 +46,14 @@ export function createModal() {
   return { open, close, handleKeydown };
 }
 
-export function slideIn(_node: Element) {
+export function slideIn(_: Element) {
   return {
     duration: 550,
     css: (t: number) => `transform:translateX(${(1 - t) * 100}%)`,
   };
 }
 
-export function panelIn(_node: Element, { y = -1.5, scale = false } = {}) {
+export function panelIn(_: Element, { y = -1.5, scale = false } = {}) {
   return {
     duration: 550,
     css: (t: number) => {

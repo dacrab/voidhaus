@@ -9,8 +9,6 @@ import type { RequestHandler } from "./$types";
 
 export const prerender = false;
 
-const CouponIdSchema = z.string().min(1);
-
 const ShippingAddressSchema = z.object({
   name: z.string(),
   line1: z.string(),
@@ -73,10 +71,8 @@ export const POST: RequestHandler = async ({ request }) => {
     });
 
     const rawCouponId = session.metadata?.couponId;
-    const couponParsed = rawCouponId ? CouponIdSchema.safeParse(rawCouponId) : null;
-    const couponId = couponParsed?.success ? (couponParsed.data as Id<"coupons">) : undefined;
-    if (couponId) {
-      await convex.mutation(api.coupons.use, { id: couponId });
+    if (rawCouponId) {
+      await convex.mutation(api.coupons.use, { id: rawCouponId as Id<"coupons"> });
     }
 
     await convex.mutation(api.orders.fulfill, {

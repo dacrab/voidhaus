@@ -2,11 +2,6 @@
   let { status }: { status?: number } = $props();
   const code = $derived(status ?? 404);
   const title = $derived(code === 404 ? 'Not Found' : 'Error');
-  const msg = $derived(
-    code === 404
-      ? "This page doesn't exist — or has been removed.<br/>The collection remains."
-      : 'Something went wrong.<br/>Please try again.'
-  );
 </script>
 
 <svelte:head>
@@ -17,7 +12,13 @@
   <div class="relative z-10 flex flex-col gap-2xl py-32 pb-20">
     <span class="label muted">{code}</span>
     <h1 class="nf-title serif fw-medium italic leading-[0.95] tracking-[-0.03em]">{title}<br/><em class="not-italic text-ink-soft">{code === 404 ? 'found.' : 'unexpected.'}</em></h1>
-    <p class="text-base fw-normal leading-[1.85] text-soft max-w-[32ch]">{@html msg}</p>
+    <p class="text-base fw-normal leading-[1.85] text-soft max-w-[32ch]">
+      {#if code === 404}
+        This page doesn't exist — or has been removed.<br/>The collection remains.
+      {:else}
+        Something went wrong.<br/>Please try again.
+      {/if}
+    </p>
     <div class="flex gap-12 items-center pt-lg border-t border-rule">
       <a href="/" class="label muted-link">← Home</a>
       <a href="/collection" class="label muted-link">Collection →</a>

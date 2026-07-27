@@ -1,13 +1,11 @@
 import { ConvexHttpClient } from "convex/browser";
 import Stripe from "stripe";
-import type { Id } from "$convex/dataModel";
 import { env } from "$env/dynamic/private";
 
 let _convex: ConvexHttpClient | null = null;
 let _stripe: Stripe | null = null;
 
 export interface OrderItem {
-  productId: Id<"products">;
   slug: string;
   name: string;
   price: number;
