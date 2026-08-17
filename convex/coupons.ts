@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { query } from "./_generated/server";
 
 export const validate = query({
   args: { code: v.string(), orderTotal: v.number() },
@@ -20,12 +20,5 @@ export const validate = query({
     return { valid: true, discount, type: coupon.type, value: coupon.value, couponId: coupon._id };
   },
 });
-
-export const use = mutation({
-  args: { id: v.id("coupons") },
-  handler: async (ctx, args) => {
-    const coupon = await ctx.db.get(args.id);
-    if (!coupon) return;
-    await ctx.db.patch(args.id, { usedCount: coupon.usedCount + 1 });
-  },
-});
+// Note: coupon consumption (usedCount increment) lives in orders.fulfill, guarded by the
+// order's paid status, so a webhook retry can never double-consume a coupon. Keep it there.

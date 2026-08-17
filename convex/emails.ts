@@ -1,6 +1,15 @@
 import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
 
+function escapeHtml(input: string): string {
+  return input
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 // Called after order is fulfilled (paid). Sends confirmation email via Resend.
 export const sendOrderConfirmation = internalAction({
   args: {
@@ -24,7 +33,10 @@ export const sendOrderConfirmation = internalAction({
     const eur = new Intl.NumberFormat("en-US", { style: "currency", currency: "EUR" });
 
     const itemsHtml = args.orderItems
-      .map((i) => `<tr><td>${i.name}</td><td>${i.size}</td><td>${eur.format(i.price)}</td></tr>`)
+      .map(
+        (i) =>
+          `<tr><td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.size)}</td><td>${eur.format(i.price)}</td></tr>`,
+      )
       .join("");
 
     const html = `

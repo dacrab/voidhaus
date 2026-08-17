@@ -29,6 +29,11 @@ export interface Product {
   img2?: string;
 }
 
+// This module is the single source of truth for the catalog. Per-size stock lives in
+// Convex (see convex/seed.ts, which imports PRODUCTS from here and derives sizeStock);
+// the storefront renders this module, while checkout/fulfillment read live stock from
+// Convex. Keep the two in sync by re-running the seed when products change.
+
 export const PRODUCTS: Product[] = [
   {
     slug: "ash-trousers",

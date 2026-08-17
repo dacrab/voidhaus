@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 
@@ -60,6 +60,7 @@ export const fulfill = mutation({
     stripeSessionId: v.string(),
     stripePaymentIntentId: v.string(),
     customerEmail: v.optional(v.string()),
+    couponId: v.optional(v.id("coupons")),
     shippingAddress: v.optional(
       v.object({
         name: v.string(),
@@ -78,6 +79,23 @@ export const fulfill = mutation({
       .withIndex("by_session", (q) => q.eq("stripeSessionId", args.stripeSessionId))
       .first();
     if (!order) return null;
+    // Idempotent: a retried webhook delivery must not re-decrement stock, re-consume
+    // a coupon, or re-send the confirmation email once the order is already paid.
+    if (order.status === "paid") return order._id;
+
+    // Reject oversell before marking the order paid so we never commit a payment
+    // against inventory we cannot fulfill (stock is validated again atomically in
+    // decrementSizeStock as a safety net).
+    for (const item of order.items) {
+      if (!item.productId) continue;
+      const product = await ctx.db.get(item.productId);
+      if (!product) continue;
+      const current = product.sizeStock?.[item.size] ?? 0;
+      if (current < item.quantity) {
+        throw new ConvexError(`Insufficient stock for ${item.name} (size ${item.size})`);
+      }
+    }
+
     await ctx.db.patch(order._id, {
       status: "paid",
       stripePaymentIntentId: args.stripePaymentIntentId,
@@ -91,6 +109,13 @@ export const fulfill = mutation({
           size: item.size,
           quantity: item.quantity,
         });
+      }
+    }
+    // Coupon consumption is atomic with fulfillment so a retry can never double-use it.
+    if (args.couponId) {
+      const coupon = await ctx.db.get(args.couponId);
+      if (coupon) {
+        await ctx.db.patch(args.couponId, { usedCount: coupon.usedCount + 1 });
       }
     }
     // Send confirmation email

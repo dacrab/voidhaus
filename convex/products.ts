@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { internalMutation, query } from "./_generated/server";
 
 function totalStock(stock: Record<string, number>): number {
@@ -31,6 +31,20 @@ export const getBySlug = query({
   },
 });
 
+// Live per-size stock used by the checkout endpoint to reject overselling before a
+// Stripe session is created (the storefront catalog itself is the static module).
+export const getStockBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    const product = await ctx.db
+      .query("products")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .first();
+    if (!product) return null;
+    return { id: product._id, slug: product.slug, sizeStock: product.sizeStock ?? {} };
+  },
+});
+
 export const decrementSizeStock = internalMutation({
   args: { id: v.id("products"), size: v.string(), quantity: v.number() },
   handler: async (ctx, args) => {
@@ -38,7 +52,12 @@ export const decrementSizeStock = internalMutation({
     if (!product) return;
     const sizeStock = { ...product.sizeStock };
     const current = sizeStock[args.size] ?? 0;
-    sizeStock[args.size] = Math.max(0, current - args.quantity);
+    if (current < args.quantity) {
+      // Never clamp into a silent oversell — fail the mutation so the order is not
+      // treated as fulfilled against stock we don't have.
+      throw new ConvexError(`Insufficient stock for size ${args.size}`);
+    }
+    sizeStock[args.size] = current - args.quantity;
     const stock = totalStock(sizeStock);
     await ctx.db.patch(args.id, { sizeStock, stock });
   },
