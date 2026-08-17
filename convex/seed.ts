@@ -3,6 +3,12 @@ import { PRODUCTS as SEED_PRODUCTS } from "../src/lib/data/products";
 import { internal } from "./_generated/api";
 import { mutation } from "./_generated/server";
 
+// SOURCE OF TRUTH: src/lib/data/products.ts is the canonical catalog (names, prices,
+// sizes, images) and is what the storefront renders. This seed mirrors those products
+// into Convex solely to track per-size stock (sizeStock) for checkout/fulfillment.
+// If a product is added/removed/renamed in products.ts, re-run this seed so the stock
+// table matches; the two copies are expected to stay in sync via this seed.
+
 const PRODUCTS = SEED_PRODUCTS.map((p) => {
   const sizeStock: Record<string, number> = {};
   for (const size of p.sizes) {

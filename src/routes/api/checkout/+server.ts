@@ -38,6 +38,16 @@ export const POST: RequestHandler = async ({ request, url }) => {
       const product = PRODUCTS.find((p) => p.slug === item.slug);
       if (!product?.sizes.includes(item.size)) continue;
 
+      // Live inventory check against Convex: reject before Stripe is involved so the
+      // user sees the error instead of an order that can never be fulfilled.
+      const stock = await convex.query(api.products.getStockBySlug, { slug: item.slug });
+      if (!stock || (stock.sizeStock[item.size] ?? 0) < 1) {
+        return json(
+          { error: `Insufficient stock for ${product.name} (size ${item.size})` },
+          { status: 400 },
+        );
+      }
+
       lineItems.push({
         price_data: {
           currency: "eur",
@@ -52,6 +62,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
       });
 
       orderItems.push({
+        productId: stock.id,
         slug: product.slug,
         name: product.name,
         price: product.price,

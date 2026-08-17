@@ -6,6 +6,7 @@ let _convex: ConvexHttpClient | null = null;
 let _stripe: Stripe | null = null;
 
 export interface OrderItem {
+  productId?: string;
   slug: string;
   name: string;
   price: number;

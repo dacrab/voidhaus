@@ -29,7 +29,8 @@
       });
       const data = await res.json();
       if (data.url) {
-        saveCart([]);
+        // Don't clear the cart yet — if the customer cancels on Stripe they keep
+        // their selection. The cart is cleared on /checkout/success after payment.
         window.location.href = data.url;
       } else if (data.error) {
         checkoutError = data.error;

@@ -59,7 +59,9 @@ export const POST: RequestHandler = async ({ request }) => {
         })
       : undefined;
 
-    const orderItems: OrderItem[] = JSON.parse(session.metadata?.orderItems ?? "[]");
+    const orderItems = JSON.parse(
+      session.metadata?.orderItems ?? "[]",
+    ) as (OrderItem & { productId?: Id<"products"> })[];
     const total = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
 
     await convex.mutation(api.orders.create, {
@@ -71,14 +73,15 @@ export const POST: RequestHandler = async ({ request }) => {
     });
 
     const rawCouponId = session.metadata?.couponId;
-    if (rawCouponId) {
-      await convex.mutation(api.coupons.use, { id: rawCouponId as Id<"coupons"> });
-    }
 
+    // fulfill is idempotent (no-op when the order is already paid) and consumes the
+    // coupon atomically with it, so a Stripe retry can't double-decrement stock or
+    // double-use a coupon.
     await convex.mutation(api.orders.fulfill, {
       stripeSessionId: session.id,
       stripePaymentIntentId: String(session.payment_intent ?? ""),
       customerEmail: customerDetails?.email ?? undefined,
+      couponId: rawCouponId ? (rawCouponId as Id<"coupons">) : undefined,
       shippingAddress,
     });
   } catch {
