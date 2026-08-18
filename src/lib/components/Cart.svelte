@@ -27,7 +27,7 @@
           items: items.map(i => ({ slug: i.slug, size: i.size })),
         }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as { url?: string | null; error?: string };
       if (data.url) {
         // Don't clear the cart yet — if the customer cancels on Stripe they keep
         // their selection. The cart is cleared on /checkout/success after payment.

@@ -2,15 +2,17 @@
   import PageHeader from "$lib/components/PageHeader.svelte";
   import { formatPrice as fmtPrice } from "$lib/utils/cart";
 
-  let email = $state("");
-  let orders: Array<{
+  type OrderRow = {
     id: string;
     items: Array<{ name: string; size: string; price: number; quantity: number }>;
     total: number;
     currency: string;
     status: string;
     createdAt: number;
-  }> | null = $state(null);
+  };
+
+  let email = $state("");
+  let orders: OrderRow[] | null = $state(null);
   let error = $state("");
   let loading = $state(false);
 
@@ -26,11 +28,11 @@
         body: JSON.stringify({ email }),
       });
       if (!res.ok) {
-        const body = await res.json();
+        const body = (await res.json()) as { error?: string };
         error = body.error ?? "Something went wrong";
         return;
       }
-      const body = await res.json();
+      const body = (await res.json()) as { orders: OrderRow[] };
       orders = body.orders;
     } catch {
       error = "Could not reach the server";
