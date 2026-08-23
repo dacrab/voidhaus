@@ -11,7 +11,7 @@ export function observeAnimations(): () => void {
     { rootMargin: "0px 0px -80px 0px" },
   );
 
-  document.querySelectorAll('[data-anim="scroll"], [data-anim="stagger"]').forEach((el) => {
+  document.querySelectorAll('[data-anim="scroll"], [data-anim="stagger"], .js-rule').forEach((el) => {
     observer.observe(el);
   });
 

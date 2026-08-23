@@ -1,5 +1,10 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.10/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
     "includes": ["src/**/*.ts", "convex/**/*.ts", "scripts/**/*.js"]
   },
@@ -8,18 +13,88 @@
     "indentWidth": 2,
     "lineWidth": 120
   },
+  "assist": {
+    "actions": {
+      "source": { "organizeImports": "on" }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
       "preset": "recommended",
+      "a11y": {
+        "noSvgWithoutTitle": "off",
+        "useButtonType": "warn"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": {
+          "level": "warn",
+          "options": { "maxAllowedComplexity": 15 }
+        },
+        "noForEach": "off",
+        "noUselessUndefined": "error",
+        "useLiteralKeys": "off",
+        "useSimplifiedLogicExpression": "warn"
+      },
+      "correctness": {
+        "noUnusedFunctionParameters": "warn",
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "warn",
+        "useHookAtTopLevel": "error"
+      },
+      "performance": {
+        "noAccumulatingSpread": "warn",
+        "noDelete": "warn"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "warn",
+        "noCommentText": "off",
+        "noConsole": "warn",
+        "noDebugger": "error",
+        "noConfusingVoidType": "error",
+        "noDoubleEquals": "error",
+        "noExplicitAny": "error",
+        "noImplicitAnyLet": "warn",
+        "noMisleadingInstantiator": "error",
+        "noRedeclare": "error",
+        "noSelfCompare": "error",
+        "noVar": "error"
+      },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "warn",
+        "noParameterAssign": "error",
+        "noUselessElse": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useCollapsedElseIf": "warn",
+        "useConsistentArrayType": { "level": "error", "options": { "syntax": "shorthand" } },
+        "useConsistentBuiltinInstantiation": "error",
+        "useConst": "error",
+        "useDefaultParameterLast": "error",
+        "useImportType": "error",
+        "useSelfClosingElements": "warn",
+        "useShorthandAssign": "error",
+        "useSingleVarDeclarator": "error",
+        "useTemplate": "error",
+        "useThrowOnlyError": "error"
       }
     }
   },
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  }
+  "overrides": [
+    {
+      "includes": ["**/*.svelte", "**/*.svelte.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedFunctionParameters": "off",
+            "noUnusedImports": "off",
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    }
+  ]
 }

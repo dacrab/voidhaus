@@ -2,26 +2,24 @@
   import ProductCard from '$lib/components/ProductCard.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
   import { filterProducts } from '$lib/data/filter';
-
-  let { data } = $props();
-  const products = $derived(data.products);
-  const categories = $derived(data.categories);
+  import { CATEGORIES, PRODUCTS } from '$lib/data/products';
+  import { SITE } from '$lib/data/site';
 
   let activeCategory = $state('All');
   let search = $state('');
-  let filtered = $derived(filterProducts(products, search, activeCategory));
+  let filtered = $derived(filterProducts(PRODUCTS, search, activeCategory));
 </script>
 
 <svelte:head>
   <title>Collection — VOIDHAUS</title>
 </svelte:head>
 
-<PageHeader label="SS 2026" title="Collection" aside="{products.length} pieces" />
+<PageHeader label={SITE.season} title="Collection" aside="{PRODUCTS.length} pieces" />
 
 <div class="wrap">
   <div class="rule"></div>
   <nav class="cat-filters" aria-label="Category filters">
-    {#each categories as cat}
+    {#each CATEGORIES as cat}
       <button
         class="cat-filter label"
         class:cat-filter--active={activeCategory === cat}

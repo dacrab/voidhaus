@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { formatPrice } from "../src/lib/utils/cart";
 import { internalAction } from "./_generated/server";
 
 function escapeHtml(input: string): string {
@@ -30,13 +31,11 @@ export const sendOrderConfirmation = internalAction({
       return;
     }
 
-    const eur = new Intl.NumberFormat("en-US", { style: "currency", currency: "EUR" });
-
     const itemsHtml = args.orderItems
-      .map(
-        (i) =>
-          `<tr><td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.size)}</td><td>${eur.format(i.price)}</td></tr>`,
-      )
+      .map((i) => {
+        const qty = i.quantity > 1 ? ` × ${i.quantity}` : "";
+        return `<tr><td>${escapeHtml(i.name)}${qty}</td><td>${escapeHtml(i.size)}</td><td>€ ${formatPrice(i.price * i.quantity)}</td></tr>`;
+      })
       .join("");
 
     const html = `
@@ -51,7 +50,7 @@ export const sendOrderConfirmation = internalAction({
           </tr></thead>
           <tbody>${itemsHtml}</tbody>
         </table>
-        <p style="font-size: 18px; font-weight: 500;">Total: ${eur.format(args.total)}</p>
+        <p style="font-size: 18px; font-weight: 500;">Total: € ${formatPrice(args.total)}</p>
         <p style="color: #666; font-size: 14px;">Complimentary worldwide shipping · 5–10 business days</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0;" />
         <p style="color: #999; font-size: 12px;">VOIDHAUS — studio@voidhaus.com</p>

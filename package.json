@@ -4,18 +4,19 @@
   "version": "0.0.1",
   "type": "module",
   "engines": {
-    "node": "24.x"
+    "bun": ">=1.1.0"
   },
   "scripts": {
     "dev": "doppler run -- vite dev",
     "build": "vite build && bun scripts/sitemap.js",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "type-check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
+    "test:watch": "vitest",
     "knip": "knip",
     "lint": "biome check .",
-    "lint:fix": "biome check --write ."
+    "lint:fix": "biome check . --write"
   },
   "dependencies": {
     "@fontsource-variable/cormorant": "^5.2.8",
@@ -28,6 +29,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.4",
+    "knip": "^6.26.0",
     "@sveltejs/kit": "^2.69.2",
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@tailwindcss/vite": "^4.3.2",

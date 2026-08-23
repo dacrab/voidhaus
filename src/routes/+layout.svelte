@@ -6,6 +6,7 @@
   import { afterNavigate } from '$app/navigation';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
+  import { page } from '$app/state';
   import { SITE } from '$lib/data/site';
 
   let { children } = $props();
@@ -47,7 +48,7 @@
   <meta name="robots" content="index, follow" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content={SITE.name} />
-  <link rel="canonical" href="{SITE.url}" />
+  <link rel="canonical" href={page.url.pathname === '/' ? SITE.url : `${SITE.url}${page.url.pathname}`} />
 </svelte:head>
 
 <div id="js-veil" aria-hidden="true">
@@ -56,7 +57,7 @@
 
 <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:bg-white focus:px-md focus:py-sm focus:text-ink focus:border focus:border-ink">Skip to content</a>
 
-<Nav solidNav={false} />
+<Nav />
 <Cart />
 
 <main id="main">

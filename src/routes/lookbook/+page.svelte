@@ -1,5 +1,6 @@
 <script lang="ts">
   import { IMAGES } from '$lib/data/images';
+  import { SITE } from '$lib/data/site';
   import PageHeader from '$lib/components/PageHeader.svelte';
   import CTAStrip from '$lib/components/CTAStrip.svelte';
 
@@ -14,7 +15,7 @@
   <title>Lookbook — VOIDHAUS</title>
 </svelte:head>
 
-<PageHeader label="SS 2026" title="Lookbook" />
+<PageHeader label={SITE.season} title="Lookbook" />
 
 <div class="wrap">
   <div class="rule"></div>

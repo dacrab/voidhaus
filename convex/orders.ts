@@ -1,14 +1,17 @@
 import { ConvexError, v } from "convex/values";
+import { isValidEmail } from "../src/lib/data/limits";
 import { internal } from "./_generated/api";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, query } from "./_generated/server";
 
-export const create = mutation({
+// Internal: only reachable from the Stripe webhook pipeline (http.ts), which is
+// gated by a signature-verified server route and a shared secret.
+export const create = internalMutation({
   args: {
     stripeSessionId: v.string(),
     customerEmail: v.string(),
     items: v.array(
       v.object({
-        productId: v.optional(v.id("products")),
+        productId: v.id("products"),
         slug: v.string(),
         name: v.string(),
         price: v.number(),
@@ -17,6 +20,7 @@ export const create = mutation({
       }),
     ),
     total: v.number(),
+    discount: v.optional(v.number()),
     currency: v.string(),
   },
   handler: async (ctx, args) => {
@@ -26,36 +30,27 @@ export const create = mutation({
       .first();
     if (existing) return existing._id;
 
-    const email = args.customerEmail.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      throw new Error("Invalid customer email");
-    }
-    if (!Array.isArray(args.items) || args.items.length === 0) {
-      throw new Error("Order must contain at least one item");
-    }
+    if (!isValidEmail(args.customerEmail)) throw new ConvexError("Invalid customer email");
+    if (args.items.length === 0) throw new ConvexError("Order must contain at least one item");
     for (const item of args.items) {
-      if (!item.productId || !item.slug || !item.name || !item.size) {
-        throw new Error("Invalid order item");
-      }
-      if (typeof item.price !== "number" || item.price < 0) {
-        throw new Error("Invalid item price");
-      }
-      if (typeof item.quantity !== "number" || item.quantity < 1) {
-        throw new Error("Invalid item quantity");
+      if (!(item.slug && item.name && item.size) || item.price < 0 || item.quantity < 1) {
+        throw new ConvexError("Invalid order item");
       }
     }
-    if (typeof args.total !== "number" || args.total < 0) {
-      throw new Error("Invalid order total");
-    }
-    if (args.currency !== "eur") {
-      throw new Error("Unsupported currency");
-    }
+    if (args.total < 0 || args.currency !== "eur") throw new ConvexError("Invalid order total");
 
-    return await ctx.db.insert("orders", { ...args, customerEmail: email, status: "pending" });
+    return await ctx.db.insert("orders", {
+      ...args,
+      customerEmail: args.customerEmail.trim(),
+      status: "pending",
+    });
   },
 });
 
-export const fulfill = mutation({
+// Internal: only callable from the webhook pipeline. Idempotent on `paid`; on
+// oversell the order is marked `failed` instead of throwing, so Stripe retries
+// stop and the payment can be refunded manually against a durable record.
+export const fulfill = internalMutation({
   args: {
     stripeSessionId: v.string(),
     stripePaymentIntentId: v.string(),
@@ -83,16 +78,41 @@ export const fulfill = mutation({
     // a coupon, or re-send the confirmation email once the order is already paid.
     if (order.status === "paid") return order._id;
 
-    // Reject oversell before marking the order paid so we never commit a payment
-    // against inventory we cannot fulfill (stock is validated again atomically in
-    // decrementSizeStock as a safety net).
+    const soldOut: string[] = [];
     for (const item of order.items) {
       if (!item.productId) continue;
       const product = await ctx.db.get(item.productId);
       if (!product) continue;
       const current = product.sizeStock?.[item.size] ?? 0;
-      if (current < item.quantity) {
-        throw new ConvexError(`Insufficient stock for ${item.name} (size ${item.size})`);
+      if (current < item.quantity) soldOut.push(`${item.name} (${item.size})`);
+    }
+    if (soldOut.length > 0) {
+      console.error(`Order ${order._id} failed, oversell — refund required: ${soldOut.join(", ")}`);
+      await ctx.db.patch(order._id, { status: "failed" });
+      return null;
+    }
+
+    for (const item of order.items) {
+      if (!item.productId) continue;
+      const product = await ctx.db.get(item.productId);
+      if (!product) continue;
+      const sizeStock: Record<string, number> = { ...product.sizeStock };
+      sizeStock[item.size] = (sizeStock[item.size] ?? 0) - item.quantity;
+      await ctx.db.patch(item.productId, {
+        sizeStock,
+        stock: Object.values(sizeStock).reduce((a: number, b: number) => a + b, 0),
+      });
+    }
+
+    // Re-check limits at fulfillment: pending checkouts can overshoot maxUses.
+    if (args.couponId) {
+      const coupon = await ctx.db.get(args.couponId);
+      if (
+        coupon?.active &&
+        !(coupon.expiresAt && Date.now() > coupon.expiresAt) &&
+        !(coupon.maxUses && coupon.usedCount >= coupon.maxUses)
+      ) {
+        await ctx.db.patch(coupon._id, { usedCount: coupon.usedCount + 1 });
       }
     }
 
@@ -102,45 +122,41 @@ export const fulfill = mutation({
       customerEmail: args.customerEmail ?? order.customerEmail,
       shippingAddress: args.shippingAddress,
     });
-    for (const item of order.items) {
-      if (item.productId) {
-        await ctx.runMutation(internal.products.decrementSizeStock, {
-          id: item.productId,
-          size: item.size,
-          quantity: item.quantity,
-        });
-      }
-    }
-    // Coupon consumption is atomic with fulfillment so a retry can never double-use it.
-    if (args.couponId) {
-      const coupon = await ctx.db.get(args.couponId);
-      if (coupon) {
-        await ctx.db.patch(args.couponId, { usedCount: coupon.usedCount + 1 });
-      }
-    }
-    // Send confirmation email
-    if (args.customerEmail) {
-      await ctx.scheduler.runAfter(0, internal.emails.sendOrderConfirmation, {
-        customerEmail: args.customerEmail,
-        orderItems: order.items.map((i) => ({
-          name: i.name,
-          size: i.size,
-          price: i.price,
-          quantity: i.quantity,
-        })),
-        total: order.total,
-      });
-    }
+
+    const email = args.customerEmail ?? order.customerEmail;
+    await ctx.scheduler.runAfter(0, internal.emails.sendOrderConfirmation, {
+      customerEmail: email,
+      orderItems: order.items.map((i) => ({
+        name: i.name,
+        size: i.size,
+        price: i.price,
+        quantity: i.quantity,
+      })),
+      // Item prices are already net of the checkout-time discount, so this is
+      // exactly what the customer paid.
+      total: order.total,
+    });
     return order._id;
   },
 });
 
-export const getByEmail = query({
-  args: { email: v.string() },
+// Public but capability-gated: callers must know the Stripe checkout session id
+// (only shown to the payer post-redirect). Returns no PII beyond purchased items.
+export const getBySession = query({
+  args: { sessionId: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const orders = await ctx.db
       .query("orders")
-      .withIndex("by_email", (q) => q.eq("customerEmail", args.email.trim()))
+      .withIndex("by_session", (q) => q.eq("stripeSessionId", args.sessionId))
       .collect();
+    return orders.map((o) => ({
+      id: o._id,
+      items: o.items,
+      total: o.total,
+      discount: o.discount ?? 0,
+      currency: o.currency,
+      status: o.status,
+      createdAt: o._creationTime,
+    }));
   },
 });

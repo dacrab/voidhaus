@@ -2,7 +2,6 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { sentrySvelteKit } from '@sentry/sveltekit';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
-import path from 'path';
 
 const hasSentryCredentials = Boolean(
   process.env.SENTRY_AUTH_TOKEN &&
@@ -21,9 +20,4 @@ export default defineConfig({
     tailwindcss(),
     sveltekit(),
   ],
-  resolve: {
-    alias: {
-      '$convex': path.resolve('./convex/_generated'),
-    },
-  },
 });
