@@ -6,18 +6,19 @@
     id: string;
     items: Array<{ name: string; size: string; price: number; quantity: number }>;
     total: number;
+    discount: number;
     currency: string;
     status: string;
     createdAt: number;
   };
 
-  let email = $state("");
+  let sessionId = $state("");
   let orders: OrderRow[] | null = $state(null);
   let error = $state("");
   let loading = $state(false);
 
   async function lookup() {
-    if (!email) return;
+    if (!sessionId) return;
     error = "";
     orders = null;
     loading = true;
@@ -25,7 +26,7 @@
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ sessionId }),
       });
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
@@ -54,17 +55,16 @@
     aria-label="Look up your orders"
     onsubmit={(e) => { e.preventDefault(); lookup(); }}
   >
-    <label for="order-email" class="label muted block mb-sm">
-      Enter the email you used at checkout
+    <label for="order-session" class="label muted block mb-sm">
+      Enter the checkout session id from your payment redirect (cs_…)
     </label>
     <div class="flex gap-sm items-start">
       <input
-        id="order-email"
-        type="email"
-        autocomplete="email"
-        bind:value={email}
+        id="order-session"
+        type="text"
+        bind:value={sessionId}
         class="order-input"
-        placeholder="you@example.com"
+        placeholder="cs_live_…"
       />
       <button type="submit" class="btn-outline label" disabled={loading}>
         {loading ? "Searching…" : "Search"}
@@ -78,7 +78,7 @@
 
   {#if orders !== null}
     {#if orders.length === 0}
-      <p class="label muted mt-lg">No orders found for that email.</p>
+      <p class="label muted mt-lg">No orders found for that session.</p>
     {:else}
       <div class="flex flex-col gap-lg mt-lg">
         {#each orders as order}
@@ -91,11 +91,17 @@
               {#each order.items as item}
                 <div class="flex justify-between text-sm">
                   <span>{item.name} <span class="muted">({item.size})</span> &times;{item.quantity}</span>
-                  <span class="muted">&euro;{fmtPrice(item.price)}</span>
+                  <span class="muted">&euro;{fmtPrice(item.price * item.quantity)}</span>
                 </div>
               {/each}
             </div>
             <div class="rule"></div>
+            {#if order.discount > 0}
+              <div class="flex justify-between pt-xs">
+                <span class="label muted">Discount applied</span>
+                <span class="label muted">&minus;&euro;{fmtPrice(order.discount)}</span>
+              </div>
+            {/if}
             <div class="flex justify-between pt-xs">
               <span class="label">Total</span>
               <span class="label">&euro;{fmtPrice(order.total)}</span>

@@ -1,4 +1,5 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
+import { isValidEmail, LIMITS } from "../src/lib/data/limits";
 import { mutation } from "./_generated/server";
 
 export const create = mutation({
@@ -14,14 +15,12 @@ export const create = mutation({
     const subject = args.subject.trim();
     const message = args.message.trim();
 
-    if (!name || !email || !subject || !message) {
-      throw new Error("All fields are required");
+    if (!(name && email && subject && message)) {
+      throw new ConvexError("All fields are required");
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      throw new Error("Invalid email");
-    }
-    if (name.length > 200 || subject.length > 200 || message.length > 5000) {
-      throw new Error("Message too long");
+    if (!isValidEmail(email)) throw new ConvexError("Invalid email");
+    if (name.length > LIMITS.nameMax || subject.length > LIMITS.subjectMax || message.length > LIMITS.messageMax) {
+      throw new ConvexError("Message too long");
     }
 
     return await ctx.db.insert("messages", {

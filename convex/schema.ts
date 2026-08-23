@@ -42,6 +42,7 @@ export default defineSchema({
       }),
     ),
     total: v.number(),
+    discount: v.optional(v.number()),
     currency: v.string(),
     status: v.string(),
     shippingAddress: v.optional(
@@ -92,9 +93,4 @@ export default defineSchema({
       }),
     ),
   }),
-
-  images: defineTable({
-    key: v.string(),
-    url: v.string(),
-  }).index("by_key", ["key"]),
 });

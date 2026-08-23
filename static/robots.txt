@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://voidhaus.vercel.app/sitemap.xml
+Sitemap: https://voidhaus.com/sitemap.xml

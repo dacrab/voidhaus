@@ -11,7 +11,6 @@ const pages = [
   "/stockists",
   "/privacy",
   "/terms",
-  "/checkout/success",
   ...PRODUCTS.map((p) => `/product/${p.slug}`),
 ];
 

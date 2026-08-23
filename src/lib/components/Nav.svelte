@@ -6,9 +6,6 @@
   import { getCart } from '$lib/utils/cart';
   import { SITE } from '$lib/data/site';
 
-  interface Props { solidNav?: boolean; }
-  let { solidNav = false }: Props = $props();
-
   const modal = createModal();
 
   let path = $state('');
@@ -29,7 +26,7 @@
 
   onMount(() => {
     path = window.location.pathname;
-    scrolled = solidNav || window.scrollY > 40;
+    scrolled = window.scrollY > 40;
 
     const syncCart = () => { cartCount = getCart().length; };
     syncCart();
@@ -38,7 +35,7 @@
     let lastY = 0;
     const onScroll = () => {
       const y = window.scrollY;
-      scrolled = solidNav || y > 40;
+      scrolled = y > 40;
       hidden = y > lastY && y > 120 && !open;
       lastY = y;
     };

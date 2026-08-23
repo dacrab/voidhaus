@@ -1,10 +1,9 @@
+import { captureException } from "@sentry/sveltekit";
 import { json } from "@sveltejs/kit";
 import type Stripe from "stripe";
 import { z } from "zod";
-import { api } from "$convex/api";
-import type { Id } from "$convex/dataModel";
 import { env } from "$env/dynamic/private";
-import { getConvex, getStripe, type OrderItem } from "$lib/utils/api";
+import { getStripe } from "$lib/utils/api";
 import type { RequestHandler } from "./$types";
 
 export const prerender = false;
@@ -19,20 +18,27 @@ const ShippingAddressSchema = z.object({
   country: z.string(),
 });
 
+const OrderItemSchema = z.object({
+  productId: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  price: z.number(),
+  size: z.string(),
+  quantity: z.number().int().min(1),
+});
+
 export const POST: RequestHandler = async ({ request }) => {
   const stripe = getStripe();
-  const convex = getConvex();
-  const webhookSecret = env.STRIPE_WEBHOOK_SECRET;
   const body = await request.text();
   const sig = request.headers.get("stripe-signature");
 
-  if (!sig || !webhookSecret) {
+  if (!(sig && env.STRIPE_WEBHOOK_SECRET)) {
     return new Response("Missing signature or webhook secret", { status: 400 });
   }
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    event = stripe.webhooks.constructEvent(body, sig, env.STRIPE_WEBHOOK_SECRET);
   } catch {
     return new Response("Webhook Error: Invalid signature", { status: 400 });
   }
@@ -45,6 +51,12 @@ export const POST: RequestHandler = async ({ request }) => {
     const session = event.data.object as Stripe.Checkout.Session;
     const customerDetails = session.customer_details;
     const shippingDetails = session.collected_information?.shipping_details;
+
+    // Permanent configuration problem — retries cannot fix it.
+    if (!customerDetails?.email) {
+      console.error("Webhook rejected: checkout session has no customer email", session.id);
+      return new Response("Missing customer email", { status: 400 });
+    }
 
     const shipping = shippingDetails?.address;
     const shippingAddress = shipping
@@ -59,32 +71,39 @@ export const POST: RequestHandler = async ({ request }) => {
         })
       : undefined;
 
-    const orderItems = JSON.parse(
-      session.metadata?.orderItems ?? "[]",
-    ) as (OrderItem & { productId?: Id<"products"> })[];
-    const total = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
+    const orderItems = z.array(OrderItemSchema).parse(JSON.parse(session.metadata?.orderItems ?? "[]"));
+    // Total is computed at checkout from the same discounted line items and
+    // stored in metadata so the recorded amount always matches what was charged.
+    const total = z.coerce
+      .number()
+      .nonnegative()
+      .parse(session.metadata?.total ?? NaN);
 
-    await convex.mutation(api.orders.create, {
-      stripeSessionId: session.id,
-      customerEmail: customerDetails?.email ?? "",
-      items: orderItems,
-      total,
-      currency: "eur",
+    const couponId = session.metadata?.couponId || undefined;
+
+    const response = await fetch(`${env.CONVEX_SITE_URL}/fulfill`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-internal-secret": env.INTERNAL_WEBHOOK_SECRET ?? "",
+      },
+      body: JSON.stringify({
+        sessionId: session.id,
+        paymentIntentId: String(session.payment_intent ?? ""),
+        customerEmail: customerDetails.email,
+        couponId,
+        items: orderItems,
+        total,
+        shippingAddress,
+      }),
     });
-
-    const rawCouponId = session.metadata?.couponId;
-
-    // fulfill is idempotent (no-op when the order is already paid) and consumes the
-    // coupon atomically with it, so a Stripe retry can't double-decrement stock or
-    // double-use a coupon.
-    await convex.mutation(api.orders.fulfill, {
-      stripeSessionId: session.id,
-      stripePaymentIntentId: String(session.payment_intent ?? ""),
-      customerEmail: customerDetails?.email ?? undefined,
-      couponId: rawCouponId ? (rawCouponId as Id<"coupons">) : undefined,
-      shippingAddress,
-    });
-  } catch {
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Convex fulfillment failed (${response.status}): ${detail}`);
+    }
+  } catch (err) {
+    console.error("Webhook processing failed:", err);
+    captureException(err);
     return json({ error: "Failed to process webhook" }, { status: 500 });
   }
 

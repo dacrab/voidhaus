@@ -16,6 +16,9 @@ export const validate = query({
       return { valid: false, error: `Minimum order €${coupon.minOrder}` };
 
     const discount = coupon.type === "percent" ? Math.round(args.orderTotal * (coupon.value / 100)) : coupon.value;
+    if (discount <= 0 || discount >= args.orderTotal) {
+      return { valid: false, error: "Discount exceeds order total" };
+    }
 
     return { valid: true, discount, type: coupon.type, value: coupon.value, couponId: coupon._id };
   },

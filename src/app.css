@@ -373,6 +373,8 @@ html:not(.no-js) :is(.js-atelier-img, .js-img) {
 
 /* Data-anim initial states + transitions */
 html:not(.no-js) [data-anim="hero"],
+html:not(.no-js) [data-anim="scroll"],
+html:not(.no-js) [data-anim="stagger"],
 html:not(.no-js) .js-hero-season,
 html:not(.no-js) .js-hero-tagline,
 html:not(.no-js) .js-hero-cta,

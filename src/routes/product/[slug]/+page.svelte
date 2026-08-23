@@ -3,14 +3,13 @@
   import SizeGuide from '$lib/components/SizeGuide.svelte';
   import ProductCard from '$lib/components/ProductCard.svelte';
   import PageHeader from '$lib/components/PageHeader.svelte';
+  import { IMAGES } from '$lib/data/images';
+  import { PRODUCTS, SHARED_DETAILS } from '$lib/data/products';
   let { data } = $props();
   const product = $derived(data.product);
-  const allProducts = $derived(data.allProducts);
-  const sharedDetails = $derived(data.sharedDetails);
-  const images = $derived(data.images);
-  const mainImg = $derived(images[product.img]);
-  const altImg = $derived(product.img2 ? images[product.img2] ?? '' : '');
-  const related = $derived(allProducts.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3));
+  const mainImg = $derived(IMAGES[product.img]);
+  const altImg = $derived(product.img2 ? IMAGES[product.img2] ?? '' : '');
+  const related = $derived(PRODUCTS.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3));
 
   let selectedSize = $state('');
   let added = $state(false);
@@ -111,7 +110,7 @@
       </div>
 
       <div class="flex flex-col gap-xs pt-lg" data-anim="hero" data-delay="0.5">
-        {#each sharedDetails as [label, value]}
+        {#each SHARED_DETAILS as [label, value]}
           <div class="flex justify-between text-sm border-b border-rule py-xs">
             <span class="label muted">{label}</span>
             <span class="fw-normal text-soft">{value}</span>
