@@ -1,33 +1,35 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { clientIp, getStoreFromEnv, limitWithStore, MemoryStore, UpstashRestStore } from "./rate-limit";
 
+const WINDOW_MS = 60_000;
+
 describe("MemoryStore", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
   it("counts consecutive hits inside the window", async () => {
-    const store = new MemoryStore();
+    const store = new MemoryStore(WINDOW_MS);
     vi.setSystemTime(0);
-    expect(await store.hit("k", 60_000)).toBe(1);
-    expect(await store.hit("k", 60_000)).toBe(2);
-    expect(await store.hit("k", 60_000)).toBe(3);
+    expect(await store.hit("k")).toBe(1);
+    expect(await store.hit("k")).toBe(2);
+    expect(await store.hit("k")).toBe(3);
   });
 
   it("keeps keys independent", async () => {
-    const store = new MemoryStore();
+    const store = new MemoryStore(WINDOW_MS);
     vi.setSystemTime(0);
-    await store.hit("a", 60_000);
-    await store.hit("a", 60_000);
-    expect(await store.hit("b", 60_000)).toBe(1);
+    await store.hit("a");
+    await store.hit("a");
+    expect(await store.hit("b")).toBe(1);
   });
 
   it("drops hits once the window has passed", async () => {
-    const store = new MemoryStore();
+    const store = new MemoryStore(WINDOW_MS);
     vi.setSystemTime(0);
-    await store.hit("k", 60_000);
-    await store.hit("k", 60_000);
+    await store.hit("k");
+    await store.hit("k");
     vi.setSystemTime(61_000);
-    expect(await store.hit("k", 60_000)).toBe(1);
+    expect(await store.hit("k")).toBe(1);
   });
 });
 
@@ -38,8 +40,13 @@ function upstashFetch(result: number) {
 describe("UpstashRestStore", () => {
   it("sends an INCR+EXPIRE NX pipeline and returns the counter", async () => {
     const doFetch = upstashFetch(4);
-    const store = new UpstashRestStore("https://example.upstash.io", "tok", doFetch as unknown as typeof fetch);
-    const count = await store.hit("bucket:ip", 60_000);
+    const store = new UpstashRestStore(
+      "https://example.upstash.io",
+      "tok",
+      WINDOW_MS,
+      doFetch as unknown as typeof fetch,
+    );
+    const count = await store.hit("bucket:ip");
     expect(count).toBe(4);
     const [url, init] = (doFetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(url).toBe("https://example.upstash.io/pipeline");
@@ -53,16 +60,21 @@ describe("UpstashRestStore", () => {
 
   it("rounds the window up to whole seconds", async () => {
     const doFetch = upstashFetch(1);
-    const store = new UpstashRestStore("https://example.upstash.io", "tok", doFetch as unknown as typeof fetch);
-    await store.hit("k", 1500);
+    const store = new UpstashRestStore("https://example.upstash.io", "tok", 1500, doFetch as unknown as typeof fetch);
+    await store.hit("k");
     const [, init] = (doFetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(JSON.parse(init.body)[1]).toEqual(["EXPIRE", "k", 2, "NX"]);
   });
 
   it("throws on non-OK responses so callers can fail open", async () => {
     const doFetch = vi.fn().mockResolvedValue(new Response("nope", { status: 401 }));
-    const store = new UpstashRestStore("https://example.upstash.io", "tok", doFetch as unknown as typeof fetch);
-    await expect(store.hit("k", 60_000)).rejects.toThrow("401");
+    const store = new UpstashRestStore(
+      "https://example.upstash.io",
+      "tok",
+      WINDOW_MS,
+      doFetch as unknown as typeof fetch,
+    );
+    await expect(store.hit("k")).rejects.toThrow("401");
   });
 });
 
@@ -88,19 +100,19 @@ describe("store selection and failure handling", () => {
     const failing: import("./rate-limit").RateLimitStore = {
       hit: () => Promise.reject(new Error("down")),
     };
-    await expect(limitWithStore(failing, "k", 60_000, 5)).resolves.toBe(true);
-    await expect(limitWithStore(failing, "k", 60_000, 5)).resolves.toBe(true);
+    await expect(limitWithStore(failing, "k", 5)).resolves.toBe(true);
+    await expect(limitWithStore(failing, "k", 5)).resolves.toBe(true);
     expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
   });
 
   it("denies when hits exceed max via the injected-store seam", async () => {
-    const store = new MemoryStore();
+    const store = new MemoryStore(WINDOW_MS);
     vi.useFakeTimers();
     vi.setSystemTime(0);
     const results = [];
     for (let i = 0; i < 3; i++) {
-      results.push(await limitWithStore(store, "k", 60_000, 2));
+      results.push(await limitWithStore(store, "k", 2));
     }
     expect(results).toEqual([true, true, false]);
     vi.useRealTimers();

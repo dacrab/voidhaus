@@ -72,9 +72,11 @@ export const sendOrderConfirmation = internalAction({
         }),
       });
       if (!res.ok) {
+        // biome-ignore lint/suspicious/noConsole: email delivery failures surface in server logs
         console.error("Resend email failed:", res.status, await res.text());
       }
     } catch (err) {
+      // biome-ignore lint/suspicious/noConsole: email send failures surface in server logs without failing the order
       console.error("Failed to send order confirmation email:", err);
     }
   },
@@ -91,9 +93,11 @@ export const triggerRebuild = internalAction({
     try {
       const res = await fetch(hookUrl, { method: "POST" });
       if (!res.ok) {
+        // biome-ignore lint/suspicious/noConsole: deploy hook failures surface in server logs
         console.error("Vercel deploy hook failed:", res.status, await res.text());
       }
     } catch (err) {
+      // biome-ignore lint/suspicious/noConsole: rebuild trigger failures surface in server logs without throwing
       console.error("Failed to trigger Vercel rebuild:", err);
     }
   },

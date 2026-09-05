@@ -7,15 +7,17 @@ const WINDOW_MS = 60_000;
 
 export interface RateLimitStore {
   /** Record a hit and return the number of hits inside the current window. */
-  hit(key: string, windowMs: number): Promise<number>;
+  hit(key: string): Promise<number>;
 }
 
 export class MemoryStore implements RateLimitStore {
   private readonly hits = new Map<string, number[]>();
 
-  async hit(key: string, windowMs: number): Promise<number> {
+  constructor(private readonly windowMs: number) {}
+
+  async hit(key: string): Promise<number> {
     const now = Date.now();
-    const recent = (this.hits.get(key) ?? []).filter((t) => now - t < windowMs);
+    const recent = (this.hits.get(key) ?? []).filter((t) => now - t < this.windowMs);
     recent.push(now);
     this.hits.set(key, recent);
     return recent.length;
@@ -31,11 +33,12 @@ export class UpstashRestStore implements RateLimitStore {
   constructor(
     private readonly url: string,
     private readonly token: string,
+    private readonly windowMs: number,
     private readonly doFetch: typeof fetch = fetch,
   ) {}
 
-  async hit(key: string, windowMs: number): Promise<number> {
-    const seconds = Math.ceil(windowMs / 1000);
+  async hit(key: string): Promise<number> {
+    const seconds = Math.ceil(this.windowMs / 1000);
     const response = await this.doFetch(`${this.url}/pipeline`, {
       method: "POST",
       headers: {
@@ -62,17 +65,18 @@ export class UpstashRestStore implements RateLimitStore {
 
 export function getStoreFromEnv(env: NodeJS.ProcessEnv = process.env): RateLimitStore {
   const { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: token } = env;
-  return url && token ? new UpstashRestStore(url, token) : new MemoryStore();
+  return url && token ? new UpstashRestStore(url, token, WINDOW_MS) : new MemoryStore(WINDOW_MS);
 }
 
 let warnedStoreFailure = false;
 
-async function check(store: RateLimitStore, key: string, windowMs: number, max: number): Promise<boolean> {
+async function check(store: RateLimitStore, key: string, max: number): Promise<boolean> {
   try {
-    return (await store.hit(key, windowMs)) <= max;
+    return (await store.hit(key)) <= max;
   } catch (err) {
     if (!warnedStoreFailure) {
       warnedStoreFailure = true;
+      // biome-ignore lint/suspicious/noConsole: store outage warning belongs in server logs (once per process)
       console.warn("[rate-limit] store unavailable, failing open:", err);
     }
     return true;
@@ -82,8 +86,8 @@ async function check(store: RateLimitStore, key: string, windowMs: number, max: 
 const store = getStoreFromEnv();
 
 /** Testable seam: same policy as `limited` against an injected store. */
-export function limitWithStore(store: RateLimitStore, key: string, windowMs: number, max: number): Promise<boolean> {
-  return check(store, key, windowMs, max);
+export function limitWithStore(store: RateLimitStore, key: string, max: number): Promise<boolean> {
+  return check(store, key, max);
 }
 
 export function clientIp(request: Request): string {
@@ -94,5 +98,5 @@ export function clientIp(request: Request): string {
 }
 
 export async function limited(request: Request, bucket: string, max: number): Promise<boolean> {
-  return !(await check(store, `${bucket}:${clientIp(request)}`, WINDOW_MS, max));
+  return !(await check(store, `${bucket}:${clientIp(request)}`, max));
 }

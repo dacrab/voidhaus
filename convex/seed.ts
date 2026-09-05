@@ -1,7 +1,6 @@
 import type { GenericDatabaseWriter } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { PRODUCTS as SEED_PRODUCTS } from "../src/lib/data/products";
-import { STOCKISTS } from "../src/lib/data/stockists";
 import { internal } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
@@ -21,7 +20,7 @@ function requireAdmin(token?: string) {
   }
 }
 
-type SeedTable = "products" | "stockists";
+type SeedTable = "products";
 
 async function isEmpty(db: GenericDatabaseWriter<DataModel>, table: SeedTable) {
   return db
@@ -41,8 +40,7 @@ const SEED_PRODUCTS_WITH_STOCK = SEED_PRODUCTS.map((p) => {
   for (const size of p.sizes) {
     sizeStock[size] = Math.max(1, Math.round(10 / p.sizes.length));
   }
-  const stock = Object.values(sizeStock).reduce((a, b) => a + b, 0);
-  return { ...p, stock, sizeStock };
+  return { ...p, sizeStock };
 });
 
 export const seedProducts = mutation({
@@ -56,18 +54,5 @@ export const seedProducts = mutation({
     }
     await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
     return `Seeded ${SEED_PRODUCTS_WITH_STOCK.length} products`;
-  },
-});
-
-export const seedStockists = mutation({
-  args: { force: v.optional(v.boolean()), token: v.string() },
-  handler: async (ctx, { force, token }) => {
-    requireAdmin(token);
-    if (!((await isEmpty(ctx.db, "stockists")) || force)) return "Already seeded";
-    await clearTable(ctx.db, "stockists");
-    for (const r of STOCKISTS) {
-      await ctx.db.insert("stockists", r);
-    }
-    return `Seeded ${STOCKISTS.length} regions`;
   },
 });

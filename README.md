@@ -24,7 +24,7 @@ Push to `master` — Vercel builds and deploys automatically.
   Stripe signature, then calls the Convex httpAction `POST /fulfill`, which is
   gated by a shared secret (`INTERNAL_WEBHOOK_SECRET`) known only to the server
   route.
-- Seed mutations (`seedProducts`, `seedStockists`) require an admin token
+- Seed mutations (`seedProducts`) require an admin token
   argument matching the Convex deployment's `ADMIN_TOKEN`.
 - Public functions are limited to what the storefront needs: batched stock
   reads, coupon validation, contact-message creation, and order lookup by
