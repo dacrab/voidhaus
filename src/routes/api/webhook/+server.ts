@@ -27,6 +27,22 @@ const OrderItemSchema = z.object({
   quantity: z.number().int().min(1),
 });
 
+// Extracted from the Stripe session in the shape the orders schema stores.
+function parseShippingAddress(session: Stripe.Checkout.Session): z.infer<typeof ShippingAddressSchema> | undefined {
+  const shipping = session.collected_information?.shipping_details?.address;
+  if (!shipping) return undefined;
+  const details = session.collected_information?.shipping_details;
+  return ShippingAddressSchema.parse({
+    name: details?.name ?? "",
+    line1: shipping.line1 ?? "",
+    line2: shipping.line2 ?? undefined,
+    city: shipping.city ?? "",
+    state: shipping.state ?? undefined,
+    postalCode: shipping.postal_code ?? "",
+    country: shipping.country ?? "",
+  });
+}
+
 export const POST: RequestHandler = async ({ request }) => {
   const stripe = getStripe();
   const body = await request.text();
@@ -50,26 +66,15 @@ export const POST: RequestHandler = async ({ request }) => {
   try {
     const session = event.data.object as Stripe.Checkout.Session;
     const customerDetails = session.customer_details;
-    const shippingDetails = session.collected_information?.shipping_details;
 
     // Permanent configuration problem — retries cannot fix it.
     if (!customerDetails?.email) {
+      // biome-ignore lint/suspicious/noConsole: webhook rejections belong in server logs
       console.error("Webhook rejected: checkout session has no customer email", session.id);
       return new Response("Missing customer email", { status: 400 });
     }
 
-    const shipping = shippingDetails?.address;
-    const shippingAddress = shipping
-      ? ShippingAddressSchema.parse({
-          name: shippingDetails?.name ?? "",
-          line1: shipping.line1 ?? "",
-          line2: shipping.line2 ?? undefined,
-          city: shipping.city ?? "",
-          state: shipping.state ?? undefined,
-          postalCode: shipping.postal_code ?? "",
-          country: shipping.country ?? "",
-        })
-      : undefined;
+    const shippingAddress = parseShippingAddress(session);
 
     const orderItems = z.array(OrderItemSchema).parse(JSON.parse(session.metadata?.orderItems ?? "[]"));
     // Total is computed at checkout from the same discounted line items and
@@ -102,6 +107,7 @@ export const POST: RequestHandler = async ({ request }) => {
       throw new Error(`Convex fulfillment failed (${response.status}): ${detail}`);
     }
   } catch (err) {
+    // biome-ignore lint/suspicious/noConsole: webhook failures belong in server logs
     console.error("Webhook processing failed:", err);
     captureException(err);
     return json({ error: "Failed to process webhook" }, { status: 500 });

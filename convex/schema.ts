@@ -14,18 +14,11 @@ export default defineSchema({
     sizes: v.array(v.string()),
     // Per-size stock: { "S": 5, "M": 10, "L": 3 }
     sizeStock: v.optional(v.record(v.string(), v.number())),
-    // Legacy total stock (computed from sizeStock)
-    stock: v.number(),
     // Image references: either a key (legacy) or a Convex storage ID
     img: v.string(),
     img2: v.optional(v.string()),
-    imgStorageId: v.optional(v.id("_storage")),
-    img2StorageId: v.optional(v.id("_storage")),
     active: v.boolean(),
-  })
-    .index("by_slug", ["slug"])
-    .index("by_category", ["category"])
-    .index("by_active", ["active"]),
+  }).index("by_slug", ["slug"]),
 
   orders: defineTable({
     stripeSessionId: v.string(),
@@ -56,10 +49,7 @@ export default defineSchema({
         country: v.string(),
       }),
     ),
-  })
-    .index("by_session", ["stripeSessionId"])
-    .index("by_status", ["status"])
-    .index("by_email", ["customerEmail"]),
+  }).index("by_session", ["stripeSessionId"]),
 
   messages: defineTable({
     name: v.string(),
@@ -67,7 +57,7 @@ export default defineSchema({
     subject: v.string(),
     message: v.string(),
     read: v.boolean(),
-  }).index("by_read", ["read"]),
+  }),
 
   coupons: defineTable({
     code: v.string(),
@@ -78,19 +68,5 @@ export default defineSchema({
     usedCount: v.number(),
     active: v.boolean(),
     expiresAt: v.optional(v.number()),
-  })
-    .index("by_code", ["code"])
-    .index("by_active", ["active"]),
-
-  stockists: defineTable({
-    region: v.string(),
-    stores: v.array(
-      v.object({
-        city: v.string(),
-        name: v.string(),
-        address: v.string(),
-        country: v.string(),
-      }),
-    ),
-  }),
+  }).index("by_code", ["code"]),
 });

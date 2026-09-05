@@ -29,4 +29,5 @@ ${pages
 `;
 
 writeFileSync("static/sitemap.xml", xml);
+// biome-ignore lint/suspicious/noConsole: build script reports the generated URL count
 console.log(`Sitemap generated with ${pages.length} URLs`);

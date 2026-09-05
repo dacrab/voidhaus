@@ -37,6 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     return json({ ok: true }, { status: 200 });
   } catch (err) {
+    // biome-ignore lint/suspicious/noConsole: contact submission failures surface in server logs
     console.error("Contact submission failed:", err);
     return json({ error: "Something went wrong" }, { status: 500 });
   }

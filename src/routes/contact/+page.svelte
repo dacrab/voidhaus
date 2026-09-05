@@ -1,5 +1,6 @@
 <script lang="ts">
   import { SITE } from '$lib/data/site';
+  import { LIMITS } from '$lib/data/limits';
   import PageHeader from '$lib/components/PageHeader.svelte';
 
   let name = $state('');
@@ -54,7 +55,7 @@
         <form class="flex flex-col gap-lg" onsubmit={handleSubmit}>
           <div class="flex flex-col gap-sm">
             <label class="label muted" for="contact-name">Name</label>
-            <input id="contact-name" type="text" bind:value={name} required
+            <input id="contact-name" type="text" bind:value={name} required maxlength={LIMITS.nameMax}
               class="form-input" autocomplete="name" />
           </div>
           <div class="flex flex-col gap-sm">
@@ -64,7 +65,7 @@
           </div>
           <div class="flex flex-col gap-sm">
             <label class="label muted" for="contact-message">Message</label>
-            <textarea id="contact-message" bind:value={message} required rows="5"
+            <textarea id="contact-message" bind:value={message} required rows="5" maxlength={LIMITS.messageMax}
               class="form-input min-h-[10rem]"></textarea>
           </div>
           {#if error}

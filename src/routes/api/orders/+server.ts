@@ -42,6 +42,7 @@ export const POST: RequestHandler = async ({ request }) => {
       { status: 200 },
     );
   } catch (err) {
+    // biome-ignore lint/suspicious/noConsole: order lookup failures surface in server logs
     console.error("Order lookup failed:", err);
     return json({ error: "Something went wrong" }, { status: 500 });
   }
