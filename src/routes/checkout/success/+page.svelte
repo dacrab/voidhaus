@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { SITE } from '$lib/data/site';
   import { saveCart } from '$lib/utils/cart';
+  import { OrdersResponseSchema } from '$lib/utils/schemas';
 
   let state = $state<'verifying' | 'confirmed' | 'processing'>('verifying');
 
@@ -21,8 +22,12 @@
         state = 'processing';
         return;
       }
-      const body = (await res.json()) as { orders?: Array<{ status: string }> };
-      if (body.orders?.some((o) => o.status === 'paid')) {
+      const parsed = OrdersResponseSchema.safeParse(await res.json());
+      if (!parsed.success) {
+        state = 'processing';
+        return;
+      }
+      if (parsed.data.orders.some((o) => o.status === 'paid')) {
         // Paid and recorded server-side: now the cart can finally be cleared.
         saveCart([]);
         state = 'confirmed';

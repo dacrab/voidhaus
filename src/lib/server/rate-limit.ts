@@ -24,11 +24,6 @@ export class MemoryStore implements RateLimitStore {
   }
 }
 
-interface UpstashCommandResult {
-  result?: number | null;
-  error?: string;
-}
-
 export class UpstashRestStore implements RateLimitStore {
   constructor(
     private readonly url: string,
@@ -55,11 +50,15 @@ export class UpstashRestStore implements RateLimitStore {
     if (!response.ok) {
       throw new Error(`Upstash REST responded ${response.status}`);
     }
-    const results = (await response.json()) as UpstashCommandResult[];
-    if (!Array.isArray(results) || typeof results[0]?.result !== "number") {
+    const results: unknown = await response.json();
+    if (!Array.isArray(results) || results.length === 0) {
       throw new Error("Unexpected Upstash REST pipeline response");
     }
-    return results[0].result;
+    const first: unknown = results[0];
+    if (typeof first !== "object" || first === null || !("result" in first) || typeof first.result !== "number") {
+      throw new Error("Unexpected Upstash REST pipeline response");
+    }
+    return first.result;
   }
 }
 
@@ -94,7 +93,8 @@ export function clientIp(request: Request): string {
   const xff = request.headers.get("x-forwarded-for");
   if (!xff) return "unknown";
   const parts = xff.split(",");
-  return parts[parts.length - 1].trim();
+  const last = parts[parts.length - 1];
+  return last?.trim() ?? "unknown";
 }
 
 export async function limited(request: Request, bucket: string, max: number): Promise<boolean> {

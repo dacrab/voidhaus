@@ -14,7 +14,7 @@
 
 <LegalPage
   title="Privacy Policy — VOIDHAUS"
-  description={sections[0].body}
+  description={sections[0]?.body ?? ""}
   updated="June 2026"
   sibling={{ href: '/terms', label: 'Terms & Conditions' }}
   {sections}

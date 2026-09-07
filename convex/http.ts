@@ -70,16 +70,16 @@ const fulfill = httpAction(async (ctx, request) => {
     customerEmail: body.customerEmail ?? "",
     items: body.items,
     total: body.total,
-    discount: body.discount,
+    ...(body.discount !== undefined ? { discount: body.discount } : {}),
     currency: "eur",
   });
 
   await ctx.runMutation(internal.orders.fulfill, {
     stripeSessionId: body.sessionId,
     stripePaymentIntentId: body.paymentIntentId,
-    customerEmail: body.customerEmail,
-    couponId: body.couponId,
-    shippingAddress: body.shippingAddress,
+    ...(body.customerEmail !== undefined ? { customerEmail: body.customerEmail } : {}),
+    ...(body.couponId !== undefined ? { couponId: body.couponId } : {}),
+    ...(body.shippingAddress !== undefined ? { shippingAddress: body.shippingAddress } : {}),
   });
 
   return new Response(JSON.stringify({ received: true }), {

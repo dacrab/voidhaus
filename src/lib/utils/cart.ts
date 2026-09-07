@@ -9,7 +9,7 @@ export interface CartItem {
   num: string;
 }
 
-function isValidCartItem(v: unknown): v is CartItem {
+export function isValidCartItem(v: unknown): v is CartItem {
   return (
     typeof v === "object" &&
     v !== null &&
