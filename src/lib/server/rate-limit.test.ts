@@ -48,7 +48,8 @@ describe("UpstashRestStore", () => {
     );
     const count = await store.hit("bucket:ip");
     expect(count).toBe(4);
-    const [url, init] = (doFetch as ReturnType<typeof vi.fn>).mock.calls[0];
+    const calls = (doFetch as ReturnType<typeof vi.fn>).mock.calls;
+    const [url, init] = calls[0] ?? [];
     expect(url).toBe("https://example.upstash.io/pipeline");
     expect(init.method).toBe("POST");
     expect(init.headers.Authorization).toBe("Bearer tok");
@@ -62,7 +63,8 @@ describe("UpstashRestStore", () => {
     const doFetch = upstashFetch(1);
     const store = new UpstashRestStore("https://example.upstash.io", "tok", 1500, doFetch as unknown as typeof fetch);
     await store.hit("k");
-    const [, init] = (doFetch as ReturnType<typeof vi.fn>).mock.calls[0];
+    const calls = (doFetch as ReturnType<typeof vi.fn>).mock.calls;
+    const [, init] = calls[0] ?? [];
     expect(JSON.parse(init.body)[1]).toEqual(["EXPIRE", "k", 2, "NX"]);
   });
 

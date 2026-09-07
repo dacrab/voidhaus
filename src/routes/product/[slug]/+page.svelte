@@ -7,7 +7,7 @@
   import { PRODUCTS, SHARED_DETAILS } from '$lib/data/products';
   let { data } = $props();
   const product = $derived(data.product);
-  const mainImg = $derived(IMAGES[product.img]);
+  const mainImg = $derived(IMAGES[product.img] ?? '');
   const altImg = $derived(product.img2 ? IMAGES[product.img2] ?? '' : '');
   const related = $derived(PRODUCTS.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3));
 

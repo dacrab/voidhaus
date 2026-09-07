@@ -37,7 +37,7 @@ export default defineSchema({
     total: v.number(),
     discount: v.optional(v.number()),
     currency: v.string(),
-    status: v.string(),
+    status: v.union(v.literal("pending"), v.literal("paid"), v.literal("failed")),
     shippingAddress: v.optional(
       v.object({
         name: v.string(),

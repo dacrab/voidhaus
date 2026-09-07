@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { createModal, slideIn } from '$lib/utils/modal';
-  import { getCart, saveCart, formatPrice, CART_KEY, type CartItem } from '$lib/utils/cart';
+  import { getCart, saveCart, formatPrice, isValidCartItem, CART_KEY, type CartItem } from '$lib/utils/cart';
+  import { CheckoutResponseSchema } from '$lib/utils/schemas';
 
   const modal = createModal();
 
@@ -27,13 +28,17 @@
           items: items.map(i => ({ slug: i.slug, size: i.size })),
         }),
       });
-      const data = (await res.json()) as { url?: string | null; error?: string };
-      if (data.url) {
+      const parsed = CheckoutResponseSchema.safeParse(await res.json());
+      if (!parsed.success) {
+        checkoutError = 'Something went wrong';
+        return;
+      }
+      if ('url' in parsed.data) {
         // Don't clear the cart yet — if the customer cancels on Stripe they keep
         // their selection. The cart is cleared on /checkout/success after payment.
-        window.location.href = data.url;
-      } else if (data.error) {
-        checkoutError = data.error;
+        window.location.href = parsed.data.url;
+      } else {
+        checkoutError = parsed.data.error;
       }
     } catch {
       checkoutError = 'Something went wrong';
@@ -65,7 +70,10 @@
     items = getCart();
 
     const onAdd = (e: Event) => {
-      const item = (e as CustomEvent<CartItem>).detail;
+      // window-level events are a public bus: any script on the page can dispatch
+      // vh:add-to-cart, so validate the detail before it enters cart state.
+      if (!(e instanceof CustomEvent) || !isValidCartItem(e.detail)) return;
+      const item = e.detail;
       if (!items.find(i => i.slug === item.slug && i.size === item.size)) {
         items = [...items, item];
         saveCart(items);

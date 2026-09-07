@@ -1,16 +1,7 @@
 <script lang="ts">
   import PageHeader from "$lib/components/PageHeader.svelte";
   import { formatPrice as fmtPrice } from "$lib/utils/cart";
-
-  type OrderRow = {
-    id: string;
-    items: Array<{ name: string; size: string; price: number; quantity: number }>;
-    total: number;
-    discount: number;
-    currency: string;
-    status: string;
-    createdAt: number;
-  };
+  import { ApiErrorSchema, OrdersResponseSchema, type OrderRow } from "$lib/utils/schemas";
 
   let sessionId = $state("");
   let orders: OrderRow[] | null = $state(null);
@@ -29,12 +20,16 @@
         body: JSON.stringify({ sessionId }),
       });
       if (!res.ok) {
-        const body = (await res.json()) as { error?: string };
-        error = body.error ?? "Something went wrong";
+        const parsed = ApiErrorSchema.safeParse(await res.json());
+        error = parsed.success && parsed.data.error ? parsed.data.error : "Something went wrong";
         return;
       }
-      const body = (await res.json()) as { orders: OrderRow[] };
-      orders = body.orders;
+      const parsed = OrdersResponseSchema.safeParse(await res.json());
+      if (!parsed.success) {
+        error = "Something went wrong";
+        return;
+      }
+      orders = parsed.data.orders;
     } catch {
       error = "Could not reach the server";
     } finally {

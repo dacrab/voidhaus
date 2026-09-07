@@ -6,12 +6,15 @@ function trapFocus(container: HTMLElement, e: KeyboardEvent) {
   const els = [...container.querySelectorAll<HTMLElement>(FOCUSABLE)];
   if (!els.length) return;
   const active = document.activeElement;
-  if (e.shiftKey && active === els[0]) {
+  const first = els[0];
+  const last = els[els.length - 1];
+  if (!(first && last)) return;
+  if (e.shiftKey && active === first) {
     e.preventDefault();
-    els[els.length - 1].focus();
-  } else if (!e.shiftKey && active === els[els.length - 1]) {
+    last.focus();
+  } else if (!e.shiftKey && active === last) {
     e.preventDefault();
-    els[0].focus();
+    first.focus();
   }
 }
 
