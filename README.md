@@ -70,6 +70,7 @@ in-memory per-instance window. Store failures fail open (warns once).
 | `STRIPE_WEBHOOK_SECRET` | SvelteKit server | Webhook signature verification |
 | `INTERNAL_WEBHOOK_SECRET` | SvelteKit server **and** Convex | Shared secret between `/api/webhook` and Convex `/fulfill` |
 | `ADMIN_TOKEN` | Convex | Authorizes seed mutations |
+| `VERCEL_DEPLOY_HOOK` | Convex | Rebuild trigger fired after product changes (optional) |
 | `RESEND_API_KEY` | Convex | Order confirmation emails (optional; skipped if unset) |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | SvelteKit server | Optional shared rate-limit store |
 | `PUBLIC_SENTRY_DSN` | Client | Browser error reporting (optional) |

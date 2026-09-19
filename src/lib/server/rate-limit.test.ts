@@ -34,26 +34,20 @@ describe("MemoryStore", () => {
 });
 
 function upstashFetch(result: number) {
-  return vi.fn().mockResolvedValue(new Response(JSON.stringify([{ result }, { result: 1 }]), { status: 200 }));
+  return vi.fn<typeof fetch>(async () => new Response(JSON.stringify([{ result }, { result: 1 }]), { status: 200 }));
 }
 
 describe("UpstashRestStore", () => {
   it("sends an INCR+EXPIRE NX pipeline and returns the counter", async () => {
     const doFetch = upstashFetch(4);
-    const store = new UpstashRestStore(
-      "https://example.upstash.io",
-      "tok",
-      WINDOW_MS,
-      doFetch as unknown as typeof fetch,
-    );
+    const store = new UpstashRestStore("https://example.upstash.io", "tok", WINDOW_MS, doFetch);
     const count = await store.hit("bucket:ip");
     expect(count).toBe(4);
-    const calls = (doFetch as ReturnType<typeof vi.fn>).mock.calls;
-    const [url, init] = calls[0] ?? [];
+    const [url, init] = doFetch.mock.calls[0] ?? [];
     expect(url).toBe("https://example.upstash.io/pipeline");
-    expect(init.method).toBe("POST");
-    expect(init.headers.Authorization).toBe("Bearer tok");
-    expect(JSON.parse(init.body)).toEqual([
+    expect(init?.method).toBe("POST");
+    expect(new Headers(init?.headers).get("Authorization")).toBe("Bearer tok");
+    expect(JSON.parse(String(init?.body))).toEqual([
       ["INCR", "bucket:ip"],
       ["EXPIRE", "bucket:ip", 60, "NX"],
     ]);
@@ -61,21 +55,15 @@ describe("UpstashRestStore", () => {
 
   it("rounds the window up to whole seconds", async () => {
     const doFetch = upstashFetch(1);
-    const store = new UpstashRestStore("https://example.upstash.io", "tok", 1500, doFetch as unknown as typeof fetch);
+    const store = new UpstashRestStore("https://example.upstash.io", "tok", 1500, doFetch);
     await store.hit("k");
-    const calls = (doFetch as ReturnType<typeof vi.fn>).mock.calls;
-    const [, init] = calls[0] ?? [];
-    expect(JSON.parse(init.body)[1]).toEqual(["EXPIRE", "k", 2, "NX"]);
+    const [, init] = doFetch.mock.calls[0] ?? [];
+    expect(JSON.parse(String(init?.body))[1]).toEqual(["EXPIRE", "k", 2, "NX"]);
   });
 
   it("throws on non-OK responses so callers can fail open", async () => {
-    const doFetch = vi.fn().mockResolvedValue(new Response("nope", { status: 401 }));
-    const store = new UpstashRestStore(
-      "https://example.upstash.io",
-      "tok",
-      WINDOW_MS,
-      doFetch as unknown as typeof fetch,
-    );
+    const doFetch = vi.fn<typeof fetch>(async () => new Response("nope", { status: 401 }));
+    const store = new UpstashRestStore("https://example.upstash.io", "tok", WINDOW_MS, doFetch);
     await expect(store.hit("k")).rejects.toThrow("401");
   });
 });
