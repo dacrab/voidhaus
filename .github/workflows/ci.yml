@@ -31,9 +31,9 @@ jobs:
       - uses: dopplerhq/cli-action@v4
 
       - name: Check
-        run: bun run type-check
+        run: bun run typecheck
       - name: Convex type-check
-        run: bunx tsc --noEmit -p convex/tsconfig.json
+        run: bun run typecheck:convex
       - name: Lint
         run: bun run lint
       - name: Test
