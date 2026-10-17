@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "type": "module",
   "engines": {
-    "bun": ">=1.1.0"
+    "bun": ">=1.1.0",
+    "node": "24.x"
   },
   "scripts": {
     "dev": "doppler run -- vite dev",
