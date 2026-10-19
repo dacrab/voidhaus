@@ -1,13 +1,13 @@
 <script lang="ts">
   import '../app.css';
-  import Nav from '$lib/components/Nav.svelte';
-  import Cart from '$lib/components/Cart.svelte';
-  import { observeAnimations } from '$lib/utils/scroll-observer';
+  import Nav from '#lib/components/Nav.svelte';
+  import Cart from '#lib/components/Cart.svelte';
+  import { observeAnimations } from '#lib/utils/scroll-observer.js';
   import { afterNavigate } from '$app/navigation';
   import { onMount } from 'svelte';
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import { page } from '$app/state';
-  import { SITE } from '$lib/data/site';
+  import { SITE } from '#lib/data/site.js';
 
   let { children } = $props();
 
@@ -16,7 +16,10 @@
   });
 
   let stop: (() => void) | undefined;
-  afterNavigate(() => {
+
+  afterNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
+
     stop?.();
     stop = browser ? observeAnimations() : undefined;
   });
@@ -69,8 +72,8 @@
     <div class="rule js-rule"></div>
     <div class="footer-inner">
       <div class="footer-brand">
-        <span class="label muted">&copy; {new Date().getFullYear()} {SITE.name}</span>
-        <span class="label muted">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
+        <span class="label muted">© {new Date().getFullYear()} {SITE.name}</span>
+        <span class="label muted">{SITE.ateliers.map((a) => a.city).join(' · ')}</span>
       </div>
       <nav class="footer-nav" aria-label="Legal navigation">
         <a href="/stockists" class="label muted muted-link">Stockists</a>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import LegalPage from '$lib/components/LegalPage.svelte';
+  import LegalPage from '#lib/components/LegalPage.svelte';
 
   const sections = [
     { title: 'Data Controller', body: 'VOIDHAUS S.r.l., Via della Spiga 19, 20121 Milan, Italy, is the data controller for the purposes of the EU General Data Protection Regulation (GDPR).' },
