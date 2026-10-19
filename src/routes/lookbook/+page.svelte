@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { IMAGES } from '$lib/data/images';
-  import { SITE } from '$lib/data/site';
-  import PageHeader from '$lib/components/PageHeader.svelte';
-  import CTAStrip from '$lib/components/CTAStrip.svelte';
+  import { IMAGES } from '#lib/data/images.js';
+  import { SITE } from '#lib/data/site.js';
+  import PageHeader from '#lib/components/PageHeader.svelte';
+  import CTAStrip from '#lib/components/CTAStrip.svelte';
 
   const chapters = [
     { id: 'coat', title: 'The Coat', subtitle: 'Obsidian Coat — No. 001', num: '01', img: IMAGES['coat-primary'], text: 'A coat you never take off indoors. Double-faced cashmere, American shoulders, self-belt at the waist. It marks the threshold between the world and your body.' },

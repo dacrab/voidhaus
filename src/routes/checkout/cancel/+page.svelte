@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SITE } from '$lib/data/site';
+  import { SITE } from '#lib/data/site.js';
 </script>
 
 <svelte:head>

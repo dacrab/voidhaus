@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
-  import { createModal, panelIn } from '$lib/utils/modal';
+  import { createModal, panelIn } from '#lib/utils/modal.js';
 
   let { category = 'Clothing' }: { category?: 'Clothing' | 'Footwear' } = $props();
 

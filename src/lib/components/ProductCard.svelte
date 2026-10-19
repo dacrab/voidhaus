@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { IMAGES } from '$lib/data/images';
-  import { formatPrice } from '$lib/utils/cart';
+  import { IMAGES } from '#lib/data/images.js';
+  import { formatPrice } from '#lib/utils/cart.js';
 
   interface Props {
     slug: string;

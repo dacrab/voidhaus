@@ -1,9 +1,8 @@
 import { captureException } from "@sentry/sveltekit";
-import { json } from "@sveltejs/kit";
 import type Stripe from "stripe";
 import { z } from "zod";
-import { env } from "$env/dynamic/private";
-import { getStripe } from "$lib/utils/api";
+import { getStripe } from "#lib/utils/api.js";
+import { CONVEX_SITE_URL, INTERNAL_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET } from "$app/env/private";
 import type { RequestHandler } from "./$types";
 
 export const prerender = false;
@@ -48,19 +47,19 @@ export const POST: RequestHandler = async ({ request }) => {
   const body = await request.text();
   const sig = request.headers.get("stripe-signature");
 
-  if (!(sig && env.STRIPE_WEBHOOK_SECRET)) {
+  if (!(sig && STRIPE_WEBHOOK_SECRET)) {
     return new Response("Missing signature or webhook secret", { status: 400 });
   }
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(body, sig, STRIPE_WEBHOOK_SECRET);
   } catch {
     return new Response("Webhook Error: Invalid signature", { status: 400 });
   }
 
   if (event.type !== "checkout.session.completed") {
-    return json({ received: true }, { status: 200 });
+    return Response.json({ received: true }, { status: 200 });
   }
 
   try {
@@ -86,11 +85,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const couponId = session.metadata?.couponId || undefined;
 
-    const response = await fetch(`${env.CONVEX_SITE_URL}/fulfill`, {
+    const response = await fetch(`${CONVEX_SITE_URL}/fulfill`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-internal-secret": env.INTERNAL_WEBHOOK_SECRET ?? "",
+        "x-internal-secret": INTERNAL_WEBHOOK_SECRET ?? "",
       },
       body: JSON.stringify({
         sessionId: session.id,
@@ -110,8 +109,8 @@ export const POST: RequestHandler = async ({ request }) => {
     // biome-ignore lint/suspicious/noConsole: webhook failures belong in server logs
     console.error("Webhook processing failed:", err);
     captureException(err);
-    return json({ error: "Failed to process webhook" }, { status: 500 });
+    return Response.json({ error: "Failed to process webhook" }, { status: 500 });
   }
 
-  return json({ received: true }, { status: 200 });
+  return Response.json({ received: true }, { status: 200 });
 };

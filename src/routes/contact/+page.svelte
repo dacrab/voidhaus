@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { SITE } from '$lib/data/site';
-  import { LIMITS } from '$lib/data/limits';
-  import PageHeader from '$lib/components/PageHeader.svelte';
+  import { SITE } from '#lib/data/site.js';
+  import { LIMITS } from '#lib/data/limits.js';
+  import PageHeader from '#lib/components/PageHeader.svelte';
 
   let name = $state('');
   let email = $state('');

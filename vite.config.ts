@@ -1,12 +1,14 @@
-import { sveltekit } from '@sveltejs/kit/vite';
-import { sentrySvelteKit } from '@sentry/sveltekit/vite';
-import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vite';
+import adapter from "@sveltejs/adapter-vercel";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+import { sveltekit } from "@sveltejs/kit/vite";
+import { sentrySvelteKit } from "@sentry/sveltekit/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "vite";
 
 const hasSentryCredentials = Boolean(
   process.env.SENTRY_AUTH_TOKEN &&
-    process.env.SENTRY_ORG &&
-    process.env.SENTRY_PROJECT,
+  process.env.SENTRY_ORG &&
+  process.env.SENTRY_PROJECT,
 );
 
 const sentryOptions = {
@@ -18,6 +20,9 @@ export default defineConfig({
   plugins: [
     sentrySvelteKit(sentryOptions),
     tailwindcss(),
-    sveltekit(),
+    sveltekit({
+      preprocess: vitePreprocess(),
+      adapter: adapter(),
+    }),
   ],
 });

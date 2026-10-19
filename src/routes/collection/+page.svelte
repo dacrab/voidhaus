@@ -1,9 +1,9 @@
 <script lang="ts">
-  import ProductCard from '$lib/components/ProductCard.svelte';
-  import PageHeader from '$lib/components/PageHeader.svelte';
-  import { filterProducts } from '$lib/data/filter';
-  import { CATEGORIES, PRODUCTS } from '$lib/data/products';
-  import { SITE } from '$lib/data/site';
+  import ProductCard from '#lib/components/ProductCard.svelte';
+  import PageHeader from '#lib/components/PageHeader.svelte';
+  import { filterProducts } from '#lib/data/filter.js';
+  import { CATEGORIES, PRODUCTS } from '#lib/data/products.js';
+  import { SITE } from '#lib/data/site.js';
 
   let activeCategory = $state('All');
   let search = $state('');

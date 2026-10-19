@@ -1,12 +1,6 @@
 {
-  "extends": "./.svelte-kit/tsconfig.json",
+  "extends": "$app/tsconfig",
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
     "noImplicitReturns": true,
@@ -16,8 +10,8 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "moduleResolution": "bundler"
+    "allowUnusedLabels": false
   },
-  "exclude": ["convex/**/*", ".convex/**/*"]
+  "exclude": ["convex/**/*", ".convex/**/*"],
+  "include": ["src", "vite.config.ts"]
 }
