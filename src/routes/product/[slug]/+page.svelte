@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { formatPrice, type CartItem } from '$lib/utils/cart';
-  import SizeGuide from '$lib/components/SizeGuide.svelte';
-  import ProductCard from '$lib/components/ProductCard.svelte';
-  import PageHeader from '$lib/components/PageHeader.svelte';
-  import { IMAGES } from '$lib/data/images';
-  import { PRODUCTS, SHARED_DETAILS } from '$lib/data/products';
+  import { formatPrice, type CartItem } from '#lib/utils/cart.js';
+  import SizeGuide from '#lib/components/SizeGuide.svelte';
+  import ProductCard from '#lib/components/ProductCard.svelte';
+  import PageHeader from '#lib/components/PageHeader.svelte';
+  import { IMAGES } from '#lib/data/images.js';
+  import { PRODUCTS, SHARED_DETAILS } from '#lib/data/products.js';
   let { data } = $props();
   const product = $derived(data.product);
   const mainImg = $derived(IMAGES[product.img] ?? '');

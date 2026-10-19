@@ -2,9 +2,9 @@
   import { onMount, tick } from 'svelte';
   import { afterNavigate } from '$app/navigation';
   import { fade } from 'svelte/transition';
-  import { createModal, panelIn } from '$lib/utils/modal';
-  import { getCart } from '$lib/utils/cart';
-  import { SITE } from '$lib/data/site';
+  import { createModal, panelIn } from '#lib/utils/modal.js';
+  import { getCart } from '#lib/utils/cart.js';
+  import { SITE } from '#lib/data/site.js';
 
   const modal = createModal();
 
@@ -22,7 +22,11 @@
     { href: '/contact', label: 'Contact' },
   ];
 
-  afterNavigate(() => { path = window.location.pathname; });
+  afterNavigate(({ shallow, type }) => {
+    if (shallow && type === 'goto') return;
+
+    path = window.location.pathname;
+  });
 
   onMount(() => {
     path = window.location.pathname;
@@ -76,7 +80,7 @@
   }
 </script>
 
-<svelte:window onkeydown={onKeydown} />
+<svelte:window onkeydown={onKeydown}></svelte:window>
 
 <header class="nav" class:scrolled class:hidden class:open>
   <div class="nav-l">
@@ -116,8 +120,12 @@
     <nav class="menu-links" aria-label="Navigation">
       {#each links as { href, label }, i}
         {@const active = href === '/' ? path === '/' : path.startsWith(href)}
-        <a {href} class="menu-link" class:active
-           aria-current={active ? 'page' : undefined}
+
+        <a
+          href={href}
+          class="menu-link"
+          class:active
+          aria-current={active ? 'page' : undefined}
            onclick={handleNavClick}>
           <span class="menu-link-num">0{i + 1}</span>
           {label}
@@ -128,7 +136,7 @@
     <div class="menu-foot">
       <div class="menu-foot-info">
         <span class="label op-35">{SITE.season}</span>
-        <span class="label op-35">{SITE.ateliers.map(a => a.city).join(' · ')}</span>
+        <span class="label op-35">{SITE.ateliers.map((a) => a.city).join(' · ')}</span>
       </div>
       <button class="menu-foot-cart label" onclick={() => { toggleMenu(); openCart(); }}>
         Selection{#if cartCount > 0} ({cartCount}){/if} →

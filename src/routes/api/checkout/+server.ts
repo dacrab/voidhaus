@@ -1,11 +1,10 @@
 import { captureException } from "@sentry/sveltekit";
-import { json } from "@sveltejs/kit";
 import type Stripe from "stripe";
 import { z } from "zod";
-import { api } from "$convex/api";
-import { PRODUCTS } from "$lib/data/products";
-import { limited } from "$lib/server/rate-limit";
-import { getConvex, getStripe, type OrderItem } from "$lib/utils/api";
+import { api } from "#convex/api.js";
+import { PRODUCTS } from "#lib/data/products.js";
+import { limited } from "#lib/server/rate-limit.js";
+import { getConvex, getStripe, type OrderItem } from "#lib/utils/api.js";
 import type { RequestHandler } from "./$types";
 
 export const prerender = false;
@@ -148,7 +147,10 @@ async function applyCoupon(
   orderItems: OrderItem[],
 ): Promise<CouponResult> {
   const subtotal = orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
-  const result = await convex.query(api.coupons.validate, { code: couponCode, orderTotal: subtotal });
+  const result = await convex.query(api.coupons.validate, {
+    code: couponCode,
+    orderTotal: subtotal,
+  });
   if (!result.valid) return { ok: false, error: result.error ?? "Invalid coupon" };
   // Applied by us rather than via a Stripe coupon object: amount_off coupons
   // discount per line-item unit in Stripe, mis-charging multi-item carts.
@@ -182,7 +184,7 @@ function toLineItems(orderItems: OrderItem[]): NonNullable<Stripe.Checkout.Sessi
 
 export const POST: RequestHandler = async ({ request, url }) => {
   if (await limited(request, "checkout", 10)) {
-    return json({ error: "Too many requests" }, { status: 429 });
+    return Response.json({ error: "Too many requests" }, { status: 429 });
   }
   const stripe = getStripe();
   const convex = getConvex();
@@ -191,18 +193,23 @@ export const POST: RequestHandler = async ({ request, url }) => {
     // The item cap is a product-visible limit: give it an actionable message
     // instead of the generic invalid-body error.
     if (Array.isArray(raw?.items) && raw.items.length > MAX_CHECKOUT_ITEMS) {
-      return json({ error: `Too many distinct items for checkout (max ${MAX_CHECKOUT_ITEMS})` }, { status: 400 });
+      return Response.json(
+        {
+          error: `Too many distinct items for checkout (max ${MAX_CHECKOUT_ITEMS})`,
+        },
+        { status: 400 },
+      );
     }
     const parsed = CheckoutBodySchema.safeParse(raw);
     if (!parsed.success) {
-      return json({ error: "Invalid request body" }, { status: 400 });
+      return Response.json({ error: "Invalid request body" }, { status: 400 });
     }
 
     const { items, couponCode } = parsed.data;
 
     const orderResult = await buildOrderItems(convex, items);
     if ("error" in orderResult) {
-      return json({ error: orderResult.error }, { status: 400 });
+      return Response.json({ error: orderResult.error }, { status: 400 });
     }
     let orderItems = orderResult.items;
 
@@ -213,7 +220,7 @@ export const POST: RequestHandler = async ({ request, url }) => {
     if (couponCode) {
       const result = await applyCoupon(convex, couponCode, orderItems);
       if (!result.ok) {
-        return json({ error: result.error }, { status: 400 });
+        return Response.json({ error: result.error }, { status: 400 });
       }
       couponId = result.couponId;
       orderItems = result.items;
@@ -265,9 +272,9 @@ export const POST: RequestHandler = async ({ request, url }) => {
       },
     });
 
-    return json({ url: session.url }, { status: 200 });
+    return Response.json({ url: session.url }, { status: 200 });
   } catch (err) {
     captureException(err);
-    return json({ error: "Checkout failed" }, { status: 500 });
+    return Response.json({ error: "Checkout failed" }, { status: 500 });
   }
 };

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import PageHeader from "$lib/components/PageHeader.svelte";
-  import { formatPrice as fmtPrice } from "$lib/utils/cart";
-  import { ApiErrorSchema, OrdersResponseSchema, type OrderRow } from "$lib/utils/schemas";
+  import PageHeader from "#lib/components/PageHeader.svelte";
+  import { formatPrice as fmtPrice } from "#lib/utils/cart.js";
+  import { ApiErrorSchema, OrdersResponseSchema, type OrderRow } from "#lib/utils/schemas.js";
 
   let sessionId = $state("");
   let orders: OrderRow[] | null = $state(null);

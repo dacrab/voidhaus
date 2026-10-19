@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { SITE } from '$lib/data/site';
-  import { saveCart } from '$lib/utils/cart';
-  import { OrdersResponseSchema } from '$lib/utils/schemas';
+  import { SITE } from '#lib/data/site.js';
+  import { saveCart } from '#lib/utils/cart.js';
+  import { OrdersResponseSchema } from '#lib/utils/schemas.js';
 
   let state = $state<'verifying' | 'confirmed' | 'processing'>('verifying');
 

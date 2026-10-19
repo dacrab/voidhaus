@@ -1,10 +1,10 @@
 <script lang="ts">
   import { afterNavigate } from '$app/navigation';
-  import { IMAGES } from '$lib/data/images';
-  import { PRODUCTS } from '$lib/data/products';
-  import { SITE } from '$lib/data/site';
-  import ProductCard from '$lib/components/ProductCard.svelte';
-  import CTAStrip from '$lib/components/CTAStrip.svelte';
+  import { IMAGES } from '#lib/data/images.js';
+  import { PRODUCTS } from '#lib/data/products.js';
+  import { SITE } from '#lib/data/site.js';
+  import ProductCard from '#lib/components/ProductCard.svelte';
+  import CTAStrip from '#lib/components/CTAStrip.svelte';
 
   const featured = PRODUCTS.slice(0, 4);
   const hero = IMAGES['hero'];

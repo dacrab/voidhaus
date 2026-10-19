@@ -1,5 +1,5 @@
 <script lang="ts">
-  import LegalPage from '$lib/components/LegalPage.svelte';
+  import LegalPage from '#lib/components/LegalPage.svelte';
 
   const sections = [
     { title: 'Acceptance of Terms', body: 'By accessing and using the VOIDHAUS website and purchasing products, you agree to be bound by these Terms & Conditions. If you do not agree, please do not use this website.' },

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { IMAGES } from '$lib/data/images';
-  import { SITE } from '$lib/data/site';
-  import PageHeader from '$lib/components/PageHeader.svelte';
-  import CTAStrip from '$lib/components/CTAStrip.svelte';
+  import { IMAGES } from '#lib/data/images.js';
+  import { SITE } from '#lib/data/site.js';
+  import PageHeader from '#lib/components/PageHeader.svelte';
+  import CTAStrip from '#lib/components/CTAStrip.svelte';
 
   const atelier = IMAGES['atelier'];
 </script>

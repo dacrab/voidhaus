@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit";
-import { PRODUCTS } from "$lib/data/products";
+import { PRODUCTS } from "#lib/data/products.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = ({ params }) => {

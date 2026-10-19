@@ -1,6 +1,6 @@
 <script lang="ts">
-  import PageHeader from '$lib/components/PageHeader.svelte';
-  import { SITE } from '$lib/data/site';
+  import PageHeader from '#lib/components/PageHeader.svelte';
+  import { SITE } from '#lib/data/site.js';
 
   let { data } = $props();
   const regions = $derived(data.stockists);

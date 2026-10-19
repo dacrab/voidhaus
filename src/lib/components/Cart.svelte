@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { createModal, slideIn } from '$lib/utils/modal';
-  import { getCart, saveCart, formatPrice, isValidCartItem, CART_KEY, type CartItem } from '$lib/utils/cart';
-  import { CheckoutResponseSchema } from '$lib/utils/schemas';
+  import { createModal, slideIn } from '#lib/utils/modal.js';
+  import { getCart, saveCart, formatPrice, isValidCartItem, CART_KEY, type CartItem } from '#lib/utils/cart.js';
+  import { CheckoutResponseSchema } from '#lib/utils/schemas.js';
 
   const modal = createModal();
 
