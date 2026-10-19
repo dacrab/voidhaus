@@ -24,7 +24,7 @@
     "@fontsource-variable/cormorant": "^5.2.8",
     "@fontsource-variable/space-grotesk": "^5.2.10",
     "@sentry/sveltekit": "^10.64.0",
-    "@sveltejs/adapter-vercel": "^6.3.4",
+    "@sveltejs/adapter-vercel": "^7.0.0",
     "convex": "^1.42.1",
     "stripe": "^22.3.0",
     "svelte": "^5.56.4",
