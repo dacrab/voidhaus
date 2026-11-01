@@ -57,10 +57,10 @@
   <span class="label muted" data-anim="hero">
     {verifying ? "Checking your order…" : confirmed ? "Order confirmed" : "Processing payment"}
   </span>
-  <h1 class="display text-3xl md:text-5xl fw-light py-md" data-anim="hero" data-delay="0.1">
+  <h1 class="display text-3xl md:text-5xl fw-light py-md" data-anim="hero" data-delay="0.08">
     {verifying ? "One moment" : confirmed ? "Thank you" : "Almost there"}
   </h1>
-  <p class="text-soft leading-[1.85] max-w-[48ch]" data-anim="hero" data-delay="0.2">
+  <p class="text-soft leading-[1.85] max-w-[48ch]" data-anim="hero" data-delay="0.16">
     {#if verifying}
       Please wait while we verify your payment.
     {:else if confirmed}
@@ -69,13 +69,13 @@
       Your payment is still processing. Refresh this page in a moment, or look it up under My orders.
     {/if}
   </p>
-  <div class="flex flex-col sm:flex-row items-center justify-center gap-md pt-xl" data-anim="hero" data-delay="0.3">
+  <div class="flex flex-col sm:flex-row items-center justify-center gap-md pt-xl" data-anim="hero" data-delay="0.24">
     <a href="/collection" class="btn-outline justify-center w-full sm:w-auto px-xl">
       <span class="label">Return to the index</span>
     </a>
     <a href={ordersHref} class="label muted muted-link self-center py-sm px-md whitespace-nowrap">My orders →</a>
   </div>
-  <p class="text-sm text-soft pt-xl" data-anim="hero" data-delay="0.4">
+  <p class="text-sm text-soft pt-xl" data-anim="hero" data-delay="0.32">
     Questions — <a href="/contact" class="muted-link">write to the studio</a>.
   </p>
 </div>

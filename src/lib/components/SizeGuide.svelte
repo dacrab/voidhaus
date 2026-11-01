@@ -1,9 +1,9 @@
 <script lang="ts">
   import { tick } from "svelte";
-  import { fade } from "svelte/transition";
   import { SITE } from "#lib/data/site.js";
-  import { createModal, panelIn } from "#lib/utils/modal.js";
-  import { prefersReducedMotion } from "#lib/utils/motion.js";
+  import { centrePanel, createModal } from "#lib/utils/modal.js";
+  import { fade, MOTION } from "#lib/utils/motion.js";
+  import { portal } from "#lib/utils/portal.js";
 
   const modal = createModal();
 
@@ -46,7 +46,8 @@
     role="presentation"
     aria-hidden="true"
     onclick={closeModal}
-    transition:fade={{ duration: prefersReducedMotion() ? 0 : 450 }}
+    use:portal
+    transition:fade={{ duration: MOTION.base }}
   ></div>
 
   <div
@@ -56,8 +57,8 @@
     aria-labelledby="sg-title"
     tabindex="-1"
     bind:this={panelEl}
-    in:panelIn={{ y: 0.75, scale: true }}
-    out:fade={{ duration: prefersReducedMotion() ? 0 : 300 }}
+    use:portal
+    transition:centrePanel={{ y: 0.75, scale: true }}
   >
     <div class="sg-head">
       <h2 class="label sg-title" id="sg-title">Size Guide</h2>
@@ -119,7 +120,9 @@
     background: none; border: none;
     border-bottom: 1px solid var(--color-rule);
     padding-bottom: 0.1rem;
-    transition: color var(--duration-fast), border-color var(--duration-fast);
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
   }
   .sg-btn:hover { color: var(--color-ink); border-bottom-color: var(--color-ink); }
 
@@ -170,7 +173,7 @@
   }
   .sg-link {
     color: var(--color-ink); border-bottom: 1px solid var(--color-rule);
-    transition: border-color var(--duration-fast);
+    transition: border-color var(--duration-fast) var(--ease-out);
   }
   .sg-link:hover { border-bottom-color: var(--color-ink); }
   .sg-scroll { overflow-x: auto; }

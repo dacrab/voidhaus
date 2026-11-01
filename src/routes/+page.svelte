@@ -32,16 +32,16 @@
   />
   <div class="hero-shade"></div>
   <div class="hero-frame wrap">
-    <div class="hero-top" data-anim="hero" data-delay="0.2">
+    <div class="hero-top" data-anim="hero" data-delay="0.15">
       <span class="label ot-secondary">Index — {SITE.season}</span>
       <span class="label ot-secondary">Twelve objects</span>
     </div>
     <div class="hero-bottom">
-      <p class="label ot-muted hero-line" data-anim="hero" data-delay="0.3">
+      <p class="label ot-muted hero-line" data-anim="hero" data-delay="0.25">
         A study in absence / Milan — Antwerp — Florence — Tokyo
       </p>
-      <h1 class="hero-title" data-anim="hero" data-delay="0.4">VOIDHAUS</h1>
-      <div class="hero-foot" data-anim="hero" data-delay="0.55">
+      <h1 class="hero-title" data-anim="hero" data-delay="0.35">VOIDHAUS</h1>
+      <div class="hero-foot" data-anim="hero" data-delay="0.5">
         <p class="hero-sub">Twelve objects for the body<br />and the room.</p>
         <a class="label ot-primary hero-enter" href="/collection">Enter the index <span aria-hidden="true">↘</span></a>
       </div>
@@ -67,8 +67,8 @@
     <span class="label">No season</span>
   </div>
   <div class="statement-grid">
-    <h2 class="statement-title display" data-anim="scroll">We dress<br />the absence.</h2>
-    <div class="statement-copy" data-anim="scroll">
+    <h2 class="statement-title display" data-anim="scroll" data-delay="0.08">We dress<br />the absence.</h2>
+    <div class="statement-copy" data-anim="scroll" data-delay="0.16">
       <p>
         Voidhaus makes twelve objects per cycle. No seasonal drop. No mid-season edit. A fixed index of outerwear,
         bodies, and things for the room.
@@ -87,7 +87,7 @@
     <span class="label">02 / Selected objects</span>
     <a class="label muted-link" href="/collection">Full index ({PRODUCTS.length}) →</a>
   </div>
-  <div class="home-index" data-anim="scroll">
+  <div class="home-index" data-stagger>
     {#each featured as product (product.slug)}
       <ProductCard {product} />
     {/each}
@@ -117,8 +117,8 @@
   </div>
 </section>
 
-<section class="wrap service" data-anim="scroll">
-  <div class="service-grid">
+<section class="wrap service">
+  <div class="service-grid" data-stagger>
     <div class="service-item">
       <span class="label muted">Shipping</span>
       <p>Worldwide, 5–10 working days. Duties included.</p>
@@ -224,7 +224,9 @@
     color: var(--color-soft);
     padding: 0.15rem 0.7rem;
     border-left: 1px solid var(--color-rule);
-    transition: color var(--duration-fast), background var(--duration-fast);
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background var(--duration-fast) var(--ease-out);
   }
   .code-link:first-child { border-left: 0; }
   .code-link:hover { color: var(--color-ink); background: var(--color-surface); }

@@ -1,12 +1,11 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
   import { getProduct } from "#lib/data/products.js";
   import { formatPrice } from "#lib/format.js";
   import { productImage } from "#lib/images.js";
   import { cart } from "#lib/stores/cart.svelte.js";
   import { cartItemKey } from "#lib/utils/cart.js";
-  import { createModal, slideIn } from "#lib/utils/modal.js";
-  import { prefersReducedMotion } from "#lib/utils/motion.js";
+  import { createModal, slidePanel } from "#lib/utils/modal.js";
+  import { fade, MOTION } from "#lib/utils/motion.js";
   import { CheckoutResponseSchema } from "#lib/utils/schemas.js";
 
   const modal = createModal();
@@ -77,7 +76,7 @@
     class="backdrop cart-backdrop"
     role="presentation"
     onclick={closeCart}
-    transition:fade={{ duration: prefersReducedMotion() ? 0 : 450 }}
+    transition:fade={{ duration: MOTION.base }}
   ></div>
 
   <div
@@ -86,8 +85,7 @@
     aria-modal="true"
     aria-label="Your selection"
     bind:this={panelEl}
-    in:slideIn
-    out:slideIn
+    transition:slidePanel
   >
     <div class="panel-head">
       <span class="label">Selection ({cart.count})</span>
@@ -180,7 +178,11 @@
     gap: var(--spacing-xl); padding: var(--spacing-2xl) var(--spacing-lg); text-align: center;
   }
   .empty-msg  { font-size: var(--text-base); font-variation-settings: var(--fw-normal); color: var(--color-soft); }
-  .empty-link { color: var(--color-muted); transition: color var(--duration-fast); border-bottom: 1px solid var(--color-rule); }
+  .empty-link {
+    color: var(--color-muted);
+    transition: color var(--duration-fast) var(--ease-out);
+    border-bottom: 1px solid var(--color-rule);
+  }
   .empty-link:hover { color: var(--color-ink); }
 
   .items {
@@ -204,7 +206,7 @@
   .item-img {
     width: 100%; height: 100%;
     object-fit: cover; object-position: center;
-    transition: opacity var(--duration-base);
+    transition: opacity var(--duration-base) var(--ease-out);
   }
   .item-img-link:hover .item-img { opacity: var(--op-hover); }
 
@@ -230,7 +232,8 @@
 
   .checkout-btn {
     width: 100%; background: var(--color-ink); color: var(--color-canvas);
-    border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button); transition: background var(--duration-base);
+    border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button);
+    transition: background var(--duration-base) var(--ease-out);
   }
   .checkout-btn:hover { background: var(--color-ink-soft); }
   .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }

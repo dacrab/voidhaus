@@ -11,11 +11,11 @@
   <div class="ph-inner">
     <div class="ph-left">
       <span class="label muted" data-anim="hero">{label}</span>
-      <h1 class="ph-title fw-light" data-anim="hero" data-delay="0.1">{title}</h1>
+      <h1 class="ph-title fw-light" data-anim="hero" data-delay="0.08">{title}</h1>
     </div>
     {#if aside}
-      <span class="label muted self-end pb-1" data-anim="hero" data-delay="0.2">{aside}</span>
+      <span class="label muted self-end pb-1" data-anim="hero" data-delay="0.16">{aside}</span>
     {/if}
   </div>
-  <div class="rule" data-anim="rule"></div>
+  <div class="rule" data-anim="rule" data-delay="0.14"></div>
 </div>

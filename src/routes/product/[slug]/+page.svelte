@@ -103,7 +103,7 @@
     <a href="/collection" class="label muted-link">← The Index</a>
     <span class="label">{product.num} / {product.category}</span>
   </div>
-  <div class="pdp-title-row" data-anim="hero" data-delay="0.1">
+  <div class="pdp-title-row" data-anim="hero" data-delay="0.08">
     <h1 class="pdp-title">{product.name}</h1>
     <span class="pdp-ghost" aria-hidden="true">{product.num}</span>
   </div>
@@ -155,14 +155,14 @@
   </div>
 
   <aside class="pdp-info">
-    <div class="pdp-price-row" data-anim="hero" data-delay="0.2">
+    <div class="pdp-price-row" data-anim="hero" data-delay="0.16">
       <span class="label muted">Price</span>
       <span class="pdp-price">€ {formatPrice(product.price)}</span>
     </div>
 
-    <p class="pdp-desc" data-anim="hero" data-delay="0.25">{product.desc}</p>
+    <p class="pdp-desc" data-anim="hero" data-delay="0.22">{product.desc}</p>
 
-    <dl class="specs" data-anim="hero" data-delay="0.3">
+    <dl class="specs" data-anim="hero" data-delay="0.28">
       <div>
         <dt class="label muted">Material</dt>
         <dd>{product.material}</dd>
@@ -179,7 +179,7 @@
       {/each}
     </dl>
 
-    <div class="pdp-buy" data-anim="hero" data-delay="0.35">
+    <div class="pdp-buy" data-anim="hero" data-delay="0.34">
       <div class="size-head">
         <span class="label">{sized ? "Size" : "Format"}</span>
         {#if sized}
@@ -223,7 +223,7 @@
       <span class="label">Continue the index</span>
       <a href="/collection" class="label muted-link">All objects →</a>
     </div>
-    <div class="product-grid" data-anim="scroll">
+    <div class="product-grid" data-stagger>
       {#each related as item (item.slug)}
         <ProductCard product={item} />
       {/each}
@@ -303,7 +303,9 @@
     color: var(--ot-primary);
     cursor: pointer;
     backdrop-filter: blur(6px);
-    transition: background var(--duration-fast), border-color var(--duration-fast);
+    transition:
+      background var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
   }
   .pdp-colour:hover { background: rgb(0 0 0 / 0.7); border-color: var(--ot-primary); }
   .pdp-dot {
@@ -312,7 +314,7 @@
     border-radius: 50%;
     background: transparent;
     border: 1px solid currentColor;
-    transition: background var(--duration-fast);
+    transition: background var(--duration-fast) var(--ease-out);
   }
   .pdp-dot.on { background: currentColor; }
 
