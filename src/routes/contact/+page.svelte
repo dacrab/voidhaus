@@ -45,7 +45,6 @@
 <PageHeader label="Contact" title="Get in Touch" />
 
 <div class="wrap">
-  <div class="rule"></div>
   <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl py-2xl md:py-3xl">
     <div class="flex flex-col gap-xl" data-anim="scroll">
       {#if sent}
@@ -95,7 +94,7 @@
           {#if error}
             <p class="form-error label" role="alert">{error}</p>
           {/if}
-          <button type="submit" class="btn-outline max-w-[16rem]" disabled={submitting}>
+          <button type="submit" class="btn-outline justify-center max-w-[16rem]" disabled={submitting}>
             <span class="label">{submitting ? "Sending…" : "Send"}</span>
           </button>
         </form>

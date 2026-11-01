@@ -8,8 +8,9 @@
   --color-canvas:   #111110;
   --color-surface:  #1a1a18;
   --color-rule:     #2a2a28;
-  --color-mid:      #555553;
-  --color-soft:     #777773;
+  --color-mid:      #666662;
+  --color-soft:     #8a8a84;
+  --color-muted:    #7d7d77;
   --color-ink:      #e8e7e4;
   --color-ink-soft: #b0afac;
   --color-error:    #dc2626;
@@ -65,9 +66,9 @@
   --scrim-light:  rgb(0 0 0 / 0.25);
 
   /* Opacity steps */
-  --op-disabled: 0.15;
-  --op-muted:    0.35;
-  --op-hover:    0.55;
+  --op-disabled: 0.25;
+  --op-muted:    0.5;
+  --op-hover:    0.65;
 
   /* Layout */
   --nav-h:       4.25rem;
@@ -116,8 +117,14 @@
   }
 
   body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
     overflow-x: hidden;
   }
+
+  #main { flex: 1 0 auto; }
+  #main:focus { outline: none; }
 
   body::before {
     content: "";
@@ -186,7 +193,7 @@
   .fw-medium { font-variation-settings: var(--fw-medium); }
 
   /* ── Opacity ── */
-  .muted { opacity: var(--op-muted); }
+  .muted { color: var(--color-muted); }
 
   /* ── Layout ── */
   .wrap {
@@ -236,17 +243,17 @@
     outline: none;
   }
   .field::placeholder {
-    color: var(--color-mid);
+    color: var(--color-muted);
   }
   textarea.field { resize: vertical; }
 
   /* ── Interactive ── */
   .muted-link {
     position: relative;
-    opacity: var(--op-muted);
-    transition: opacity var(--duration-fast);
+    color: var(--color-muted);
+    transition: color var(--duration-fast);
   }
-  .muted-link:hover { opacity: 1; }
+  .muted-link:hover { color: var(--color-ink); }
   .muted-link::after {
     content: "";
     position: absolute;
@@ -263,11 +270,10 @@
     border: none;
     background: none;
     padding: 0;
-    color: var(--color-ink);
-    opacity: var(--op-muted);
-    transition: opacity var(--duration-fast);
+    color: var(--color-muted);
+    transition: color var(--duration-fast);
   }
-  .ghost-btn:hover { opacity: 1; }
+  .ghost-btn:hover { color: var(--color-ink); }
 
   .btn-outline {
     position: relative;
@@ -301,19 +307,28 @@
   }
   .btn-outline:hover:not(:disabled) { color: var(--color-canvas); }
   .btn-outline:hover:not(:disabled)::before { transform: scaleX(1); }
-  .btn-outline:disabled { cursor: not-allowed; }
+  .btn-outline:disabled {
+    cursor: not-allowed;
+    opacity: var(--op-muted);
+  }
+  .btn-outline:disabled::before { display: none; }
 
   /* ── Product grid ── */
   .product-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1px;
-    background: var(--color-soft);
-    border-inline: 1px solid var(--color-soft);
-    border-bottom: 1px solid var(--color-soft);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: var(--color-canvas);
+    border-top: 1px solid var(--color-rule);
+    border-left: 1px solid var(--color-rule);
   }
   @media (min-width: 768px) {
-    .product-grid { grid-template-columns: repeat(3, 1fr); }
+    .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .product-grid > * {
+    min-width: 0;
+    background: var(--color-canvas);
+    border-right: 1px solid var(--color-rule);
+    border-bottom: 1px solid var(--color-rule);
   }
 
   .card-info {
@@ -322,7 +337,7 @@
     justify-content: space-between;
     gap: var(--spacing-xs);
     padding: var(--spacing-md) var(--spacing-md) 1.25rem;
-    border-top: 1px solid var(--color-soft);
+    border-top: 1px solid var(--color-rule);
   }
   @media (min-width: 768px) {
     .card-info { padding: 1.25rem var(--spacing-lg) 1.75rem; }
@@ -335,12 +350,11 @@
   }
   .card-name {
     margin-top: var(--spacing-xs);
-    overflow: hidden;
     color: var(--color-ink);
     font-size: var(--text-sm);
     font-variation-settings: var(--fw-normal);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.35;
+    white-space: normal;
   }
   .card-price {
     flex-shrink: 0;
@@ -512,10 +526,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   :is([data-anim], .hero-img, .pdp-main) {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+    transition: none !important;
   }
   .scroll-indicator,
   .scroll-line::after { animation: none; }

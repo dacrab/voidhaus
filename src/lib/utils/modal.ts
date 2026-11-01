@@ -1,3 +1,5 @@
+import { prefersReducedMotion } from "./motion.js";
+
 const FOCUSABLE =
   'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
@@ -49,6 +51,7 @@ export function createModal() {
 }
 
 export function slideIn(_: Element) {
+  if (prefersReducedMotion()) return { duration: 0 };
   return {
     duration: 550,
     css: (t: number) => `transform:translateX(${(1 - t) * 100}%)`,
@@ -56,6 +59,7 @@ export function slideIn(_: Element) {
 }
 
 export function panelIn(_: Element, { y = -1.5, scale = false } = {}) {
+  if (prefersReducedMotion()) return { duration: 0 };
   return {
     duration: 550,
     css: (t: number) => {

@@ -15,7 +15,6 @@
 <PageHeader label="About" title="Manifesto" />
 
 <div class="wrap" data-anim="scroll">
-  <div class="rule"></div>
   <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl items-start py-2xl md:py-3xl">
     <div class="overflow-hidden">
       <img

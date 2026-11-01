@@ -11,7 +11,6 @@
 <PageHeader label="Retail" title="Stockists" />
 
 <div class="wrap">
-  <div class="rule"></div>
   <div class="stockists-grid">
     {#each STOCKISTS as region (region.region)}
       <section class="stockist-region" data-anim="scroll">
@@ -56,13 +55,14 @@
   }
   .stockist-stores {
     display: grid;
-    gap: 1px;
-    background: var(--color-rule);
-    border: 1px solid var(--color-rule);
+    border-top: 1px solid var(--color-rule);
+    border-left: 1px solid var(--color-rule);
   }
-  @media (min-width: 768px) { .stockist-stores { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 768px) { .stockist-stores { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .stockist-store {
     background: var(--color-canvas);
+    border-right: 1px solid var(--color-rule);
+    border-bottom: 1px solid var(--color-rule);
     padding: var(--spacing-lg);
     display: flex; flex-direction: column; gap: var(--spacing-xs);
   }

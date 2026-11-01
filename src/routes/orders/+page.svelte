@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import PageHeader from "#lib/components/PageHeader.svelte";
   import { formatPrice } from "#lib/format.js";
   import { ApiErrorSchema, OrdersResponseSchema, type OrderRow } from "#lib/utils/schemas.js";
@@ -37,6 +38,13 @@
       loading = false;
     }
   }
+
+  onMount(() => {
+    const param = new URL(window.location.href).searchParams.get("session_id");
+    if (!param) return;
+    sessionId = param;
+    lookup();
+  });
 </script>
 
 <svelte:head>
@@ -45,28 +53,28 @@
 
 <PageHeader label="Account" title="My Orders" />
 
-<div class="wrap py-2xl">
+<div class="wrap py-2xl" data-anim="scroll">
   <form role="search" aria-label="Look up your orders" onsubmit={(event) => { event.preventDefault(); lookup(); }}>
     <label for="order-session" class="label muted block mb-sm">
-      Enter the checkout session id from your payment redirect (cs_…)
+      Paste the checkout session ID from your payment redirect.
     </label>
-    <div class="flex gap-sm items-start">
+    <div class="flex flex-col sm:flex-row gap-sm items-stretch sm:items-start">
       <input
         id="order-session"
         type="text"
         bind:value={sessionId}
-        class="field max-w-[28rem]"
+        class="field sm:max-w-[28rem]"
         placeholder="cs_live_…"
         autocomplete="off"
       />
-      <button type="submit" class="btn-outline label max-w-[10rem]" disabled={loading}>
+      <button type="submit" class="btn-outline label justify-center sm:max-w-[10rem]" disabled={loading}>
         {loading ? "Searching…" : "Search"}
       </button>
     </div>
   </form>
 
   {#if error}
-    <p class="label muted mt-lg" role="alert">{error}</p>
+    <p class="label text-error mt-lg" role="alert">{error}</p>
   {/if}
 
   {#if orders !== null}
@@ -90,7 +98,7 @@
               {#each order.items as item (item.name + item.size)}
                 <div class="flex justify-between text-sm">
                   <span>{item.name} <span class="muted">({item.size})</span> &times;{item.quantity}</span>
-                  <span class="muted">&euro;{formatPrice(item.price * item.quantity)}</span>
+                  <span class="muted">&euro; {formatPrice(item.price * item.quantity)}</span>
                 </div>
               {/each}
             </div>
@@ -98,12 +106,12 @@
             {#if order.discount > 0}
               <div class="flex justify-between pt-xs">
                 <span class="label muted">Discount applied</span>
-                <span class="label muted">&minus;&euro;{formatPrice(order.discount)}</span>
+                <span class="label muted">&minus;&euro; {formatPrice(order.discount)}</span>
               </div>
             {/if}
             <div class="flex justify-between pt-xs">
               <span class="label">Total</span>
-              <span class="label">&euro;{formatPrice(order.total)}</span>
+              <span class="label">&euro; {formatPrice(order.total)}</span>
             </div>
           </div>
         {/each}

@@ -16,8 +16,8 @@
   <div class="relative z-10 flex flex-col gap-2xl py-32 pb-20">
     <span class="label muted">{status}</span>
     <h1 class="nf-title serif fw-medium italic leading-[0.95] tracking-[-0.03em]">
-      {title}<br />
-      <em class="not-italic text-ink-soft">{status === 404 ? "found." : "unexpected."}</em>
+      {status === 404 ? "Page" : "Something"}<br />
+      <em class="not-italic text-ink-soft">{status === 404 ? "not found." : "unexpected."}</em>
     </h1>
     <p class="text-base fw-normal leading-[1.85] text-soft max-w-[32ch]">
       {#if status === 404}

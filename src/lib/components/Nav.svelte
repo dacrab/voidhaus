@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { fly } from "svelte/transition";
   import { page } from "$app/state";
   import { SITE } from "#lib/data/site.js";
   import { cart } from "#lib/stores/cart.svelte.js";
   import { createModal } from "#lib/utils/modal.js";
+  import { prefersReducedMotion } from "#lib/utils/motion.js";
 
   const modal = createModal();
+  const reduced = prefersReducedMotion();
 
   const links = [
     { href: "/collection", label: "Collection" },
@@ -17,6 +19,7 @@
   ];
 
   let menuOpen = $state(false);
+  let menuEl = $state<HTMLElement>();
   let scrolled = $state(false);
   let hidden = $state(false);
 
@@ -37,11 +40,15 @@
     return () => window.removeEventListener("scroll", onScroll);
   });
 
-  function toggleMenu() {
+  async function toggleMenu() {
     menuOpen = !menuOpen;
     hidden = false;
-    if (menuOpen) modal.open();
-    else modal.close();
+    if (menuOpen) {
+      await tick();
+      if (menuOpen) modal.open(menuEl);
+    } else {
+      modal.close();
+    }
   }
 
   function openCart() {
@@ -50,7 +57,7 @@
   }
 
   function onKeydown(event: KeyboardEvent) {
-    if (menuOpen && event.key === "Escape") toggleMenu();
+    if (menuOpen && modal.handleKeydown(menuEl, event)) toggleMenu();
   }
 </script>
 
@@ -96,8 +103,9 @@
     role="dialog"
     aria-modal="true"
     aria-label="Navigation menu"
-    in:fly={{ y: -16, duration: 350 }}
-    out:fly={{ y: -16, duration: 250 }}
+    bind:this={menuEl}
+    in:fly={{ y: reduced ? 0 : -16, duration: reduced ? 0 : 350 }}
+    out:fly={{ y: reduced ? 0 : -16, duration: reduced ? 0 : 250 }}
   >
     <nav class="menu-links" aria-label="Navigation">
       {#each links as { href, label }, index (href)}
@@ -109,7 +117,7 @@
           class:active
           aria-current={active ? "page" : undefined}
           onclick={toggleMenu}
-          in:fly={{ y: 30, duration: 700, delay: 100 + index * 70 }}
+          in:fly={{ y: reduced ? 0 : 30, duration: reduced ? 0 : 700, delay: reduced ? 0 : 100 + index * 70 }}
         >
           <span class="menu-link-num">0{index + 1}</span>
           {label}
@@ -133,7 +141,8 @@
   .nav {
     position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 300;
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-    padding-inline: var(--spacing-lg); height: var(--nav-h);
+    padding-inline: clamp(var(--spacing-lg), 5vw, var(--spacing-4xl));
+    height: var(--nav-h);
     color: var(--ot-primary);
     transition:
       background var(--duration-base) ease,
@@ -141,8 +150,6 @@
       transform var(--duration-slower) var(--ease-out),
       box-shadow var(--duration-base) ease;
   }
-  @media (min-width: 640px)  { .nav { padding-inline: 2.5rem; } }
-  @media (min-width: 1024px) { .nav { padding-inline: var(--spacing-3xl); } }
 
   .nav.scrolled {
     background: var(--color-surface);
@@ -163,6 +170,7 @@
   .nav-l {
     grid-column: 1;
     display: flex; align-items: center;
+    margin-left: -0.75rem;
   }
 
   .nav-link {
@@ -176,6 +184,7 @@
   .nav-r {
     display: flex; align-items: center;
     justify-content: flex-end; gap: var(--spacing-lg); grid-column: 3;
+    margin-right: -0.75rem;
   }
   .nav-cart { display: flex; align-items: center; gap: 0.4rem; }
   @media (max-width: 767px) { .nav-cart { display: none; } }
@@ -221,17 +230,18 @@
 
   .menu-link {
     display: flex; align-items: baseline; gap: var(--spacing-lg);
-    font-size: clamp(2.5rem, 7vw, 6.5rem);
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
     font-variation-settings: var(--fw-light);
     letter-spacing: var(--ls-display); line-height: 1.05;
-    color: var(--color-ink);
-    padding-block: 0.4em;
-    border-bottom: 1px solid var(--color-soft);
-    transition: color var(--duration-fast), opacity var(--duration-fast);
+    color: var(--color-soft);
+    padding-block: 0.22em;
+    border-bottom: 1px solid var(--color-rule);
+    transition: color var(--duration-fast);
   }
-  .menu-link:first-child { border-top: 1px solid var(--color-soft); }
-  .menu-link:hover  { opacity: var(--op-hover); }
-  .menu-link.active { opacity: var(--op-hover); }
+  .menu-link:first-child { border-top: 1px solid var(--color-rule); }
+  .menu-link:hover  { color: var(--color-ink); }
+  .menu-link.active { color: var(--color-ink); }
+  .menu-link.active .menu-link-num { color: var(--color-ink-soft); }
 
   .menu-link-num {
     font-size: var(--text-xs);
