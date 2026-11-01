@@ -6,10 +6,13 @@
   import Cart from "#lib/components/Cart.svelte";
   import Nav from "#lib/components/Nav.svelte";
   import { SITE } from "#lib/data/site.js";
+  import { SITE_URL } from "#lib/site-url.js";
   import { cart } from "#lib/stores/cart.svelte.js";
   import { observeAnimations } from "#lib/utils/scroll-observer.js";
 
   let { children } = $props();
+
+  const canonical = $derived(new URL(page.url.pathname, SITE_URL).href);
 
   let stopAnimations: (() => void) | undefined;
 
@@ -32,7 +35,7 @@
   <meta name="robots" content="index, follow" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content={SITE.name} />
-  <link rel="canonical" href={page.url.pathname === "/" ? SITE.url : `${SITE.url}${page.url.pathname}`} />
+  <link rel="canonical" href={canonical} />
 </svelte:head>
 
 <a href="#main" class="skip-link label">Skip to content</a>

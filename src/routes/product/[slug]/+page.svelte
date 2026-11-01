@@ -7,6 +7,7 @@
   import { SITE } from "#lib/data/site.js";
   import { formatPrice } from "#lib/format.js";
   import { productImage } from "#lib/images.js";
+  import { SITE_URL } from "#lib/site-url.js";
   import { cart } from "#lib/stores/cart.svelte.js";
   import { StockResponseSchema } from "#lib/utils/schemas.js";
   import type { PageData } from "./$types";
@@ -16,7 +17,7 @@
   const product = $derived(data.product);
   const image = $derived(productImage(product.img));
   const detailImage = $derived(product.img2 ? productImage(product.img2) : undefined);
-  const socialImage = $derived(new URL(product.img, SITE.url).href);
+  const socialImage = $derived(new URL(image.src, SITE_URL).href);
   const related = $derived(
     PRODUCTS.filter((item) => item.category === product.category && item.slug !== product.slug).slice(0, 3),
   );

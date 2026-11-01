@@ -1,5 +1,6 @@
 <script lang="ts">
   import LegalPage from "#lib/components/LegalPage.svelte";
+  import { SITE } from "#lib/data/site.js";
 
   const sections = [
     {
@@ -20,7 +21,7 @@
     },
     {
       title: "Returns & Refunds",
-      body: "You may return unworn items within 14 days of receipt for a full refund. Items must be in original packaging with all tags attached. Made-to-order and personalised items are non-refundable. Contact studio@voidhaus.com to initiate a return.",
+      body: `You may return unworn items within 14 days of receipt for a full refund. Items must be in original packaging with all tags attached. Made-to-order and personalised items are non-refundable. Contact ${SITE.email.studio} to initiate a return.`,
     },
     {
       title: "Intellectual Property",

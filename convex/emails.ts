@@ -21,7 +21,10 @@ interface Email {
 
 async function sendEmail({ to, subject, html, replyTo }: Email): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) return;
+  const from = process.env.EMAIL_FROM;
+  // Both a key and a verified sender are required; otherwise emails are
+  // skipped rather than sent from an unverified address.
+  if (!(resendKey && from)) return;
 
   try {
     const response = await fetch("https://api.resend.com/emails", {
@@ -31,7 +34,7 @@ async function sendEmail({ to, subject, html, replyTo }: Email): Promise<void> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM ?? "VOIDHAUS <orders@voidhaus.com>",
+        from,
         to,
         subject,
         html,
@@ -72,7 +75,7 @@ export const sendOrderConfirmation = internalAction({
 
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="font-weight: 300; letter-spacing: -0.02em;">VOIDHAUS</h1>
+        <h1 style="font-weight: 300; letter-spacing: -0.02em;">${SITE.name}</h1>
         <p>Thank you for your order. Here's your confirmation:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
           <thead><tr style="border-bottom: 1px solid #eee;">
@@ -85,7 +88,7 @@ export const sendOrderConfirmation = internalAction({
         <p style="font-size: 18px; font-weight: 500;">Total: € ${formatPrice(args.total)}</p>
         <p style="color: #666; font-size: 14px;">Complimentary worldwide shipping · 5–10 business days</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0;" />
-        <p style="color: #999; font-size: 12px;">VOIDHAUS — studio@voidhaus.com</p>
+        <p style="color: #999; font-size: 12px;">${SITE.name} — ${SITE.email.studio}</p>
       </div>
     `;
 
@@ -107,7 +110,7 @@ export const sendContactNotification = internalAction({
   handler: async (_, args) => {
     const html = `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="font-weight: 300; letter-spacing: -0.02em;">VOIDHAUS</h1>
+        <h1 style="font-weight: 300; letter-spacing: -0.02em;">${SITE.name}</h1>
         <p><strong>${escapeHtml(args.name)}</strong> &lt;${escapeHtml(args.email)}&gt;</p>
         <p style="white-space: pre-wrap; line-height: 1.7;">${escapeHtml(args.message)}</p>
       </div>

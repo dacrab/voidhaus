@@ -4,11 +4,12 @@
   import { PRODUCTS, SITE_IMAGES } from "#lib/data/products.js";
   import { SITE } from "#lib/data/site.js";
   import { wideImage } from "#lib/images.js";
+  import { SITE_URL } from "#lib/site-url.js";
 
   const featured = PRODUCTS.slice(0, 4);
   const hero = wideImage(SITE_IMAGES.hero);
   const editorial = wideImage(SITE_IMAGES.editorial);
-  const socialImage = new URL(SITE_IMAGES.hero, SITE.url).href;
+  const socialImage = new URL(hero.src, SITE_URL).href;
 </script>
 
 <svelte:head>
