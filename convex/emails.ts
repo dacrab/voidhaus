@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { SITE } from "../src/lib/data/site";
 import { formatPrice } from "../src/lib/format";
 import { internalAction } from "./_generated/server";
 
@@ -9,6 +10,42 @@ function escapeHtml(input: string): string {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+interface Email {
+  to: string;
+  subject: string;
+  html: string;
+  replyTo?: string;
+}
+
+async function sendEmail({ to, subject, html, replyTo }: Email): Promise<void> {
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) return;
+
+  try {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM ?? "VOIDHAUS <orders@voidhaus.com>",
+        to,
+        subject,
+        html,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+      }),
+    });
+    if (!response.ok) {
+      // biome-ignore lint/suspicious/noConsole: email delivery failures surface in server logs
+      console.error("Resend email failed:", response.status, await response.text());
+    }
+  } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: email send failures surface in server logs without failing the request
+    console.error("Failed to send email:", error);
+  }
 }
 
 // Called after an order is paid. Sends the confirmation email via Resend.
@@ -26,9 +63,6 @@ export const sendOrderConfirmation = internalAction({
     total: v.number(),
   },
   handler: async (_, args) => {
-    const resendKey = process.env.RESEND_API_KEY;
-    if (!resendKey) return;
-
     const itemsHtml = args.orderItems
       .map((item) => {
         const quantity = item.quantity > 1 ? ` × ${item.quantity}` : "";
@@ -55,27 +89,35 @@ export const sendOrderConfirmation = internalAction({
       </div>
     `;
 
-    try {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "VOIDHAUS <orders@voidhaus.com>",
-          to: args.customerEmail,
-          subject: "Order Confirmed — VOIDHAUS",
-          html,
-        }),
-      });
-      if (!response.ok) {
-        // biome-ignore lint/suspicious/noConsole: email delivery failures surface in server logs
-        console.error("Resend email failed:", response.status, await response.text());
-      }
-    } catch (error) {
-      // biome-ignore lint/suspicious/noConsole: email send failures surface in server logs without failing the order
-      console.error("Failed to send order confirmation email:", error);
-    }
+    await sendEmail({
+      to: args.customerEmail,
+      subject: "Order Confirmed — VOIDHAUS",
+      html,
+    });
+  },
+});
+
+// Called after a contact message is stored. Replies go straight to the sender.
+export const sendContactNotification = internalAction({
+  args: {
+    name: v.string(),
+    email: v.string(),
+    message: v.string(),
+  },
+  handler: async (_, args) => {
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="font-weight: 300; letter-spacing: -0.02em;">VOIDHAUS</h1>
+        <p><strong>${escapeHtml(args.name)}</strong> &lt;${escapeHtml(args.email)}&gt;</p>
+        <p style="white-space: pre-wrap; line-height: 1.7;">${escapeHtml(args.message)}</p>
+      </div>
+    `;
+
+    await sendEmail({
+      to: SITE.email.studio,
+      subject: `Contact — ${args.name}`,
+      replyTo: args.email,
+      html,
+    });
   },
 });

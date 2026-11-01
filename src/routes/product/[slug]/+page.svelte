@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import PageHeader from "#lib/components/PageHeader.svelte";
   import ProductCard from "#lib/components/ProductCard.svelte";
   import SizeGuide from "#lib/components/SizeGuide.svelte";
@@ -8,6 +8,7 @@
   import { formatPrice } from "#lib/format.js";
   import { productImage } from "#lib/images.js";
   import { cart } from "#lib/stores/cart.svelte.js";
+  import { StockResponseSchema } from "#lib/utils/schemas.js";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -22,9 +23,39 @@
 
   let selectedSize = $state("");
   let added = $state(false);
+  let stock = $state<Record<string, number> | null>(null);
   let resetTimer: ReturnType<typeof setTimeout> | undefined;
 
+  const allSoldOut = $derived(Boolean(stock) && product.sizes.every((size) => stock?.[size] === 0));
+
   onDestroy(() => clearTimeout(resetTimer));
+
+  onMount(() => {
+    const controller = new AbortController();
+
+    void (async () => {
+      try {
+        const response = await fetch(`/api/stock?slug=${encodeURIComponent(product.slug)}`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+
+        const parsed = StockResponseSchema.safeParse(await response.json());
+        if (!parsed.success) return;
+
+        stock = parsed.data.stock;
+        if (selectedSize && stock[selectedSize] === 0) selectedSize = "";
+      } catch {
+        // Live availability is an enhancement; checkout re-validates stock.
+      }
+    })();
+
+    return () => controller.abort();
+  });
+
+  function isSoldOut(size: string): boolean {
+    return stock?.[size] === 0;
+  }
 
   function addToCart() {
     if (!selectedSize) return;
@@ -109,12 +140,17 @@
         </div>
         <div class="flex flex-wrap gap-sm">
           {#each product.sizes as size (size)}
+            {@const soldOut = isSoldOut(size)}
             <button
               class="size-btn"
               class:size-btn--active={selectedSize === size}
+              class:size-btn--soldout={soldOut}
               type="button"
               onclick={() => (selectedSize = size)}
               aria-pressed={selectedSize === size}
+              aria-label={soldOut ? `${size} — sold out` : undefined}
+              title={soldOut ? "Sold out" : undefined}
+              disabled={soldOut}
             >
               {size}
             </button>
@@ -125,13 +161,13 @@
       <div class="pt-lg" data-anim="hero" data-delay="0.4">
         <button
           class="btn-outline"
-          class:muted={!selectedSize}
-          class:cursor-not-allowed={!selectedSize}
+          class:muted={!selectedSize || allSoldOut}
+          class:cursor-not-allowed={!selectedSize || allSoldOut}
           type="button"
           onclick={addToCart}
-          disabled={!selectedSize}
+          disabled={!selectedSize || allSoldOut}
         >
-          <span class="label">{added ? "Added ✓" : "Add to Selection"}</span>
+          <span class="label">{allSoldOut ? "Sold out" : added ? "Added ✓" : "Add to Selection"}</span>
           <span class="label">&euro; {formatPrice(product.price)}</span>
         </button>
       </div>

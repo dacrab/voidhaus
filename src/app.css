@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "@fontsource-variable/space-grotesk";
 @import "@fontsource-variable/cormorant";
+@import "@fontsource-variable/cormorant/wght-italic.css";
 
 /* ─── Theme tokens (Tailwind v4) ─────────────────────────────────────────── */
 @theme {
@@ -462,6 +463,14 @@
     color: var(--color-ink);
     font-size: 9px;
     line-height: 1;
+  }
+  .size-btn--soldout,
+  .size-btn--soldout:hover {
+    border-color: var(--color-rule);
+    color: var(--color-soft);
+    opacity: var(--op-muted);
+    text-decoration: line-through;
+    cursor: not-allowed;
   }
 }
 

@@ -27,6 +27,8 @@ Push to `master` — Vercel builds and deploys automatically.
   deployment's `ADMIN_TOKEN` after changing the catalog (pass `reseed: true` to
   replace existing stock).
 - **Sitemap** — generated at build time by `src/routes/sitemap.xml/+server.ts`.
+- **Availability** — product pages stay prerendered; per-size stock is fetched
+  after hydration from `/api/stock` and re-validated at checkout.
 
 ## Backend surface (locked down)
 
@@ -39,6 +41,8 @@ Push to `master` — Vercel builds and deploys automatically.
 - Public functions are limited to batched stock reads, coupon validation,
   contact-message creation, and order lookup by checkout-session id (a
   capability string shown only to the payer).
+- Contact messages are stored in Convex and, when `RESEND_API_KEY` is set,
+  emailed to the studio with the sender's address as `reply_to`.
 
 ## Checkout
 
@@ -66,10 +70,10 @@ retries stop instead of looping forever.
 
 ## Rate limits
 
-`/api/checkout`, `/api/contact`, and `/api/orders` are rate-limited per IP.
-Upstash Redis REST is used when `UPSTASH_REDIS_REST_URL` and
-`UPSTASH_REDIS_REST_TOKEN` are set; otherwise an in-memory per-instance window
-is used. Store failures fail open with a single warning.
+`/api/checkout`, `/api/contact`, `/api/orders`, and `/api/stock` are
+rate-limited per IP. Upstash Redis REST is used when `UPSTASH_REDIS_REST_URL`
+and `UPSTASH_REDIS_REST_TOKEN` are set; otherwise an in-memory per-instance
+window is used. Store failures fail open with a single warning.
 
 ## Config
 
@@ -87,7 +91,8 @@ is used. Store failures fail open with a single warning.
 | `STRIPE_WEBHOOK_SECRET` | SvelteKit server | Webhook signature verification |
 | `INTERNAL_WEBHOOK_SECRET` | SvelteKit server **and** Convex | Shared secret for `/fulfill` |
 | `ADMIN_TOKEN` | Convex | Authorizes `seedStock` |
-| `RESEND_API_KEY` | Convex | Order confirmation emails (optional) |
+| `RESEND_API_KEY` | Convex | Order confirmations and contact alerts (optional) |
+| `EMAIL_FROM` | Convex | Verified sender for transactional email (optional) |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | SvelteKit server | Optional shared rate-limit store |
 | `PUBLIC_SENTRY_DSN` | Client | Browser error reporting (optional) |
 | `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | Build | Source-map upload (optional) |

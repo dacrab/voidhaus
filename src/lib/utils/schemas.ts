@@ -37,6 +37,10 @@ export const OrdersResponseSchema = z.object({
   orders: z.array(OrderRowSchema),
 });
 
+export const StockResponseSchema = z.object({
+  stock: z.record(z.string(), z.number()),
+});
+
 export const ApiErrorSchema = z.object({
   error: z.string().optional(),
 });
