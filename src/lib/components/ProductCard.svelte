@@ -133,6 +133,7 @@
 
   @media (max-width: 899px) {
     :global(.index-grid) > :first-child .pc-media { aspect-ratio: 4 / 3; }
+    :global(.index-grid) > :last-child:nth-child(even) .pc-media { aspect-ratio: 4 / 3; }
   }
 
   @media (min-width: 900px) {
