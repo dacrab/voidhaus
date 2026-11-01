@@ -1,5 +1,6 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
+  import { APPAREL_CATEGORIES, getProduct } from "#lib/data/products.js";
   import { formatPrice } from "#lib/format.js";
   import { productImage } from "#lib/images.js";
   import { cart } from "#lib/stores/cart.svelte.js";
@@ -15,6 +16,11 @@
   let checkoutError = $state("");
 
   const total = $derived(formatPrice(cart.items.reduce((sum, item) => sum + item.price, 0)));
+
+  function formatLabel(slug: string): string {
+    const product = getProduct(slug);
+    return product && APPAREL_CATEGORIES.includes(product.category) ? "Size" : "Format";
+  }
 
   let wasOpen = false;
   $effect(() => {
@@ -93,7 +99,7 @@
     {#if cart.items.length === 0}
       <div class="empty">
         <p class="empty-msg">Your selection is empty.</p>
-        <a href="/collection" class="label empty-link" onclick={closeCart}>Browse Collection →</a>
+        <a href="/collection" class="label empty-link" onclick={closeCart}>Enter the index →</a>
       </div>
     {:else}
       <ul class="items">
@@ -119,13 +125,13 @@
                 <div>
                   <span class="label muted">{item.num}</span>
                   <span class="item-name">{item.name}</span>
-                  <span class="item-size label">Size {item.size}</span>
+                  <span class="item-size label">{formatLabel(item.slug)} {item.size}</span>
                 </div>
                 <button
                   class="label ghost-btn"
                   type="button"
                   onclick={() => cart.remove(item.slug, item.size)}
-                  aria-label="Remove {item.name}, size {item.size}">Remove</button
+                  aria-label="Remove {item.name}, {formatLabel(item.slug).toLowerCase()} {item.size}">Remove</button
                 >
               </div>
               <span class="item-price label">€ {formatPrice(item.price)}</span>
@@ -138,7 +144,7 @@
       <div class="footer">
         <div class="total-row">
           <span class="label muted">Estimated total</span>
-          <span class="total serif">€ {total}</span>
+          <span class="total mono">€ {total}</span>
         </div>
         <p class="ship-note label muted">Duty-free · Worldwide shipping</p>
         <button class="checkout-btn label" type="button" onclick={checkout} disabled={checking}>
@@ -217,7 +223,7 @@
   }
 
   .total-row  { display: flex; align-items: baseline; justify-content: space-between; padding-block: var(--spacing-xs); }
-  .total      { font-size: var(--text-xl); font-style: italic; font-variation-settings: var(--fw-medium); color: var(--color-ink); }
+  .total      { font-size: var(--text-xl); font-variation-settings: var(--fw-normal); color: var(--color-ink); }
 
   .item-size  { color: var(--color-muted); text-transform: none; letter-spacing: var(--ls-wide); }
   .item-price { color: var(--color-muted); }

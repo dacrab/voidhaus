@@ -1,6 +1,6 @@
 # VOIDHAUS
 
-Dark luxury fashion. Twelve pieces. Four ateliers.
+Dark luxury fashion. Twelve objects for the body and the room. Four ateliers.
 
 SvelteKit 3 + Svelte 5 storefront, prerendered to Vercel. The catalog is a static
 module (`src/lib/data/products.ts`); Convex tracks per-size stock, orders,

@@ -57,26 +57,25 @@
   <span class="label muted" data-anim="hero">
     {verifying ? "Checking your order…" : confirmed ? "Order confirmed" : "Processing payment"}
   </span>
-  <h1 class="serif text-3xl md:text-4xl fw-light leading-[1.1] py-md" data-anim="hero" data-delay="0.1">
+  <h1 class="display text-3xl md:text-5xl fw-light py-md" data-anim="hero" data-delay="0.1">
     {verifying ? "One moment" : confirmed ? "Thank you" : "Almost there"}
   </h1>
   <p class="text-soft leading-[1.85] max-w-[48ch]" data-anim="hero" data-delay="0.2">
     {#if verifying}
       Please wait while we verify your payment.
     {:else if confirmed}
-      Your order is confirmed and your selection is on its way. Keep the order reference from your payment redirect to
-      look it up under My Orders.
+      Your order is confirmed. Keep the reference from your payment redirect to look it up under My orders.
     {:else}
-      Your payment is still processing. Refresh this page in a moment, or look it up under My Orders.
+      Your payment is still processing. Refresh this page in a moment, or look it up under My orders.
     {/if}
   </p>
   <div class="flex flex-col sm:flex-row items-center justify-center gap-md pt-xl" data-anim="hero" data-delay="0.3">
     <a href="/collection" class="btn-outline justify-center w-full sm:w-auto px-xl">
-      <span class="label">Continue Browsing</span>
+      <span class="label">Return to the index</span>
     </a>
-    <a href={ordersHref} class="label muted muted-link self-center py-sm px-md whitespace-nowrap">My Orders →</a>
+    <a href={ordersHref} class="label muted muted-link self-center py-sm px-md whitespace-nowrap">My orders →</a>
   </div>
   <p class="text-sm text-soft pt-xl" data-anim="hero" data-delay="0.4">
-    Questions? <a href="/contact" class="muted-link">Contact us</a>.
+    Questions — <a href="/contact" class="muted-link">write to the studio</a>.
   </p>
 </div>

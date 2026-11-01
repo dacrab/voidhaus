@@ -49,11 +49,10 @@
 
 <footer class="footer">
   <div class="wrap">
-    <div class="rule"></div>
-    <div class="footer-inner">
+    <div class="footer-top">
       <div class="footer-brand">
         <span class="label muted">© {new Date().getFullYear()} {SITE.name}</span>
-        <span class="label muted">{SITE.ateliers.map((atelier) => atelier.city).join(" · ")}</span>
+        <span class="label muted">{SITE.season} — Index 001—012</span>
       </div>
       <nav class="footer-nav" aria-label="Legal navigation">
         <a href="/stockists" class="label muted muted-link">Stockists</a>
@@ -61,6 +60,11 @@
         <a href="/terms" class="label muted muted-link">Terms</a>
         <a href="/contact" class="label muted muted-link">Contact</a>
       </nav>
+    </div>
+    <div class="footer-mark" aria-hidden="true">VOIDHAUS</div>
+    <div class="footer-bottom">
+      <span class="label muted">{SITE.ateliers.map((atelier) => atelier.city).join(" — ")}</span>
+      <span class="label muted">Twelve objects / one position</span>
     </div>
   </div>
 </footer>
@@ -83,17 +87,37 @@
   .footer {
     border-top: 1px solid var(--color-rule);
     margin-top: var(--spacing-3xl);
-    padding-block: var(--spacing-2xl) var(--spacing-3xl);
+    padding-block: var(--spacing-2xl) var(--spacing-lg);
+    overflow: hidden;
   }
-  .footer-inner {
+  .footer-top {
     display: flex; justify-content: space-between; align-items: flex-start;
     flex-wrap: wrap; gap: var(--spacing-lg);
-    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-2xl);
+    border-bottom: 1px solid var(--color-rule);
   }
   .footer-brand {
     display: flex; flex-direction: column; gap: var(--spacing-xs);
   }
   .footer-nav {
     display: flex; gap: var(--spacing-lg); align-items: center; flex-wrap: wrap;
+  }
+  .footer-mark {
+    font-size: clamp(3rem, 15.5vw, 15rem);
+    font-variation-settings: var(--fw-light);
+    letter-spacing: -0.075em;
+    line-height: 0.78;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    margin-block: clamp(1.5rem, 4vw, 3rem) var(--spacing-lg);
+    white-space: nowrap;
+    opacity: 0.92;
+  }
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-rule);
   }
 </style>

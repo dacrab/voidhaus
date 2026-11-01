@@ -42,16 +42,16 @@
   <title>Contact — VOIDHAUS</title>
 </svelte:head>
 
-<PageHeader label="Contact" title="Get in Touch" />
+<PageHeader label="Contact" title="Inquiries" />
 
 <div class="wrap">
   <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl py-2xl md:py-3xl">
     <div class="flex flex-col gap-xl" data-anim="scroll">
       {#if sent}
         <div class="flex flex-col gap-sm">
-          <span class="label fw-medium">Message sent</span>
+          <span class="label fw-medium">Message received</span>
           <p class="text-soft leading-[1.85]">
-            Thank you for reaching out. We will respond within two business days.
+            The studio will respond within two business days.
           </p>
         </div>
       {:else}

@@ -48,10 +48,10 @@
 </script>
 
 <svelte:head>
-  <title>My Orders — VOIDHAUS</title>
+  <title>Orders — VOIDHAUS</title>
 </svelte:head>
 
-<PageHeader label="Account" title="My Orders" />
+<PageHeader label="Archive" title="Orders" />
 
 <div class="wrap py-2xl" data-anim="scroll">
   <form role="search" aria-label="Look up your orders" onsubmit={(event) => { event.preventDefault(); lookup(); }}>
@@ -68,7 +68,7 @@
         autocomplete="off"
       />
       <button type="submit" class="btn-outline label justify-center sm:max-w-[10rem]" disabled={loading}>
-        {loading ? "Searching…" : "Search"}
+        {loading ? "Searching…" : "Look up"}
       </button>
     </div>
   </form>
