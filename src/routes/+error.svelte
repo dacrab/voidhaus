@@ -14,26 +14,28 @@
 
 <div class="wrap relative flex items-center overflow-hidden min-h-[calc(100svh-5rem)]">
   <div class="relative z-10 flex flex-col gap-2xl py-32 pb-20">
-    <span class="label muted">{status}</span>
-    <h1 class="nf-title fw-light leading-[0.88] tracking-[-0.05em] uppercase">
+    <span class="label muted" data-anim="hero">{status}</span>
+    <h1 class="nf-title fw-light leading-[0.88] tracking-[-0.05em] uppercase" data-anim="hero" data-delay="0.08">
       {status === 404 ? "Page" : "Something"}<br />
       <span class="nf-em">{status === 404 ? "not found." : "unexpected."}</span>
     </h1>
-    <p class="text-base fw-normal leading-[1.85] text-soft max-w-[32ch]">
+    <p class="text-base fw-normal leading-[1.85] text-soft max-w-[32ch]" data-anim="hero" data-delay="0.16">
       {#if status === 404}
         This page doesn't exist — or has been removed.<br />The index remains.
       {:else}
         {error.message || "Something went wrong."}<br />Please try again.
       {/if}
     </p>
-    <div class="flex gap-12 items-center pt-lg border-t border-rule">
+    <div class="flex gap-12 items-center pt-lg border-t border-rule" data-anim="hero" data-delay="0.24">
       <a href="/" class="label muted-link">← Home</a>
       <a href="/collection" class="label muted-link">The Index →</a>
     </div>
   </div>
   <span
     class="nf-bg fw-light absolute right-[-0.05em] bottom-[-0.15em] text-transparent pointer-events-none select-none leading-none tracking-[-0.06em]"
-    aria-hidden="true">{status}</span
+    aria-hidden="true"
+    data-anim="hero"
+    data-delay="0.32">{status}</span
   >
 </div>
 

@@ -3,6 +3,7 @@
   import { filterProducts, type CategoryFilter } from "#lib/data/filter.js";
   import { CATEGORIES, PRODUCTS } from "#lib/data/products.js";
   import { SITE } from "#lib/data/site.js";
+  import { revealGroup } from "#lib/utils/scroll-observer.js";
 
   const filters: readonly CategoryFilter[] = ["All", ...CATEGORIES];
 
@@ -33,8 +34,8 @@
     <span class="label">Index / {SITE.season}</span>
     <span class="label">Twelve objects</span>
   </div>
-  <h1 class="index-title" data-anim="hero" data-delay="0.1">The Index</h1>
-  <div class="index-intro" data-anim="hero" data-delay="0.2">
+  <h1 class="index-title" data-anim="hero" data-delay="0.08">The Index</h1>
+  <div class="index-intro" data-anim="hero" data-delay="0.16">
     <p>
       A fixed catalogue. Outerwear, bodies, objects. No seasonal edit, no replenishment, no second colourway.
     </p>
@@ -42,7 +43,7 @@
   </div>
 </header>
 
-<div class="wrap controls">
+<div class="wrap controls" data-anim="scroll" data-delay="0.04">
   <nav class="cat-filters" aria-label="Filter the index">
     {#each filters as category (category)}
       <button
@@ -69,7 +70,7 @@
   </div>
 </div>
 
-<div class="wrap result-line">
+<div class="wrap result-line" data-anim="scroll" data-delay="0.1">
   <span class="label" aria-live="polite">{String(filtered.length).padStart(2, "0")} / {PRODUCTS.length} objects</span>
   <span class="label muted">Colour on touch</span>
 </div>
@@ -84,7 +85,7 @@
   </div>
 {:else}
   <div class="wrap">
-    <div class="index-grid" data-anim="scroll">
+    <div class="index-grid" data-reveal-group use:revealGroup>
       {#each filtered as product (product.slug)}
         <ProductCard {product} />
       {/each}
@@ -154,9 +155,9 @@
     color: var(--color-soft);
     cursor: pointer;
     transition:
-      color var(--duration-fast),
-      background var(--duration-fast),
-      border-color var(--duration-fast);
+      color var(--duration-fast) var(--ease-out),
+      background var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
   }
   .cat-filter:hover { color: var(--color-ink); border-color: var(--color-soft); }
   .cat-filter--active {

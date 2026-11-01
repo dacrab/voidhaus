@@ -1,16 +1,14 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
-  import { fade, fly } from "svelte/transition";
   import { page } from "$app/state";
   import { SITE_IMAGES } from "#lib/data/products.js";
   import { SITE } from "#lib/data/site.js";
   import { productImage, wideImage } from "#lib/images.js";
   import { cart } from "#lib/stores/cart.svelte.js";
   import { createModal } from "#lib/utils/modal.js";
-  import { prefersReducedMotion } from "#lib/utils/motion.js";
+  import { fade, MOTION, rise } from "#lib/utils/motion.js";
 
   const modal = createModal();
-  const reduced = prefersReducedMotion();
 
   const links = [
     { href: "/collection", label: "Index", img: SITE_IMAGES.editorial, wide: true },
@@ -130,8 +128,8 @@
     aria-modal="true"
     aria-label="Navigation menu"
     bind:this={menuEl}
-    in:fly={{ y: reduced ? 0 : -16, duration: reduced ? 0 : 350 }}
-    out:fly={{ y: reduced ? 0 : -16, duration: reduced ? 0 : 250 }}
+    in:fade={{ duration: MOTION.base }}
+    out:fade={{ duration: MOTION.panelOut }}
   >
     <div class="menu-main">
       <nav class="menu-links" aria-label="Navigation">
@@ -147,7 +145,7 @@
             onclick={toggleMenu}
             onmouseenter={() => (activePreview = href)}
             onfocus={() => (activePreview = href)}
-            in:fly={{ y: reduced ? 0 : 30, duration: reduced ? 0 : 700, delay: reduced ? 0 : 100 + index * 60 }}
+            in:rise={{ y: 18, duration: MOTION.panel, delay: 80 + index * MOTION.stagger }}
           >
             <span class="menu-link-num">0{index + 1}</span>
             <span class="menu-link-label">{label}</span>
@@ -175,8 +173,8 @@
           srcset={preview.srcset}
           sizes="(min-width: 900px) 38vw, 100vw"
           alt=""
-          in:fade={{ duration: reduced ? 0 : 320 }}
-          out:fade={{ duration: reduced ? 0 : 220 }}
+          in:fade={{ duration: MOTION.base }}
+          out:fade={{ duration: MOTION.fast }}
         />
       {/key}
       <div class="menu-preview-scrim"></div>
@@ -196,10 +194,10 @@
     height: var(--nav-h);
     color: var(--ot-primary);
     transition:
-      background var(--duration-base) ease,
-      color var(--duration-base) ease,
-      transform var(--duration-slower) var(--ease-out),
-      box-shadow var(--duration-base) ease;
+      background var(--duration-base) var(--ease-out),
+      color var(--duration-base) var(--ease-out),
+      transform var(--duration-base) var(--ease-out),
+      box-shadow var(--duration-base) var(--ease-out);
   }
 
   .nav.scrolled {
@@ -217,7 +215,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: inherit;
-    transition: opacity var(--duration-fast);
+    transition: opacity var(--duration-fast) var(--ease-out);
     white-space: nowrap;
   }
   .nav-logo:hover { opacity: var(--op-hover); }
@@ -226,7 +224,9 @@
   .nav-c { grid-column: 2; display: flex; align-items: center; gap: var(--spacing-xl); }
   .nav-link {
     color: inherit; opacity: 0.65;
-    transition: opacity var(--duration-fast), color var(--duration-fast);
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
     background: none; border: none; padding: 0.5rem 0;
     cursor: pointer;
   }
@@ -279,7 +279,9 @@
     color: var(--color-soft);
     padding-block: 0.16em;
     border-bottom: 1px solid var(--color-rule);
-    transition: color var(--duration-fast), padding-left var(--duration-base) var(--ease-out);
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      padding-left var(--duration-base) var(--ease-out);
   }
   .menu-link:first-child { border-top: 1px solid var(--color-rule); }
   .menu-link:hover, .menu-link:focus-visible, .menu-link.active, .menu-link.previewing { color: var(--color-ink); }
@@ -291,7 +293,9 @@
     font-size: 0.35em;
     opacity: 0;
     transform: translate(-4px, -2px);
-    transition: opacity var(--duration-fast), transform var(--duration-fast);
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-base) var(--ease-out);
   }
   .menu-link:hover .menu-link-arrow,
   .menu-link:focus-visible .menu-link-arrow,
@@ -315,7 +319,7 @@
   .menu-foot-cart {
     background: none; border: none;
     color: var(--color-ink); opacity: var(--op-muted);
-    transition: opacity var(--duration-fast);
+    transition: opacity var(--duration-fast) var(--ease-out);
     cursor: pointer;
   }
   .menu-foot-cart:hover { opacity: 1; }

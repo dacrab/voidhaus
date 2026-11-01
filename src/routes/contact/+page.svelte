@@ -45,8 +45,8 @@
 <PageHeader label="Contact" title="Inquiries" />
 
 <div class="wrap">
-  <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl py-2xl md:py-3xl">
-    <div class="flex flex-col gap-xl" data-anim="scroll">
+  <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl py-2xl md:py-3xl" data-stagger>
+    <div class="flex flex-col gap-xl">
       {#if sent}
         <div class="flex flex-col gap-sm">
           <span class="label fw-medium">Message received</span>
@@ -101,7 +101,7 @@
       {/if}
     </div>
 
-    <div class="flex flex-col gap-xl" data-anim="scroll">
+    <div class="flex flex-col gap-xl">
       <div class="flex flex-col gap-sm">
         <span class="label muted">Studio</span>
         <a href="mailto:{SITE.email.studio}" class="muted-link fw-normal">{SITE.email.studio}</a>

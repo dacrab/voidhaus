@@ -43,7 +43,7 @@
 <div class="flex flex-col">
   {#each chapters as chapter, index (chapter.id)}
     {@const image = productImage(chapter.product.img)}
-    <section class="chapter" data-anim="scroll" class:odd={index % 2 !== 0}>
+    <section class="chapter" data-stagger class:odd={index % 2 !== 0}>
       <div class="chapter-img-wrap">
         <img
           class="w-full h-full object-cover"
@@ -95,11 +95,15 @@
   }
   .chapter-img-wrap img {
     filter: saturate(0.82) contrast(1.05) brightness(0.85);
-    transition: filter 1s var(--ease-img), transform 1.6s var(--ease-out);
+    transition:
+      filter var(--duration-slow) var(--ease-img),
+      transform var(--duration-slow) var(--ease-out);
   }
-  .chapter:hover .chapter-img-wrap img {
-    filter: saturate(0.95) contrast(1.04) brightness(0.9);
-    transform: scale(1.015);
+  @media (hover: hover) {
+    .chapter:hover .chapter-img-wrap img {
+      filter: saturate(0.95) contrast(1.04) brightness(0.9);
+      transform: scale(1.02);
+    }
   }
   .chapter-num {
     position: absolute; top: var(--spacing-lg); right: var(--spacing-lg);

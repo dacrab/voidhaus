@@ -12,8 +12,8 @@
 
 <div class="wrap">
   <div class="stockists-grid">
-    {#each STOCKISTS as region (region.region)}
-      <section class="stockist-region" data-anim="scroll">
+    {#each STOCKISTS as region, index (region.region)}
+      <section class="stockist-region" data-anim="scroll" data-delay={String(index * 0.05)}>
         <span class="label muted stockist-region-label">{region.region}</span>
         <div class="stockist-stores">
           {#each region.stores as store (store.name)}
@@ -30,7 +30,7 @@
     {/each}
   </div>
 
-  <div class="rule"></div>
+  <div class="rule" data-anim="rule"></div>
   <div class="stockist-inquiry" data-anim="scroll">
     <span class="label muted">Atelier inquiries</span>
     <div class="flex items-baseline justify-between flex-wrap gap-sm">

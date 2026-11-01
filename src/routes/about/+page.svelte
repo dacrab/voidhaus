@@ -33,8 +33,8 @@
 
 <PageHeader label="Studio" title="Manifesto" aside="Est. Milan" />
 
-<div class="wrap" data-anim="scroll">
-  <div class="manifesto-grid">
+<div class="wrap">
+  <div class="manifesto-grid" data-stagger>
     <div class="manifesto-image">
       <img
         src={atelierImage.src}
@@ -66,12 +66,12 @@
   </div>
 </div>
 
-<section class="wrap tenets" data-anim="scroll">
-  <div class="section-head">
+<section class="wrap tenets">
+  <div class="section-head" data-anim="scroll">
     <span class="label">Tenets</span>
     <span class="label">01—04</span>
   </div>
-  <div class="tenet-grid">
+  <div class="tenet-grid" data-stagger>
     {#each tenets as tenet (tenet.num)}
       <div class="tenet">
         <span class="label tenet-num">{tenet.num}</span>
@@ -82,12 +82,12 @@
   </div>
 </section>
 
-<div class="wrap ateliers" data-anim="scroll">
-  <div class="section-head">
+<div class="wrap ateliers">
+  <div class="section-head" data-anim="scroll">
     <span class="label">Ateliers</span>
     <span class="label">Four cities / one position</span>
   </div>
-  <div class="atelier-grid">
+  <div class="atelier-grid" data-stagger>
     {#each SITE.ateliers as atelier (atelier.city)}
       <div class="atelier">
         <span class="atelier-city">{atelier.city}</span>

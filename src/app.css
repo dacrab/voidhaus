@@ -72,10 +72,14 @@
   --text-display: clamp(2.75rem, 8.5vw, 7.5rem);
   --text-hero:    clamp(3.5rem, 18vw, 17rem);
 
-  /* Motion */
-  --duration-fast:   0.25s;
-  --duration-base:   0.4s;
-  --duration-slower: 0.7s;
+  /* Motion — keep in sync with src/lib/utils/motion.ts */
+  --duration-fast:   180ms;
+  --duration-base:   320ms;
+  --duration-slow:   700ms;
+  --duration-reveal: 900ms;
+  --duration-image:  1200ms;
+  --stagger:         70ms;
+  --reveal-y:        18px;
 }
 
 /* ─── Base ───────────────────────────────────────────────────────────────── */
@@ -235,8 +239,8 @@
   .media-mono img {
     filter: grayscale(1) contrast(1.08) brightness(0.86);
     transition:
-      filter 0.9s var(--ease-img),
-      transform 1.2s var(--ease-out);
+      filter var(--duration-slow) var(--ease-img),
+      transform var(--duration-slow) var(--ease-out);
   }
   @media (hover: hover) {
     .media-mono:hover img,
@@ -260,7 +264,7 @@
     font-size: var(--text-xs);
     letter-spacing: var(--ls-label);
     text-transform: uppercase;
-    transition: border-color var(--duration-fast);
+    transition: border-color var(--duration-fast) var(--ease-out);
   }
   .field:focus {
     border-color: var(--color-ink);
@@ -281,7 +285,7 @@
   .muted-link {
     position: relative;
     color: var(--color-muted);
-    transition: color var(--duration-fast);
+    transition: color var(--duration-fast) var(--ease-out);
   }
   .muted-link:hover { color: var(--color-ink); }
   .muted-link::after {
@@ -292,7 +296,7 @@
     width: 0;
     height: 1px;
     background: currentColor;
-    transition: width var(--duration-slower) var(--ease-out);
+    transition: width var(--duration-slow) var(--ease-out);
   }
   .muted-link:hover::after { width: 100%; }
 
@@ -301,7 +305,7 @@
     background: none;
     padding: 0;
     color: var(--color-muted);
-    transition: color var(--duration-fast);
+    transition: color var(--duration-fast) var(--ease-out);
     cursor: pointer;
   }
   .ghost-btn:hover { color: var(--color-ink); }
@@ -320,7 +324,7 @@
     font: inherit;
     text-align: left;
     cursor: pointer;
-    transition: color 0.6s var(--ease-out);
+    transition: color var(--duration-base) var(--ease-out);
   }
   .btn-outline::before {
     content: "";
@@ -330,7 +334,7 @@
     background: var(--color-ink);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.8s var(--ease-out);
+    transition: transform var(--duration-slow) var(--ease-out);
   }
   .btn-outline > * {
     position: relative;
@@ -440,7 +444,7 @@
     height: 4px;
     border-radius: 50%;
     background: var(--color-soft);
-    transition: background var(--duration-fast);
+    transition: background var(--duration-fast) var(--ease-out);
   }
   .chapter-progress .dot.active { background: var(--color-ink); }
 
@@ -457,9 +461,9 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     transition:
-      border-color var(--duration-slower) var(--ease-out),
-      color var(--duration-slower) var(--ease-out),
-      background var(--duration-slower) var(--ease-out);
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      background var(--duration-base) var(--ease-out);
   }
   .size-btn:hover {
     border-color: var(--color-ink);
@@ -482,48 +486,71 @@
 
 /* ─── Motion ─────────────────────────────────────────────────────────────── */
 @keyframes image-reveal {
-  from { opacity: 0; clip-path: inset(0 0 100% 0); transform: scale(1.04); }
+  from { opacity: 0; clip-path: inset(0 0 100% 0); transform: scale(1.035); }
   to   { opacity: 1; clip-path: inset(0 0 0 0); transform: scale(1); }
 }
 
-@media (scripting: enabled) {
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   :is(.hero-img, .pdp-main) {
-    animation: image-reveal 1.1s var(--ease-out) 0.1s both;
+    animation: image-reveal var(--duration-image) var(--ease-out) 0.05s both;
+    will-change: opacity, transform;
   }
 
   :is([data-anim="hero"], [data-anim="scroll"]) {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translate3d(0, var(--reveal-y), 0);
     transition:
-      opacity 0.9s var(--ease-out),
-      transform 0.9s var(--ease-out);
+      opacity var(--duration-reveal) var(--ease-out) var(--reveal-delay, 0ms),
+      transform var(--duration-reveal) var(--ease-out) var(--reveal-delay, 0ms);
+  }
+
+  :is([data-anim="hero"], [data-anim="scroll"]):not(.in-view) {
+    will-change: opacity, transform;
   }
 
   :is([data-anim="hero"], [data-anim="scroll"]).in-view {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
+    will-change: auto;
   }
 
   [data-anim="rule"] {
     transform: scaleX(0);
-    transition: transform 1s var(--ease-out);
+    transform-origin: left center;
+    transition: transform var(--duration-reveal) var(--ease-out) var(--reveal-delay, 0ms);
   }
   [data-anim="rule"].in-view { transform: scaleX(1); }
-}
 
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  :is([data-anim], .hero-img, .pdp-main) {
+  :is([data-stagger], [data-reveal-group]) > * {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-y), 0);
+    transition:
+      opacity var(--duration-reveal) var(--ease-out),
+      transform var(--duration-reveal) var(--ease-out);
     will-change: opacity, transform;
+  }
+  :is([data-stagger], [data-reveal-group]).in-view > * {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  :is([data-anim], .hero-img, .pdp-main) {
+  :is(.hero-img, .pdp-main, [data-anim="hero"], [data-anim="scroll"], [data-anim="rule"]),
+  :is([data-stagger], [data-reveal-group]) > * {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
     clip-path: none !important;
+  }
+
+  :is(.pc-primary, .pc-open, .btn-outline::before, .muted-link::after, .nav, .menu-bar, .chapter-img-wrap img) {
+    transition: none !important;
+  }
+  :is(.pc-link:hover .pc-primary, .pc-link:hover .pc-open, .chapter:hover .chapter-img-wrap img) {
+    transform: none !important;
   }
 }
