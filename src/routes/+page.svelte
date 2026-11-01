@@ -33,8 +33,8 @@
   <div class="hero-shade"></div>
   <div class="hero-frame wrap">
     <div class="hero-top" data-anim="hero" data-delay="0.2">
-      <span class="label ot-secondary">Voidhaus — {SITE.season}</span>
-      <span class="label ot-secondary">Index 001—012</span>
+      <span class="label ot-secondary">Index — {SITE.season}</span>
+      <span class="label ot-secondary">Twelve objects</span>
     </div>
     <div class="hero-bottom">
       <p class="label ot-muted hero-line" data-anim="hero" data-delay="0.3">

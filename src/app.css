@@ -386,6 +386,10 @@
     box-shadow: 0 0 0 1px var(--color-rule);
   }
   .index-grid > :first-child { grid-column: span 2; }
+  @media (max-width: 899px) {
+    /* Fill the final row when the index ends on a single card. */
+    .index-grid > :last-child:nth-child(even) { grid-column: span 2; }
+  }
 
   @media (min-width: 900px) {
     .index-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
