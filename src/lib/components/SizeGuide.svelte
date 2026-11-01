@@ -3,6 +3,7 @@
   import { fade } from "svelte/transition";
   import { SITE } from "#lib/data/site.js";
   import { createModal, panelIn } from "#lib/utils/modal.js";
+  import { prefersReducedMotion } from "#lib/utils/motion.js";
 
   interface Props {
     category?: "Clothing" | "Footwear";
@@ -60,7 +61,7 @@
     role="presentation"
     aria-hidden="true"
     onclick={closeModal}
-    transition:fade={{ duration: 450 }}
+    transition:fade={{ duration: prefersReducedMotion() ? 0 : 450 }}
   ></div>
 
   <div
@@ -71,7 +72,7 @@
     tabindex="-1"
     bind:this={panelEl}
     in:panelIn={{ y: 0.75, scale: true }}
-    out:fade={{ duration: 300 }}
+    out:fade={{ duration: prefersReducedMotion() ? 0 : 300 }}
   >
     <div class="sg-head">
       <h2 class="label sg-title" id="sg-title">Size Guide</h2>
@@ -158,9 +159,9 @@
     background: none; border: none;
     border-bottom: 1px solid var(--color-rule);
     padding-bottom: 0.1rem;
-    transition: opacity var(--duration-fast), border-color var(--duration-fast);
+    transition: color var(--duration-fast), border-color var(--duration-fast);
   }
-  .sg-btn:hover { opacity: 1; border-bottom-color: var(--color-ink); }
+  .sg-btn:hover { color: var(--color-ink); border-bottom-color: var(--color-ink); }
 
   .sg-panel {
     position: fixed; inset-inline: var(--spacing-md); top: 50%; translate: 0 -50%;
@@ -169,7 +170,7 @@
     z-index: 501;
     display: flex; flex-direction: column;
     max-height: 85svh;
-    border: 1px solid var(--color-soft);
+    border: 1px solid var(--color-rule);
   }
   @media (min-width: 640px) { .sg-panel { inset-inline: var(--spacing-xl); } }
 
@@ -189,14 +190,14 @@
     line-height: 1.7; color: var(--color-soft);
   }
 
-  .sg-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); border: 1px solid var(--color-soft); }
+  .sg-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); border: 1px solid var(--color-rule); }
   .sg-table th {
     text-align: left; padding: var(--spacing-sm) var(--spacing-md);
-    border-bottom: 1px solid var(--color-soft);
-    background: var(--color-surface); font-size: var(--text-xs); opacity: var(--op-muted);
+    border-bottom: 1px solid var(--color-rule);
+    background: var(--color-surface); color: var(--color-muted); font-size: var(--text-xs);
   }
   .sg-table td {
-    padding: 0.875rem var(--spacing-md); border-bottom: 1px solid var(--color-soft);
+    padding: 0.875rem var(--spacing-md); border-bottom: 1px solid var(--color-rule);
     font-variation-settings: var(--fw-normal); color: var(--color-soft);
   }
   .sg-table tr:last-child td { border-bottom: none; }
@@ -205,10 +206,10 @@
 
   .sg-note-block {
     display: flex; flex-direction: column; gap: var(--spacing-sm);
-    padding-top: var(--spacing-md); border-top: 1px solid var(--color-soft);
+    padding-top: var(--spacing-md); border-top: 1px solid var(--color-rule);
   }
   .sg-link {
-    color: var(--color-ink); border-bottom: 1px solid var(--color-soft);
+    color: var(--color-ink); border-bottom: 1px solid var(--color-rule);
     transition: border-color var(--duration-fast);
   }
   .sg-link:hover { border-bottom-color: var(--color-ink); }

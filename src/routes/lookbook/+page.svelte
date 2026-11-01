@@ -36,10 +36,6 @@
 
 <PageHeader label={SITE.season} title="Lookbook" />
 
-<div class="wrap">
-  <div class="rule"></div>
-</div>
-
 <div class="flex flex-col">
   {#each chapters as chapter, index (chapter.id)}
     {@const image = productImage(chapter.product.img)}
@@ -103,6 +99,12 @@
   @media (min-width: 768px) {
     .chapter { display: grid; grid-template-columns: 1fr 1fr; }
     .chapter.odd .chapter-img-wrap { order: 1; }
-    .chapter-img-wrap { aspect-ratio: auto; height: 100%; max-height: 80svh; }
+    .chapter-img-wrap {
+      width: 100%;
+      margin-inline: 0;
+      aspect-ratio: auto;
+      height: 100%;
+      max-height: 80svh;
+    }
   }
 </style>

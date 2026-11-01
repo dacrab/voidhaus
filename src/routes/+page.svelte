@@ -82,7 +82,7 @@
   </div>
 </section>
 
-<CTAStrip label="Press & Inquiries" linkText={SITE.email.studio} href="/contact" />
+<CTAStrip label="Press & Inquiries" linkText="Contact" href="/contact" />
 
 <style>
   .hero {

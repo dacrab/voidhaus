@@ -88,10 +88,6 @@
 
 <PageHeader label={product.num} title={product.name} aside={product.category} />
 
-<div class="wrap">
-  <div class="rule"></div>
-</div>
-
 <section class="wrap py-2xl md:py-3xl">
   <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl">
     <div class="pdp-images">
@@ -162,8 +158,6 @@
       <div class="pt-lg" data-anim="hero" data-delay="0.4">
         <button
           class="btn-outline"
-          class:muted={!selectedSize || allSoldOut}
-          class:cursor-not-allowed={!selectedSize || allSoldOut}
           type="button"
           onclick={addToCart}
           disabled={!selectedSize || allSoldOut}
@@ -192,10 +186,48 @@
       <a href="/collection" class="label muted muted-link">All pieces →</a>
     </div>
     <div class="rule"></div>
-    <div class="product-grid">
+    <div class="product-grid" data-anim="scroll">
       {#each related as item (item.slug)}
         <ProductCard product={item} />
       {/each}
+      {#if related.length < 3}
+        <a
+          class="related-more {related.length === 1 ? 'flex' : 'hidden md:flex'}"
+          class:related-more--wide={related.length === 1}
+          href="/collection"
+          aria-label="Explore the full collection"
+        >
+          <span class="label muted">The full edit</span>
+          <span class="serif text-xl md:text-3xl fw-light related-more-title hidden md:block">
+            Twelve pieces.<br />One position.
+          </span>
+          <span class="label related-more-link">View all →</span>
+        </a>
+      {/if}
     </div>
   </section>
 {/if}
+
+<style>
+  .related-more {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl);
+    background: var(--color-surface);
+    transition: background var(--duration-base) ease;
+  }
+  .related-more-title {
+    color: var(--color-soft);
+    line-height: 1.25;
+    transition: color var(--duration-base) ease;
+  }
+  .related-more-link { color: var(--color-ink); }
+  .related-more:hover { background: var(--color-canvas); }
+  .related-more:hover .related-more-title { color: var(--color-ink); }
+  @media (min-width: 768px) {
+    .related-more--wide { grid-column: span 2; }
+  }
+</style>

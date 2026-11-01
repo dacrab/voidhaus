@@ -5,6 +5,7 @@
   import { cart } from "#lib/stores/cart.svelte.js";
   import { cartItemKey } from "#lib/utils/cart.js";
   import { createModal, slideIn } from "#lib/utils/modal.js";
+  import { prefersReducedMotion } from "#lib/utils/motion.js";
   import { CheckoutResponseSchema } from "#lib/utils/schemas.js";
 
   const modal = createModal();
@@ -71,7 +72,7 @@
     class="backdrop cart-backdrop"
     role="presentation"
     onclick={closeCart}
-    transition:fade={{ duration: 450 }}
+    transition:fade={{ duration: prefersReducedMotion() ? 0 : 450 }}
   ></div>
 
   <div
@@ -174,8 +175,8 @@
     gap: var(--spacing-xl); padding: var(--spacing-2xl) var(--spacing-lg); text-align: center;
   }
   .empty-msg  { font-size: var(--text-base); font-variation-settings: var(--fw-normal); color: var(--color-soft); }
-  .empty-link { color: var(--color-ink); opacity: var(--op-muted); transition: opacity var(--duration-fast); border-bottom: 1px solid var(--color-rule); }
-  .empty-link:hover { opacity: 1; }
+  .empty-link { color: var(--color-muted); transition: color var(--duration-fast); border-bottom: 1px solid var(--color-rule); }
+  .empty-link:hover { color: var(--color-ink); }
 
   .items {
     flex: 1; overflow-y: auto; list-style: none;
@@ -218,9 +219,9 @@
   .total-row  { display: flex; align-items: baseline; justify-content: space-between; padding-block: var(--spacing-xs); }
   .total      { font-size: var(--text-xl); font-style: italic; font-variation-settings: var(--fw-medium); color: var(--color-ink); }
 
-  .item-size  { opacity: var(--op-muted); text-transform: none; letter-spacing: var(--ls-wide); }
-  .item-price { opacity: var(--op-muted); }
-  .ship-note  { text-align: center; opacity: var(--op-disabled); letter-spacing: var(--ls-wide); }
+  .item-size  { color: var(--color-muted); text-transform: none; letter-spacing: var(--ls-wide); }
+  .item-price { color: var(--color-muted); }
+  .ship-note  { text-align: center; color: var(--color-muted); letter-spacing: var(--ls-wide); }
 
   .checkout-btn {
     width: 100%; background: var(--color-ink); color: var(--color-canvas);
