@@ -20,7 +20,6 @@
     "lint:fix": "biome check . --write"
   },
   "dependencies": {
-    "@fontsource-variable/cormorant": "^5.2.8",
     "@fontsource-variable/space-grotesk": "^5.2.10",
     "@sentry/sveltekit": "^11.8.0",
     "convex": "^1.42.1",

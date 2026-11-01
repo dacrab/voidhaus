@@ -25,10 +25,10 @@ describe("filterProducts", () => {
   });
 
   it("combines category and search", () => {
-    const result = filterProducts(PRODUCTS, "wool", "Tailoring");
+    const result = filterProducts(PRODUCTS, "cashmere", "Outerwear");
     expect(result.length).toBeGreaterThan(0);
-    expect(result.every((p) => p.category === "Tailoring")).toBe(true);
-    expect(result.every((p) => p.material.toLowerCase().includes("wool"))).toBe(true);
+    expect(result.every((p) => p.category === "Outerwear")).toBe(true);
+    expect(result.every((p) => p.material.toLowerCase().includes("cashmere"))).toBe(true);
   });
 
   it("returns empty array when nothing matches", () => {

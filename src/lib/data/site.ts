@@ -1,7 +1,7 @@
 export const SITE = {
   name: "VOIDHAUS",
   season: "SS 2026",
-  tagline: "Dark luxury fashion. Twelve pieces. Four ateliers. One position.",
+  tagline: "Twelve objects for the body and the room. No season. One position.",
   email: {
     studio: "studio@voidhaus.com",
     press: "press@voidhaus.com",
@@ -10,8 +10,8 @@ export const SITE = {
   hours: "Mon – Fri, 10:00 – 18:00 CET",
   ateliers: [
     { city: "Milan", specialty: "Outerwear" },
-    { city: "Antwerp", specialty: "Tailoring" },
+    { city: "Antwerp", specialty: "Body" },
     { city: "Florence", specialty: "Leather" },
-    { city: "Tokyo", specialty: "Textiles" },
+    { city: "Tokyo", specialty: "Jersey" },
   ],
 } as const;

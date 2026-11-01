@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    { "source": "/product/ash-trousers", "destination": "/product/net-body", "permanent": true },
+    { "source": "/product/bone-shirt", "destination": "/product/readymade-chair", "permanent": true },
+    { "source": "/product/cashmere-knit", "destination": "/product/veil-hood", "permanent": true },
+    { "source": "/product/dark-layer-coat", "destination": "/product/foundation-set", "permanent": true },
+    { "source": "/product/eclipse-boots", "destination": "/product/mirage-dress", "permanent": true },
+    { "source": "/product/shadow-dress", "destination": "/product/second-skin", "permanent": true },
+    { "source": "/product/silk-slip", "destination": "/product/null-tee", "permanent": true },
+    { "source": "/product/void-belt", "destination": "/product/skin-suit", "permanent": true },
+    { "source": "/product/void-tote", "destination": "/product/void-parfum", "permanent": true },
+    { "source": "/product/wool-trousers", "destination": "/product/fallen-harness", "permanent": true }
+  ]
+}

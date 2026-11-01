@@ -5,12 +5,6 @@
   import { createModal, panelIn } from "#lib/utils/modal.js";
   import { prefersReducedMotion } from "#lib/utils/motion.js";
 
-  interface Props {
-    category?: "Clothing" | "Footwear";
-  }
-
-  let { category = "Clothing" }: Props = $props();
-
   const modal = createModal();
 
   const clothing = [
@@ -19,15 +13,6 @@
     { size: "M", it: "40", fr: "40", uk: "12", us: "8", chest: "90–93", waist: "70–73" },
     { size: "L", it: "42", fr: "42", uk: "14", us: "10", chest: "94–97", waist: "74–77" },
     { size: "XL", it: "44", fr: "44", uk: "16", us: "12", chest: "98–101", waist: "78–81" },
-  ];
-
-  const shoes = [
-    { eu: "39", uk: "6", us: "7", cm: "25.0" },
-    { eu: "40", uk: "6.5", us: "7.5", cm: "25.5" },
-    { eu: "41", uk: "7", us: "8", cm: "26.0" },
-    { eu: "42", uk: "8", us: "9", cm: "26.5" },
-    { eu: "43", uk: "9", us: "10", cm: "27.5" },
-    { eu: "44", uk: "10", us: "11", cm: "28.0" },
   ];
 
   let open = $state(false);
@@ -86,59 +71,34 @@
         Measurements in centimetres.
       </p>
 
-      {#if category === "Footwear"}
-        <div class="sg-scroll">
-          <table class="sg-table">
-            <thead>
+      <div class="sg-scroll">
+        <table class="sg-table">
+          <thead>
+            <tr>
+              <th class="label" scope="col">Size</th>
+              <th class="label" scope="col">IT/EU</th>
+              <th class="label" scope="col">FR</th>
+              <th class="label" scope="col">UK</th>
+              <th class="label" scope="col">US</th>
+              <th class="label" scope="col">Chest</th>
+              <th class="label" scope="col">Waist</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each clothing as row (row.size)}
               <tr>
-                <th class="label" scope="col">EU</th>
-                <th class="label" scope="col">UK</th>
-                <th class="label" scope="col">US</th>
-                <th class="label" scope="col">CM</th>
+                <td class="td-main">{row.size}</td>
+                <td>{row.it}</td>
+                <td>{row.fr}</td>
+                <td>{row.uk}</td>
+                <td>{row.us}</td>
+                <td>{row.chest}</td>
+                <td>{row.waist}</td>
               </tr>
-            </thead>
-            <tbody>
-              {#each shoes as row (row.eu)}
-                <tr>
-                  <td class="td-main">{row.eu}</td>
-                  <td>{row.uk}</td>
-                  <td>{row.us}</td>
-                  <td>{row.cm}</td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        </div>
-      {:else}
-        <div class="sg-scroll">
-          <table class="sg-table">
-            <thead>
-              <tr>
-                <th class="label" scope="col">Size</th>
-                <th class="label" scope="col">IT/EU</th>
-                <th class="label" scope="col">FR</th>
-                <th class="label" scope="col">UK</th>
-                <th class="label" scope="col">US</th>
-                <th class="label" scope="col">Chest</th>
-                <th class="label" scope="col">Waist</th>
-              </tr>
-            </thead>
-            <tbody>
-              {#each clothing as row (row.size)}
-                <tr>
-                  <td class="td-main">{row.size}</td>
-                  <td>{row.it}</td>
-                  <td>{row.fr}</td>
-                  <td>{row.uk}</td>
-                  <td>{row.us}</td>
-                  <td>{row.chest}</td>
-                  <td>{row.waist}</td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        </div>
-      {/if}
+            {/each}
+          </tbody>
+        </table>
+      </div>
 
       <div class="sg-note-block">
         <span class="label muted">Fit note</span>
