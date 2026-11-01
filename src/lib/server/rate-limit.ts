@@ -1,9 +1,8 @@
-// Rate limiting behind a small store interface. Uses Upstash Redis REST
-// (fixed-window INCR + EXPIRE NX) when UPSTASH_REDIS_REST_URL and
-// UPSTASH_REDIS_REST_TOKEN are set; otherwise falls back to an in-memory
-// sliding window that is per serverless instance. Store errors fail open with
-// a once-per-process warning.
+// Rate limiting behind a small store interface. Upstash Redis REST is used when
+// configured; otherwise an in-memory window is kept per serverless instance.
+// Store failures fail open with a once-per-process warning.
 const WINDOW_MS = 60_000;
+const MAX_TRACKED_KEYS = 10_000;
 
 export interface RateLimitStore {
   /** Record a hit and return the number of hits inside the current window. */
@@ -11,16 +10,24 @@ export interface RateLimitStore {
 }
 
 export class MemoryStore implements RateLimitStore {
-  private readonly hits = new Map<string, number[]>();
+  readonly #hits = new Map<string, number[]>();
 
   constructor(private readonly windowMs: number) {}
 
   async hit(key: string): Promise<number> {
     const now = Date.now();
-    const recent = (this.hits.get(key) ?? []).filter((t) => now - t < this.windowMs);
+    const recent = (this.#hits.get(key) ?? []).filter((time) => now - time < this.windowMs);
     recent.push(now);
-    this.hits.set(key, recent);
+    this.#hits.set(key, recent);
+    if (this.#hits.size > MAX_TRACKED_KEYS) this.#prune(now);
     return recent.length;
+  }
+
+  #prune(now: number): void {
+    for (const [key, times] of this.#hits) {
+      if (times.some((time) => now - time < this.windowMs)) continue;
+      this.#hits.delete(key);
+    }
   }
 }
 
@@ -40,21 +47,16 @@ export class UpstashRestStore implements RateLimitStore {
         Authorization: `Bearer ${this.token}`,
         "Content-Type": "application/json",
       },
-      // EXPIRE NX gives the counter a TTL exactly once, so INCR+EXPIRE forms a
-      // fixed window in a single round trip.
+      // INCR + EXPIRE NX forms a fixed window in a single round trip.
       body: JSON.stringify([
         ["INCR", key],
         ["EXPIRE", key, seconds, "NX"],
       ]),
     });
-    if (!response.ok) {
-      throw new Error(`Upstash REST responded ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Upstash REST responded ${response.status}`);
+
     const results: unknown = await response.json();
-    if (!Array.isArray(results) || results.length === 0) {
-      throw new Error("Unexpected Upstash REST pipeline response");
-    }
-    const first: unknown = results[0];
+    const first: unknown = Array.isArray(results) ? results[0] : undefined;
     if (typeof first !== "object" || first === null || !("result" in first) || typeof first.result !== "number") {
       throw new Error("Unexpected Upstash REST pipeline response");
     }
@@ -69,14 +71,14 @@ export function getStoreFromEnv(env: NodeJS.ProcessEnv = process.env): RateLimit
 
 let warnedStoreFailure = false;
 
-async function check(store: RateLimitStore, key: string, max: number): Promise<boolean> {
+async function withinLimit(store: RateLimitStore, key: string, max: number): Promise<boolean> {
   try {
     return (await store.hit(key)) <= max;
-  } catch (err) {
+  } catch (error) {
     if (!warnedStoreFailure) {
       warnedStoreFailure = true;
-      // biome-ignore lint/suspicious/noConsole: store outage warning belongs in server logs (once per process)
-      console.warn("[rate-limit] store unavailable, failing open:", err);
+      // biome-ignore lint/suspicious/noConsole: store outage warning belongs in server logs
+      console.warn("[rate-limit] store unavailable, failing open:", error);
     }
     return true;
   }
@@ -84,19 +86,18 @@ async function check(store: RateLimitStore, key: string, max: number): Promise<b
 
 const store = getStoreFromEnv();
 
-/** Testable seam: same policy as `limited` against an injected store. */
+/** Testable seam: same policy as `isRateLimited` against an injected store. */
 export function limitWithStore(store: RateLimitStore, key: string, max: number): Promise<boolean> {
-  return check(store, key, max);
+  return withinLimit(store, key, max);
 }
 
 export function clientIp(request: Request): string {
-  const xff = request.headers.get("x-forwarded-for");
-  if (!xff) return "unknown";
-  const parts = xff.split(",");
-  const last = parts[parts.length - 1];
-  return last?.trim() ?? "unknown";
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (!forwardedFor) return "unknown";
+  const parts = forwardedFor.split(",");
+  return parts[parts.length - 1]?.trim() ?? "unknown";
 }
 
-export async function limited(request: Request, bucket: string, max: number): Promise<boolean> {
-  return !(await check(store, `${bucket}:${clientIp(request)}`, max));
+export async function isRateLimited(request: Request, bucket: string, max: number): Promise<boolean> {
+  return !(await withinLimit(store, `${bucket}:${clientIp(request)}`, max));
 }

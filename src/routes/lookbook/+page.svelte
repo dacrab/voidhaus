@@ -1,13 +1,32 @@
 <script lang="ts">
-  import { IMAGES } from '#lib/data/images.js';
-  import { SITE } from '#lib/data/site.js';
-  import PageHeader from '#lib/components/PageHeader.svelte';
-  import CTAStrip from '#lib/components/CTAStrip.svelte';
+  import CTAStrip from "#lib/components/CTAStrip.svelte";
+  import PageHeader from "#lib/components/PageHeader.svelte";
+  import { requireProduct } from "#lib/data/products.js";
+  import { SITE } from "#lib/data/site.js";
+  import { productImage } from "#lib/images.js";
 
   const chapters = [
-    { id: 'coat', title: 'The Coat', subtitle: 'Obsidian Coat — No. 001', num: '01', img: IMAGES['coat-primary'], text: 'A coat you never take off indoors. Double-faced cashmere, American shoulders, self-belt at the waist. It marks the threshold between the world and your body.' },
-    { id: 'trousers', title: 'The Trouser', subtitle: 'Ash Trousers — No. 003', num: '02', img: IMAGES['trousers-primary'], text: 'Wide-leg wool gabardine that falls from the hip without grabbing. Pressed crease, slash pockets, extended tab. The trouser as architecture.' },
-    { id: 'boots', title: 'The Boot', subtitle: 'Eclipse Boots — No. 012', num: '03', img: IMAGES['boots-primary'], text: 'Knee-high in matte calfskin. Stacked heel, elastic side panels. The leather will mark — that is the finish. Wear becomes surface.' },
+    {
+      id: "coat",
+      title: "The Coat",
+      num: "01",
+      product: requireProduct("obsidian-coat"),
+      text: "A coat you never take off indoors. Double-faced cashmere, American shoulders, self-belt at the waist. It marks the threshold between the world and your body.",
+    },
+    {
+      id: "trousers",
+      title: "The Trouser",
+      num: "02",
+      product: requireProduct("ash-trousers"),
+      text: "Wide-leg wool gabardine that falls from the hip without grabbing. Pressed crease, slash pockets, extended tab. The trouser as architecture.",
+    },
+    {
+      id: "boots",
+      title: "The Boot",
+      num: "03",
+      product: requireProduct("eclipse-boots"),
+      text: "Knee-high in matte calfskin. Stacked heel, elastic side panels. The leather will mark — that is the finish. Wear becomes surface.",
+    },
   ];
 </script>
 
@@ -22,17 +41,20 @@
 </div>
 
 <div class="flex flex-col">
-  {#each chapters as chapter, i}
-    <section class="chapter" data-anim="scroll" class:odd={i % 2 !== 0}>
+  {#each chapters as chapter, index (chapter.id)}
+    {@const image = productImage(chapter.product.img)}
+    <section class="chapter" data-anim="scroll" class:odd={index % 2 !== 0}>
       <div class="chapter-img-wrap">
         <img
-          class="js-img w-full h-full object-cover"
-          src={chapter.img}
-          alt="{chapter.title} — {chapter.subtitle}"
+          class="w-full h-full object-cover"
+          src={image.src}
+          srcset={image.srcset}
+          sizes="(min-width: 768px) 50vw, 100vw"
+          alt="{chapter.title} — {chapter.product.name} — No. {chapter.product.num}"
           loading="lazy"
           decoding="async"
-          width="1800"
-          height="1013"
+          width="1200"
+          height="1800"
         />
         <div class="chapter-num" aria-hidden="true">{chapter.num}</div>
       </div>
@@ -40,11 +62,11 @@
         <div class="flex flex-col gap-sm max-w-[56ch]">
           <div class="chapter-progress">
             <span class="label muted">Chapter</span>
-            {#each chapters as _, ci}
-              <span class="dot" class:active={ci === i} aria-hidden="true"></span>
+            {#each chapters as other, dotIndex (other.id)}
+              <span class="dot" class:active={dotIndex === index} aria-hidden="true"></span>
             {/each}
           </div>
-          <span class="label muted" style="margin-top: var(--spacing-xs)">{chapter.subtitle}</span>
+          <span class="label muted pt-xs">{chapter.product.name} — No. {chapter.product.num}</span>
           <h2 class="serif text-3xl md:text-4xl fw-light leading-[1.1]">{chapter.title}</h2>
           <p class="text-soft leading-[1.85] pt-sm max-w-[48ch]">{chapter.text}</p>
         </div>

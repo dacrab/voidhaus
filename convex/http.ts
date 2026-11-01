@@ -6,10 +6,9 @@ import { httpAction } from "./_generated/server";
 interface FulfillPayload {
   sessionId: string;
   paymentIntentId: string;
-  customerEmail?: string;
+  customerEmail: string;
   couponId?: Id<"coupons">;
   items: Array<{
-    productId: Id<"products">;
     slug: string;
     name: string;
     price: number;
@@ -17,7 +16,7 @@ interface FulfillPayload {
     quantity: number;
   }>;
   total: number;
-  discount?: number;
+  discount: number;
   shippingAddress?: {
     name: string;
     line1: string;
@@ -29,25 +28,41 @@ interface FulfillPayload {
   };
 }
 
-function isFulfillPayload(body: unknown): body is FulfillPayload {
-  if (typeof body !== "object" || body === null) return false;
-  const b = body as Record<string, unknown>;
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isOrderItem(value: unknown): boolean {
+  if (!isRecord(value)) return false;
   return (
-    typeof b.sessionId === "string" &&
-    typeof b.paymentIntentId === "string" &&
-    typeof b.total === "number" &&
-    Array.isArray(b.items) &&
-    b.items.length > 0 &&
-    (b.customerEmail === undefined || typeof b.customerEmail === "string") &&
-    (b.couponId === undefined || typeof b.couponId === "string") &&
-    (b.discount === undefined || typeof b.discount === "number") &&
-    (b.shippingAddress === undefined || typeof b.shippingAddress === "object")
+    typeof value.slug === "string" &&
+    typeof value.name === "string" &&
+    typeof value.price === "number" &&
+    typeof value.size === "string" &&
+    typeof value.quantity === "number"
   );
 }
 
-// Called only by our own server route (api/webhook) AFTER it has verified the
-// Stripe signature there. This shared-secret gate keeps order writes unreachable
-// from the public Convex API surface.
+function isFulfillPayload(body: unknown): body is FulfillPayload {
+  if (!isRecord(body)) return false;
+
+  return (
+    typeof body.sessionId === "string" &&
+    typeof body.paymentIntentId === "string" &&
+    typeof body.customerEmail === "string" &&
+    typeof body.total === "number" &&
+    typeof body.discount === "number" &&
+    Array.isArray(body.items) &&
+    body.items.length > 0 &&
+    body.items.every(isOrderItem) &&
+    (body.couponId === undefined || typeof body.couponId === "string") &&
+    (body.shippingAddress === undefined || isRecord(body.shippingAddress))
+  );
+}
+
+// Called only by our own server route (/api/webhook) after it has verified the
+// Stripe signature. This shared-secret gate keeps order writes unreachable from
+// the public Convex API surface.
 const fulfill = httpAction(async (ctx, request) => {
   const secret = process.env.INTERNAL_WEBHOOK_SECRET;
   const provided = request.headers.get("x-internal-secret");
@@ -61,25 +76,20 @@ const fulfill = httpAction(async (ctx, request) => {
   } catch {
     return new Response("Invalid JSON", { status: 400 });
   }
+
   if (!isFulfillPayload(body)) {
     return new Response("Invalid payload", { status: 400 });
   }
 
-  await ctx.runMutation(internal.orders.create, {
-    stripeSessionId: body.sessionId,
-    customerEmail: body.customerEmail ?? "",
-    items: body.items,
-    total: body.total,
-    ...(body.discount !== undefined ? { discount: body.discount } : {}),
-    currency: "eur",
-  });
-
   await ctx.runMutation(internal.orders.fulfill, {
     stripeSessionId: body.sessionId,
     stripePaymentIntentId: body.paymentIntentId,
-    ...(body.customerEmail !== undefined ? { customerEmail: body.customerEmail } : {}),
-    ...(body.couponId !== undefined ? { couponId: body.couponId } : {}),
-    ...(body.shippingAddress !== undefined ? { shippingAddress: body.shippingAddress } : {}),
+    customerEmail: body.customerEmail,
+    items: body.items,
+    total: body.total,
+    discount: body.discount,
+    ...(body.couponId ? { couponId: body.couponId } : {}),
+    ...(body.shippingAddress ? { shippingAddress: body.shippingAddress } : {}),
   });
 
   return new Response(JSON.stringify({ received: true }), {

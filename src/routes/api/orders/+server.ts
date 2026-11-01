@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { api } from "#convex/api.js";
-import { limited } from "#lib/server/rate-limit.js";
+import { isRateLimited } from "#lib/server/rate-limit.js";
 import { getConvex } from "#lib/utils/api.js";
 import type { RequestHandler } from "./$types";
 
@@ -13,38 +13,24 @@ const SessionSchema = z.object({
 });
 
 export const POST: RequestHandler = async ({ request }) => {
-  if (await limited(request, "orders", 30)) {
+  if (await isRateLimited(request, "orders", 30)) {
     return Response.json({ error: "Too many requests" }, { status: 429 });
   }
-  const convex = getConvex();
+
   try {
-    const raw = await request.json();
-    const parsed = SessionSchema.safeParse(raw);
+    const parsed = SessionSchema.safeParse(await request.json());
     if (!parsed.success) {
       return Response.json({ error: "A checkout session id is required" }, { status: 400 });
     }
 
-    const orders = await convex.query(api.orders.getBySession, {
+    const orders = await getConvex().query(api.orders.getBySession, {
       sessionId: parsed.data.sessionId,
     });
 
-    return Response.json(
-      {
-        orders: orders.map((o) => ({
-          id: o.id,
-          items: o.items,
-          total: o.total,
-          discount: o.discount,
-          currency: o.currency,
-          status: o.status,
-          createdAt: o.createdAt,
-        })),
-      },
-      { status: 200 },
-    );
-  } catch (err) {
+    return Response.json({ orders }, { status: 200 });
+  } catch (error) {
     // biome-ignore lint/suspicious/noConsole: order lookup failures surface in server logs
-    console.error("Order lookup failed:", err);
+    console.error("Order lookup failed:", error);
     return Response.json({ error: "Something went wrong" }, { status: 500 });
   }
 };

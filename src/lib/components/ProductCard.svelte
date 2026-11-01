@@ -1,34 +1,36 @@
 <script lang="ts">
-  import { IMAGES } from '#lib/data/images.js';
-  import { formatPrice } from '#lib/utils/cart.js';
+  import { formatPrice } from "#lib/format.js";
+  import type { Product } from "#lib/data/products.js";
+  import { productImage } from "#lib/images.js";
 
   interface Props {
-    slug: string;
-    num: string;
-    name: string;
-    price: number;
-    img: string;
-    img2?: string;
-    category?: string;
+    product: Product;
   }
 
-  let { slug, num, name, price, img, img2, category }: Props = $props();
+  let { product }: Props = $props();
+
+  const image = $derived(productImage(product.img));
+  const altImage = $derived(product.img2 ? productImage(product.img2) : undefined);
 </script>
 
-<article class="pc" data-category={category}>
-  <a class="block" href="/product/{slug}" aria-label="{name} — € {formatPrice(price)}">
-    <div class="pc-media relative aspect-[3/4] overflow-hidden bg-off">
+<article class="pc">
+  <a class="block" href="/product/{product.slug}" aria-label="{product.name} — € {formatPrice(product.price)}">
+    <div class="pc-media relative aspect-[3/4] overflow-hidden bg-surface">
       <img
         class="pc-img pc-primary"
-        src={IMAGES[img]}
-        alt={name}
+        src={image.src}
+        srcset={image.srcset}
+        sizes="(min-width: 1024px) 33vw, 50vw"
+        alt={product.name}
         loading="lazy"
         decoding="async"
       />
-      {#if img2 && IMAGES[img2]}
+      {#if altImage}
         <img
           class="pc-img pc-alt absolute inset-0 opacity-0 pointer-events-none"
-          src={IMAGES[img2]}
+          src={altImage.src}
+          srcset={altImage.srcset}
+          sizes="(min-width: 1024px) 33vw, 50vw"
           alt=""
           loading="lazy"
           decoding="async"
@@ -42,20 +44,17 @@
     </div>
     <div class="card-info">
       <div class="card-info-l">
-        <span class="label muted">{num}</span>
-        <span class="card-name">{name}</span>
-        {#if category}
-          <span class="label muted">{category}</span>
-        {/if}
+        <span class="label muted">{product.num}</span>
+        <span class="card-name">{product.name}</span>
+        <span class="label muted">{product.category}</span>
       </div>
-      <span class="label muted card-price">€ {formatPrice(price)}</span>
+      <span class="label muted card-price">€ {formatPrice(product.price)}</span>
     </div>
   </a>
 </article>
 
 <style>
   .pc {
-    transition: opacity 0.5s ease, transform 0.5s ease;
     position: relative;
   }
   .pc-img {

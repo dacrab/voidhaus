@@ -3,14 +3,13 @@ node_modules/
 
 # build output
 .vercel/
-
-# sveltekit
 .svelte-kit/
 build/
 
 # environment
 .env
 .env.*
+!.env.example
 
 # logs
 npm-debug.log*
@@ -27,7 +26,3 @@ pnpm-debug.log*
 
 # convex
 .convex/
-convex/_generated/
-
-# generated build artifacts
-static/sitemap.xml

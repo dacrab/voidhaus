@@ -2,32 +2,21 @@ import { ConvexHttpClient } from "convex/browser";
 import Stripe from "stripe";
 import { CONVEX_URL, STRIPE_SECRET_KEY } from "$app/env/private";
 
-let _convex: ConvexHttpClient | null = null;
-let _stripe: Stripe | null = null;
-
-export interface OrderItem {
-  productId?: string;
-  slug: string;
-  name: string;
-  price: number;
-  size: string;
-  quantity: number;
-}
+let convexClient: ConvexHttpClient | null = null;
+let stripeClient: Stripe | null = null;
 
 export function getConvex(): ConvexHttpClient {
-  if (!_convex) {
-    const url = CONVEX_URL;
-    if (!url) throw new Error("CONVEX_URL is not configured");
-    _convex = new ConvexHttpClient(url);
+  if (!convexClient) {
+    if (!CONVEX_URL) throw new Error("CONVEX_URL is not configured");
+    convexClient = new ConvexHttpClient(CONVEX_URL);
   }
-  return _convex;
+  return convexClient;
 }
 
 export function getStripe(): Stripe {
-  if (!_stripe) {
-    const key = STRIPE_SECRET_KEY;
-    if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
-    _stripe = new Stripe(key);
+  if (!stripeClient) {
+    if (!STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is not configured");
+    stripeClient = new Stripe(STRIPE_SECRET_KEY);
   }
-  return _stripe;
+  return stripeClient;
 }

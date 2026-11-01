@@ -1,48 +1,38 @@
-export const CART_KEY = "vh-cart";
+import { z } from "zod";
 
-export interface CartItem {
-  slug: string;
-  name: string;
-  price: number;
-  size: string;
-  img: string;
-  num: string;
+export const CART_STORAGE_KEY = "vh-cart";
+
+const CartItemSchema = z.object({
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  price: z.number().nonnegative(),
+  size: z.string().min(1),
+  img: z.string().min(1),
+  num: z.string().min(1),
+});
+
+export type CartItem = z.infer<typeof CartItemSchema>;
+
+const CartItemsSchema = z.array(CartItemSchema);
+
+export function cartItemKey(item: Pick<CartItem, "slug" | "size">): string {
+  return `${item.slug}\u0000${item.size}`;
 }
 
-export function isValidCartItem(v: unknown): v is CartItem {
-  return (
-    typeof v === "object" &&
-    v !== null &&
-    typeof (v as CartItem).slug === "string" &&
-    typeof (v as CartItem).name === "string" &&
-    typeof (v as CartItem).price === "number" &&
-    (v as CartItem).price >= 0 &&
-    typeof (v as CartItem).size === "string" &&
-    typeof (v as CartItem).img === "string" &&
-    typeof (v as CartItem).num === "string"
-  );
+function defaultStorage(): Storage | undefined {
+  return typeof localStorage === "undefined" ? undefined : localStorage;
 }
 
-function isValidCartItemArray(v: unknown): v is CartItem[] {
-  return Array.isArray(v) && v.every(isValidCartItem);
-}
-
-export function getCart(): CartItem[] {
-  if (typeof window === "undefined") return [];
+export function readCart(storage: Storage | undefined = defaultStorage()): CartItem[] {
+  if (!storage) return [];
   try {
-    const raw = JSON.parse(localStorage.getItem(CART_KEY) ?? "[]");
-    return isValidCartItemArray(raw) ? raw : [];
+    const parsed = CartItemsSchema.safeParse(JSON.parse(storage.getItem(CART_STORAGE_KEY) ?? "[]"));
+    return parsed.success ? parsed.data : [];
   } catch {
     return [];
   }
 }
 
-export function saveCart(items: CartItem[]): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
-  window.dispatchEvent(new Event("vh:cart-updated"));
-}
-
-export function formatPrice(num: number) {
-  return num.toLocaleString("en-US", { minimumFractionDigits: 0 });
+export function writeCart(items: readonly CartItem[], storage: Storage | undefined = defaultStorage()): void {
+  storage?.setItem(CART_STORAGE_KEY, JSON.stringify(items));
 }
