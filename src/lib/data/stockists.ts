@@ -1,16 +1,16 @@
-type Store = {
-  city: string;
-  name: string;
-  address: string;
-  country: string;
-};
+interface Stockist {
+  readonly city: string;
+  readonly name: string;
+  readonly address: string;
+  readonly country: string;
+}
 
-export type Region = {
-  region: string;
-  stores: Store[];
-};
+export interface StockistRegion {
+  readonly region: string;
+  readonly stores: readonly Stockist[];
+}
 
-export const STOCKISTS: Region[] = [
+export const STOCKISTS = [
   {
     region: "Europe",
     stores: [
@@ -42,4 +42,4 @@ export const STOCKISTS: Region[] = [
       { city: "Sydney", name: "Incu", address: "76 Oxford Street, Paddington", country: "Australia" },
     ],
   },
-];
+] as const satisfies readonly StockistRegion[];

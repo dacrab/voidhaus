@@ -1,58 +1,42 @@
-import type { GenericDatabaseWriter } from "convex/server";
 import { ConvexError, v } from "convex/values";
-import { PRODUCTS as SEED_PRODUCTS } from "../src/lib/data/products";
-import { internal } from "./_generated/api";
-import type { DataModel } from "./_generated/dataModel";
+import { PRODUCTS } from "../src/lib/data/products";
 import { mutation } from "./_generated/server";
 
-// SOURCE OF TRUTH: src/lib/data/products.ts is the canonical catalog (names, prices,
-// sizes, images) and is what the storefront renders. This seed mirrors those products
-// into Convex solely to track per-size stock (sizeStock) for checkout/fulfillment.
-// If a product is added/removed/renamed in products.ts, re-run this seed so the stock
-// table matches; the two copies are expected to stay in sync via this seed.
+// The canonical catalog (names, prices, sizes, images) lives in
+// src/lib/data/products.ts. This seed mirrors only `slug` and `sizeStock` into
+// Convex for checkout/fulfillment. Re-run it when products are added or removed.
 
-// Function-level gating: admin mutations require a token matching the ADMIN_TOKEN
-// deployment env var (no identity provider exists in this app).
-function requireAdmin(token?: string) {
+function requireAdmin(token: string): void {
   const expected = process.env.ADMIN_TOKEN;
   if (!(expected && token) || token !== expected) {
     throw new ConvexError("Unauthorized");
   }
 }
 
-type SeedTable = "products";
-
-async function isEmpty(db: GenericDatabaseWriter<DataModel>, table: SeedTable) {
-  return db
-    .query(table)
-    .first()
-    .then((doc) => doc === null);
-}
-
-async function clearTable(db: GenericDatabaseWriter<DataModel>, table: SeedTable) {
-  for (const doc of await db.query(table).collect()) {
-    await db.delete(doc._id);
-  }
-}
-
-const SEED_PRODUCTS_WITH_STOCK = SEED_PRODUCTS.map((p) => {
+const SEED_STOCK = PRODUCTS.map((product) => {
   const sizeStock: Record<string, number> = {};
-  for (const size of p.sizes) {
-    sizeStock[size] = Math.max(1, Math.round(10 / p.sizes.length));
+  for (const size of product.sizes) {
+    sizeStock[size] = Math.max(1, Math.round(10 / product.sizes.length));
   }
-  return { ...p, sizeStock };
+  return { slug: product.slug, sizeStock };
 });
 
-export const seedProducts = mutation({
-  args: { force: v.optional(v.boolean()), token: v.string() },
-  handler: async (ctx, { force, token }) => {
+export const seedStock = mutation({
+  args: { token: v.string(), reseed: v.optional(v.boolean()) },
+  handler: async (ctx, { token, reseed }) => {
     requireAdmin(token);
-    if (!((await isEmpty(ctx.db, "products")) || force)) return "Already seeded";
-    await clearTable(ctx.db, "products");
-    for (const p of SEED_PRODUCTS_WITH_STOCK) {
-      await ctx.db.insert("products", { ...p, active: true });
+
+    const existing = await ctx.db.query("products").first();
+    if (existing && !reseed) return "Already seeded";
+
+    for (const product of await ctx.db.query("products").collect()) {
+      await ctx.db.delete(product._id);
     }
-    await ctx.scheduler.runAfter(0, internal.emails.triggerRebuild, {});
-    return `Seeded ${SEED_PRODUCTS_WITH_STOCK.length} products`;
+
+    for (const product of SEED_STOCK) {
+      await ctx.db.insert("products", product);
+    }
+
+    return `Seeded ${SEED_STOCK.length} products`;
   },
 });

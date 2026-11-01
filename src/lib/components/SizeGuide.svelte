@@ -1,32 +1,40 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-  import { createModal, panelIn } from '#lib/utils/modal.js';
+  import { tick } from "svelte";
+  import { fade } from "svelte/transition";
+  import { SITE } from "#lib/data/site.js";
+  import { createModal, panelIn } from "#lib/utils/modal.js";
 
-  let { category = 'Clothing' }: { category?: 'Clothing' | 'Footwear' } = $props();
+  interface Props {
+    category?: "Clothing" | "Footwear";
+  }
+
+  let { category = "Clothing" }: Props = $props();
 
   const modal = createModal();
-  let open = $state(false);
-  let panelEl = $state<HTMLElement | undefined>();
 
   const clothing = [
-    { size: 'XS', it: '36', fr: '36', uk: '8',  us: '4',  chest: '82–85', waist: '62–65' },
-    { size: 'S',  it: '38', fr: '38', uk: '10', us: '6',  chest: '86–89', waist: '66–69' },
-    { size: 'M',  it: '40', fr: '40', uk: '12', us: '8',  chest: '90–93', waist: '70–73' },
-    { size: 'L',  it: '42', fr: '42', uk: '14', us: '10', chest: '94–97', waist: '74–77' },
-    { size: 'XL', it: '44', fr: '44', uk: '16', us: '12', chest: '98–101', waist: '78–81' },
+    { size: "XS", it: "36", fr: "36", uk: "8", us: "4", chest: "82–85", waist: "62–65" },
+    { size: "S", it: "38", fr: "38", uk: "10", us: "6", chest: "86–89", waist: "66–69" },
+    { size: "M", it: "40", fr: "40", uk: "12", us: "8", chest: "90–93", waist: "70–73" },
+    { size: "L", it: "42", fr: "42", uk: "14", us: "10", chest: "94–97", waist: "74–77" },
+    { size: "XL", it: "44", fr: "44", uk: "16", us: "12", chest: "98–101", waist: "78–81" },
   ];
 
   const shoes = [
-    { eu: '39', uk: '6',   us: '7',   cm: '25.0' },
-    { eu: '40', uk: '6.5', us: '7.5', cm: '25.5' },
-    { eu: '41', uk: '7',   us: '8',   cm: '26.0' },
-    { eu: '42', uk: '8',   us: '9',   cm: '26.5' },
-    { eu: '43', uk: '9',   us: '10',  cm: '27.5' },
-    { eu: '44', uk: '10',  us: '11',  cm: '28.0' },
+    { eu: "39", uk: "6", us: "7", cm: "25.0" },
+    { eu: "40", uk: "6.5", us: "7.5", cm: "25.5" },
+    { eu: "41", uk: "7", us: "8", cm: "26.0" },
+    { eu: "42", uk: "8", us: "9", cm: "26.5" },
+    { eu: "43", uk: "9", us: "10", cm: "27.5" },
+    { eu: "44", uk: "10", us: "11", cm: "28.0" },
   ];
 
-  function openModal() {
+  let open = $state(false);
+  let panelEl = $state<HTMLElement>();
+
+  async function openModal() {
     open = true;
+    await tick();
     modal.open(panelEl);
   }
 
@@ -35,8 +43,8 @@
     modal.close();
   }
 
-  function onKeydown(e: KeyboardEvent) {
-    if (open && modal.handleKeydown(panelEl, e)) closeModal();
+  function onKeydown(event: KeyboardEvent) {
+    if (open && modal.handleKeydown(panelEl, event)) closeModal();
   }
 </script>
 
@@ -67,60 +75,76 @@
   >
     <div class="sg-head">
       <h2 class="label sg-title" id="sg-title">Size Guide</h2>
-      <button class="label ghost-btn" onclick={closeModal} aria-label="Close size guide">Close</button>
+      <button class="label ghost-btn" type="button" onclick={closeModal} aria-label="Close size guide">Close</button>
     </div>
     <div class="rule"></div>
 
     <div class="sg-body">
       <p class="sg-note">
-        All Voidhaus pieces are cut generously. If between sizes, size down.<br/>
+        All Voidhaus pieces are cut generously. If between sizes, size down.<br />
         Measurements in centimetres.
       </p>
 
-      {#if category === 'Footwear'}
+      {#if category === "Footwear"}
         <div class="sg-scroll">
-        <table class="sg-table">
-          <thead><tr>
-            <th class="label" scope="col">EU</th><th class="label" scope="col">UK</th>
-            <th class="label" scope="col">US</th><th class="label" scope="col">CM</th>
-          </tr></thead>
-          <tbody>
-            {#each shoes as r}
+          <table class="sg-table">
+            <thead>
               <tr>
-                <td class="td-main">{r.eu}</td>
-                <td>{r.uk}</td><td>{r.us}</td><td>{r.cm}</td>
+                <th class="label" scope="col">EU</th>
+                <th class="label" scope="col">UK</th>
+                <th class="label" scope="col">US</th>
+                <th class="label" scope="col">CM</th>
               </tr>
-            {/each}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {#each shoes as row (row.eu)}
+                <tr>
+                  <td class="td-main">{row.eu}</td>
+                  <td>{row.uk}</td>
+                  <td>{row.us}</td>
+                  <td>{row.cm}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
         </div>
       {:else}
         <div class="sg-scroll">
-        <table class="sg-table">
-          <thead><tr>
-            <th class="label" scope="col">Size</th><th class="label" scope="col">IT/EU</th>
-            <th class="label" scope="col">FR</th><th class="label" scope="col">UK</th>
-            <th class="label" scope="col">US</th><th class="label" scope="col">Chest</th><th class="label" scope="col">Waist</th>
-          </tr></thead>
-          <tbody>
-            {#each clothing as r}
+          <table class="sg-table">
+            <thead>
               <tr>
-                <td class="td-main">{r.size}</td>
-                <td>{r.it}</td><td>{r.fr}</td><td>{r.uk}</td>
-                <td>{r.us}</td><td>{r.chest}</td><td>{r.waist}</td>
+                <th class="label" scope="col">Size</th>
+                <th class="label" scope="col">IT/EU</th>
+                <th class="label" scope="col">FR</th>
+                <th class="label" scope="col">UK</th>
+                <th class="label" scope="col">US</th>
+                <th class="label" scope="col">Chest</th>
+                <th class="label" scope="col">Waist</th>
               </tr>
-            {/each}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {#each clothing as row (row.size)}
+                <tr>
+                  <td class="td-main">{row.size}</td>
+                  <td>{row.it}</td>
+                  <td>{row.fr}</td>
+                  <td>{row.uk}</td>
+                  <td>{row.us}</td>
+                  <td>{row.chest}</td>
+                  <td>{row.waist}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
         </div>
       {/if}
 
       <div class="sg-note-block">
-        <span class="label op-35">Fit note</span>
+        <span class="label muted">Fit note</span>
         <p class="sg-note">
-          Voidhaus sizing runs true to our Italian pattern blocks.
-          Outerwear is designed to layer — size up if wearing underneath.
-          Contact <a href="mailto:studio@voidhaus.com" class="sg-link">studio@voidhaus.com</a> for styling advice.
+          Voidhaus sizing runs true to our Italian pattern blocks. Outerwear is designed to layer — size up if wearing
+          underneath. Contact <a href="mailto:{SITE.email.studio}" class="sg-link">{SITE.email.studio}</a> for styling
+          advice.
         </p>
       </div>
     </div>
@@ -128,7 +152,7 @@
 {/if}
 
 <style>
-  .sg-backdrop { --backdrop-z: 500; background: var(--backdrop); }
+  .sg-backdrop { --backdrop-z: 500; background: var(--scrim-medium); }
 
   .sg-btn {
     background: none; border: none;
@@ -141,7 +165,7 @@
   .sg-panel {
     position: fixed; inset-inline: var(--spacing-md); top: 50%; translate: 0 -50%;
     max-width: 720px; margin-inline: auto;
-    background: var(--color-white);
+    background: var(--color-canvas);
     z-index: 501;
     display: flex; flex-direction: column;
     max-height: 85svh;
@@ -160,20 +184,23 @@
     display: flex; flex-direction: column; gap: var(--spacing-2xl); flex: 1;
   }
 
-  .sg-note { font-size: var(--text-sm); font-variation-settings: var(--fw-normal); line-height: 1.7; color: var(--color-soft); }
+  .sg-note {
+    font-size: var(--text-sm); font-variation-settings: var(--fw-normal);
+    line-height: 1.7; color: var(--color-soft);
+  }
 
   .sg-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); border: 1px solid var(--color-soft); }
   .sg-table th {
     text-align: left; padding: var(--spacing-sm) var(--spacing-md);
     border-bottom: 1px solid var(--color-soft);
-    background: var(--color-off); font-size: var(--text-xs); opacity: var(--op-muted);
+    background: var(--color-surface); font-size: var(--text-xs); opacity: var(--op-muted);
   }
   .sg-table td {
     padding: 0.875rem var(--spacing-md); border-bottom: 1px solid var(--color-soft);
     font-variation-settings: var(--fw-normal); color: var(--color-soft);
   }
   .sg-table tr:last-child td { border-bottom: none; }
-  .sg-table tr:hover td { background: var(--color-off); }
+  .sg-table tr:hover td { background: var(--color-surface); }
   .td-main { font-variation-settings: var(--fw-medium); color: var(--color-ink); }
 
   .sg-note-block {

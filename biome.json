@@ -1,12 +1,12 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.12/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**/*.ts", "convex/**/*.ts", "scripts/**/*.js"]
+    "includes": ["src/**/*.ts", "convex/**/*.ts", "!convex/_generated", "vite.config.ts"]
   },
   "formatter": {
     "indentStyle": "space",
@@ -82,19 +82,5 @@
         "useThrowOnlyError": "error"
       }
     }
-  },
-  "overrides": [
-    {
-      "includes": ["**/*.svelte", "**/*.svelte.ts"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noUnusedFunctionParameters": "off",
-            "noUnusedImports": "off",
-            "noUnusedVariables": "off"
-          }
-        }
-      }
-    }
-  ]
+  }
 }

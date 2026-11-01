@@ -1,13 +1,16 @@
 <script lang="ts">
-  import ProductCard from '#lib/components/ProductCard.svelte';
-  import PageHeader from '#lib/components/PageHeader.svelte';
-  import { filterProducts } from '#lib/data/filter.js';
-  import { CATEGORIES, PRODUCTS } from '#lib/data/products.js';
-  import { SITE } from '#lib/data/site.js';
+  import PageHeader from "#lib/components/PageHeader.svelte";
+  import ProductCard from "#lib/components/ProductCard.svelte";
+  import { filterProducts, type CategoryFilter } from "#lib/data/filter.js";
+  import { CATEGORIES, PRODUCTS } from "#lib/data/products.js";
+  import { SITE } from "#lib/data/site.js";
 
-  let activeCategory = $state('All');
-  let search = $state('');
-  let filtered = $derived(filterProducts(PRODUCTS, search, activeCategory));
+  const filters: readonly CategoryFilter[] = ["All", ...CATEGORIES];
+
+  let activeCategory = $state<CategoryFilter>("All");
+  let search = $state("");
+
+  const filtered = $derived(filterProducts(PRODUCTS, search, activeCategory));
 </script>
 
 <svelte:head>
@@ -19,15 +22,16 @@
 <div class="wrap">
   <div class="rule"></div>
   <nav class="cat-filters" aria-label="Category filters">
-    {#each CATEGORIES as cat}
+    {#each filters as category (category)}
       <button
         class="cat-filter label"
-        class:cat-filter--active={activeCategory === cat}
-        onclick={() => (activeCategory = cat)}
-        aria-pressed={activeCategory === cat}
+        class:cat-filter--active={activeCategory === category}
+        type="button"
+        onclick={() => (activeCategory = category)}
+        aria-pressed={activeCategory === category}
       >
-        {cat}
-        {#if activeCategory === cat}
+        {category}
+        {#if activeCategory === category}
           <span class="cat-filter-rule" aria-hidden="true"></span>
         {/if}
       </button>
@@ -39,7 +43,7 @@
       id="collection-search"
       type="search"
       bind:value={search}
-      class="search-input label"
+      class="field label"
       placeholder="Search by name, material, origin…"
     />
   </div>
@@ -51,7 +55,7 @@
 
 <div class="product-grid" data-anim="scroll">
   {#each filtered as product (product.slug)}
-    <ProductCard {...product} />
+    <ProductCard {product} />
   {/each}
 </div>
 
@@ -83,17 +87,7 @@
   .search-wrap {
     padding-block-end: var(--spacing-lg);
   }
-  .search-input {
-    background: var(--color-off);
-    border: 1px solid var(--color-rule);
-    color: var(--color-ink);
-    padding: 0.625rem 1rem;
-    width: 100%;
+  .search-wrap .field {
     max-width: 28rem;
-    outline: none;
-    transition: border-color var(--duration-fast);
-  }
-  .search-input:focus {
-    border-color: var(--color-mid);
   }
 </style>

@@ -2,31 +2,20 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  // Only per-size stock lives in Convex; the catalog itself is static in
+  // src/lib/data/products.ts and keyed by `slug`.
   products: defineTable({
     slug: v.string(),
-    num: v.string(),
-    name: v.string(),
-    price: v.number(),
-    category: v.string(),
-    material: v.string(),
-    origin: v.string(),
-    desc: v.string(),
-    sizes: v.array(v.string()),
-    // Per-size stock: { "S": 5, "M": 10, "L": 3 }
-    sizeStock: v.optional(v.record(v.string(), v.number())),
-    // Image references: either a key (legacy) or a Convex storage ID
-    img: v.string(),
-    img2: v.optional(v.string()),
-    active: v.boolean(),
+    sizeStock: v.record(v.string(), v.number()),
   }).index("by_slug", ["slug"]),
 
   orders: defineTable({
     stripeSessionId: v.string(),
     stripePaymentIntentId: v.optional(v.string()),
     customerEmail: v.string(),
+    couponId: v.optional(v.id("coupons")),
     items: v.array(
       v.object({
-        productId: v.optional(v.id("products")),
         slug: v.string(),
         name: v.string(),
         price: v.number(),
@@ -35,9 +24,9 @@ export default defineSchema({
       }),
     ),
     total: v.number(),
-    discount: v.optional(v.number()),
-    currency: v.string(),
-    status: v.union(v.literal("pending"), v.literal("paid"), v.literal("failed")),
+    discount: v.number(),
+    currency: v.literal("eur"),
+    status: v.union(v.literal("paid"), v.literal("failed")),
     shippingAddress: v.optional(
       v.object({
         name: v.string(),
@@ -54,9 +43,7 @@ export default defineSchema({
   messages: defineTable({
     name: v.string(),
     email: v.string(),
-    subject: v.string(),
     message: v.string(),
-    read: v.boolean(),
   }),
 
   coupons: defineTable({

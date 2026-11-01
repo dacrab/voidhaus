@@ -8,7 +8,6 @@ export const SITE = {
     press: "press@voidhaus.com",
   },
   address: ["Via della Spiga, 19", "20121 Milan, Italy"] as const,
-  addressCountry: "IT",
   hours: "Mon – Fri, 10:00 – 18:00 CET",
   ateliers: [
     { city: "Milan", specialty: "Outerwear" },

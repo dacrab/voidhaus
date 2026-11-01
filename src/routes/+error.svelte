@@ -1,7 +1,11 @@
 <script lang="ts">
-  let { status }: { status?: number } = $props();
-  const code = $derived(status ?? 404);
-  const title = $derived(code === 404 ? 'Not Found' : 'Error');
+  import { page } from "$app/state";
+  import type { ErrorProps } from "./$types";
+
+  let { error }: ErrorProps = $props();
+
+  const status = $derived(page.status);
+  const title = $derived(status === 404 ? "Not Found" : "Error");
 </script>
 
 <svelte:head>
@@ -10,13 +14,16 @@
 
 <div class="wrap relative flex items-center overflow-hidden min-h-[calc(100svh-5rem)]">
   <div class="relative z-10 flex flex-col gap-2xl py-32 pb-20">
-    <span class="label muted">{code}</span>
-    <h1 class="nf-title serif fw-medium italic leading-[0.95] tracking-[-0.03em]">{title}<br/><em class="not-italic text-ink-soft">{code === 404 ? 'found.' : 'unexpected.'}</em></h1>
+    <span class="label muted">{status}</span>
+    <h1 class="nf-title serif fw-medium italic leading-[0.95] tracking-[-0.03em]">
+      {title}<br />
+      <em class="not-italic text-ink-soft">{status === 404 ? "found." : "unexpected."}</em>
+    </h1>
     <p class="text-base fw-normal leading-[1.85] text-soft max-w-[32ch]">
-      {#if code === 404}
-        This page doesn't exist — or has been removed.<br/>The collection remains.
+      {#if status === 404}
+        This page doesn't exist — or has been removed.<br />The collection remains.
       {:else}
-        Something went wrong.<br/>Please try again.
+        {error.message || "Something went wrong."}<br />Please try again.
       {/if}
     </p>
     <div class="flex gap-12 items-center pt-lg border-t border-rule">
@@ -24,7 +31,10 @@
       <a href="/collection" class="label muted-link">Collection →</a>
     </div>
   </div>
-  <span class="nf-bg fw-light absolute right-[-0.05em] bottom-[-0.15em] text-transparent pointer-events-none select-none leading-none tracking-[-0.06em]" aria-hidden="true">{code}</span>
+  <span
+    class="nf-bg fw-light absolute right-[-0.05em] bottom-[-0.15em] text-transparent pointer-events-none select-none leading-none tracking-[-0.06em]"
+    aria-hidden="true">{status}</span
+  >
 </div>
 
 <style>

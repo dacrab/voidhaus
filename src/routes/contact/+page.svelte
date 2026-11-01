@@ -1,35 +1,37 @@
 <script lang="ts">
-  import { SITE } from '#lib/data/site.js';
-  import { LIMITS } from '#lib/data/limits.js';
-  import PageHeader from '#lib/components/PageHeader.svelte';
+  import PageHeader from "#lib/components/PageHeader.svelte";
+  import { LIMITS } from "#lib/data/limits.js";
+  import { SITE } from "#lib/data/site.js";
 
-  let name = $state('');
-  let email = $state('');
-  let message = $state('');
+  let name = $state("");
+  let email = $state("");
+  let message = $state("");
   let sent = $state(false);
-  let error = $state('');
-
+  let error = $state("");
   let submitting = $state(false);
 
-  async function handleSubmit(e: Event) {
-    e.preventDefault();
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
     if (submitting) return;
-    error = '';
+
+    error = "";
     submitting = true;
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, message }),
       });
-      if (res.ok) {
+      if (response.ok) {
         sent = true;
-        name = ''; email = ''; message = '';
+        name = "";
+        email = "";
+        message = "";
       } else {
-        error = 'Something went wrong. Please try again.';
+        error = "Something went wrong. Please try again.";
       }
     } catch {
-      error = 'Network error. Please try again.';
+      error = "Network error. Please try again.";
     } finally {
       submitting = false;
     }
@@ -49,30 +51,52 @@
       {#if sent}
         <div class="flex flex-col gap-sm">
           <span class="label fw-medium">Message sent</span>
-          <p class="text-soft leading-[1.85]">Thank you for reaching out. We will respond within two business days.</p>
+          <p class="text-soft leading-[1.85]">
+            Thank you for reaching out. We will respond within two business days.
+          </p>
         </div>
       {:else}
         <form class="flex flex-col gap-lg" onsubmit={handleSubmit}>
           <div class="flex flex-col gap-sm">
             <label class="label muted" for="contact-name">Name</label>
-            <input id="contact-name" type="text" bind:value={name} required maxlength={LIMITS.nameMax}
-              class="form-input" autocomplete="name" />
+            <input
+              id="contact-name"
+              type="text"
+              bind:value={name}
+              required
+              maxlength={LIMITS.nameMax}
+              class="field"
+              autocomplete="name"
+            />
           </div>
           <div class="flex flex-col gap-sm">
             <label class="label muted" for="contact-email">Email</label>
-            <input id="contact-email" type="email" bind:value={email} required
-              class="form-input" autocomplete="email" />
+            <input
+              id="contact-email"
+              type="email"
+              bind:value={email}
+              required
+              maxlength={LIMITS.emailMax}
+              class="field"
+              autocomplete="email"
+            />
           </div>
           <div class="flex flex-col gap-sm">
             <label class="label muted" for="contact-message">Message</label>
-            <textarea id="contact-message" bind:value={message} required rows="5" maxlength={LIMITS.messageMax}
-              class="form-input min-h-[10rem]"></textarea>
+            <textarea
+              id="contact-message"
+              bind:value={message}
+              required
+              rows="5"
+              maxlength={LIMITS.messageMax}
+              class="field min-h-[10rem]"
+            ></textarea>
           </div>
           {#if error}
-            <p class="label text-red-400">{error}</p>
+            <p class="form-error label" role="alert">{error}</p>
           {/if}
           <button type="submit" class="btn-outline max-w-[16rem]" disabled={submitting}>
-            <span class="label">Send</span>
+            <span class="label">{submitting ? "Sending…" : "Send"}</span>
           </button>
         </form>
       {/if}
@@ -89,7 +113,7 @@
       </div>
       <div class="flex flex-col gap-sm">
         <span class="label muted">Address</span>
-        {#each SITE.address as line}
+        {#each SITE.address as line (line)}
           <span class="fw-normal text-soft">{line}</span>
         {/each}
       </div>
@@ -102,13 +126,5 @@
 </div>
 
 <style>
-  .form-input {
-    width: 100%; padding: 0.875rem var(--spacing-md);
-    background: var(--color-off); border: 1px solid var(--color-rule);
-    color: var(--color-ink); font-family: var(--font-sans);
-    font-size: var(--text-base); font-variation-settings: var(--fw-normal);
-    transition: border-color var(--duration-fast);
-  }
-  .form-input:focus { border-color: var(--color-ink); outline: none; }
-  .form-input::placeholder { color: var(--color-mid); }
+  .form-error { color: var(--color-error); }
 </style>

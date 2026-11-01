@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { formatPrice } from "../src/lib/utils/cart";
+import { formatPrice } from "../src/lib/format";
 import { internalAction } from "./_generated/server";
 
 function escapeHtml(input: string): string {
@@ -11,7 +11,7 @@ function escapeHtml(input: string): string {
     .replaceAll("'", "&#39;");
 }
 
-// Called after order is fulfilled (paid). Sends confirmation email via Resend.
+// Called after an order is paid. Sends the confirmation email via Resend.
 export const sendOrderConfirmation = internalAction({
   args: {
     customerEmail: v.string(),
@@ -27,14 +27,12 @@ export const sendOrderConfirmation = internalAction({
   },
   handler: async (_, args) => {
     const resendKey = process.env.RESEND_API_KEY;
-    if (!resendKey) {
-      return;
-    }
+    if (!resendKey) return;
 
     const itemsHtml = args.orderItems
-      .map((i) => {
-        const qty = i.quantity > 1 ? ` × ${i.quantity}` : "";
-        return `<tr><td>${escapeHtml(i.name)}${qty}</td><td>${escapeHtml(i.size)}</td><td>€ ${formatPrice(i.price * i.quantity)}</td></tr>`;
+      .map((item) => {
+        const quantity = item.quantity > 1 ? ` × ${item.quantity}` : "";
+        return `<tr><td>${escapeHtml(item.name)}${quantity}</td><td>${escapeHtml(item.size)}</td><td>€ ${formatPrice(item.price * item.quantity)}</td></tr>`;
       })
       .join("");
 
@@ -58,7 +56,7 @@ export const sendOrderConfirmation = internalAction({
     `;
 
     try {
-      const res = await fetch("https://api.resend.com/emails", {
+      const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${resendKey}`,
@@ -71,34 +69,13 @@ export const sendOrderConfirmation = internalAction({
           html,
         }),
       });
-      if (!res.ok) {
+      if (!response.ok) {
         // biome-ignore lint/suspicious/noConsole: email delivery failures surface in server logs
-        console.error("Resend email failed:", res.status, await res.text());
+        console.error("Resend email failed:", response.status, await response.text());
       }
-    } catch (err) {
+    } catch (error) {
       // biome-ignore lint/suspicious/noConsole: email send failures surface in server logs without failing the order
-      console.error("Failed to send order confirmation email:", err);
-    }
-  },
-});
-
-// Trigger a Vercel rebuild when products change
-export const triggerRebuild = internalAction({
-  args: {},
-  handler: async () => {
-    const hookUrl = process.env.VERCEL_DEPLOY_HOOK;
-    if (!hookUrl) {
-      return;
-    }
-    try {
-      const res = await fetch(hookUrl, { method: "POST" });
-      if (!res.ok) {
-        // biome-ignore lint/suspicious/noConsole: deploy hook failures surface in server logs
-        console.error("Vercel deploy hook failed:", res.status, await res.text());
-      }
-    } catch (err) {
-      // biome-ignore lint/suspicious/noConsole: rebuild trigger failures surface in server logs without throwing
-      console.error("Failed to trigger Vercel rebuild:", err);
+      console.error("Failed to send order confirmation email:", error);
     }
   },
 });

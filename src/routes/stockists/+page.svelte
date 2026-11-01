@@ -1,9 +1,7 @@
 <script lang="ts">
-  import PageHeader from '#lib/components/PageHeader.svelte';
-  import { SITE } from '#lib/data/site.js';
-
-  let { data } = $props();
-  const regions = $derived(data.stockists);
+  import PageHeader from "#lib/components/PageHeader.svelte";
+  import { STOCKISTS } from "#lib/data/stockists.js";
+  import { SITE } from "#lib/data/site.js";
 </script>
 
 <svelte:head>
@@ -15,11 +13,11 @@
 <div class="wrap">
   <div class="rule"></div>
   <div class="stockists-grid">
-    {#each regions as region}
+    {#each STOCKISTS as region (region.region)}
       <section class="stockist-region" data-anim="scroll">
         <span class="label muted stockist-region-label">{region.region}</span>
         <div class="stockist-stores">
-          {#each region.stores as store}
+          {#each region.stores as store (store.name)}
             <div class="stockist-store">
               <div class="stockist-store-header">
                 <span class="stockist-name">{store.name}</span>
@@ -37,7 +35,9 @@
   <div class="stockist-inquiry" data-anim="scroll">
     <span class="label muted">Atelier inquiries</span>
     <div class="flex items-baseline justify-between flex-wrap gap-sm">
-      <span class="fw-normal text-soft">{SITE.ateliers.map(a => `${a.city} — ${a.specialty}`).join(' · ')}</span>
+      <span class="fw-normal text-soft"
+        >{SITE.ateliers.map((atelier) => `${atelier.city} — ${atelier.specialty}`).join(" · ")}</span
+      >
       <a href="/contact" class="label muted muted-link">Contact →</a>
     </div>
   </div>
@@ -62,7 +62,7 @@
   }
   @media (min-width: 768px) { .stockist-stores { grid-template-columns: repeat(2, 1fr); } }
   .stockist-store {
-    background: var(--color-white);
+    background: var(--color-canvas);
     padding: var(--spacing-lg);
     display: flex; flex-direction: column; gap: var(--spacing-xs);
   }

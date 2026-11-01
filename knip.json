@@ -1,12 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": [
-    "src/**/*.svelte",
-    "src/**/*.ts",
-    "src/**/*.css",
-    "convex/**/*.ts",
-    "scripts/**/*"
-  ],
-  "project": ["src/**/*.{svelte,ts,css}", "convex/**/*.ts", "scripts/**/*"],
+  "entry": ["src/routes/**/+*.{svelte,ts}", "src/env.ts", "src/**/*.test.ts"],
+  "project": ["src/**/*.{svelte,ts,css}", "convex/**/*.ts"],
+  "paths": {
+    "#lib/*": ["src/lib/*"],
+    "#convex/*": ["convex/_generated/*"]
+  },
   "ignoreBinaries": ["doppler"]
 }

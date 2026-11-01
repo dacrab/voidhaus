@@ -1,49 +1,30 @@
 <script lang="ts">
-  import '../app.css';
-  import Nav from '#lib/components/Nav.svelte';
-  import Cart from '#lib/components/Cart.svelte';
-  import { observeAnimations } from '#lib/utils/scroll-observer.js';
-  import { afterNavigate } from '$app/navigation';
-  import { onMount } from 'svelte';
-  import { browser } from '$app/env';
-  import { page } from '$app/state';
-  import { SITE } from '#lib/data/site.js';
+  import "../app.css";
+  import { onMount } from "svelte";
+  import { afterNavigate } from "$app/navigation";
+  import { page } from "$app/state";
+  import Cart from "#lib/components/Cart.svelte";
+  import Nav from "#lib/components/Nav.svelte";
+  import { SITE } from "#lib/data/site.js";
+  import { cart } from "#lib/stores/cart.svelte.js";
+  import { observeAnimations } from "#lib/utils/scroll-observer.js";
 
   let { children } = $props();
 
-  onMount(() => {
-    dismissVeil();
-  });
+  let stopAnimations: (() => void) | undefined;
 
-  let stop: (() => void) | undefined;
+  onMount(() => {
+    cart.init();
+
+    return () => stopAnimations?.();
+  });
 
   afterNavigate(({ shallow, type }) => {
-    if (shallow && type === 'goto') return;
+    if (shallow && type === "goto") return;
 
-    stop?.();
-    stop = browser ? observeAnimations() : undefined;
+    stopAnimations?.();
+    stopAnimations = observeAnimations();
   });
-
-  function dismissVeil() {
-    if (!browser) return;
-    const veil = document.getElementById('js-veil');
-    if (!veil) return;
-    const mark = veil.querySelector<HTMLElement>('.veil-mark');
-    if (mark) {
-      mark.style.opacity = '1';
-      setTimeout(() => {
-        mark.style.opacity = '0';
-        mark.style.transform = 'scale(0.92)';
-        setTimeout(() => {
-          veil.classList.add('out');
-          veil.addEventListener('transitionend', () => veil.remove(), { once: true });
-        }, 400);
-      }, 900);
-    } else {
-      requestAnimationFrame(() => requestAnimationFrame(() => veil.classList.add('out')));
-      veil.addEventListener('transitionend', () => veil.remove(), { once: true });
-    }
-  }
 </script>
 
 <svelte:head>
@@ -51,14 +32,10 @@
   <meta name="robots" content="index, follow" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content={SITE.name} />
-  <link rel="canonical" href={page.url.pathname === '/' ? SITE.url : `${SITE.url}${page.url.pathname}`} />
+  <link rel="canonical" href={page.url.pathname === "/" ? SITE.url : `${SITE.url}${page.url.pathname}`} />
 </svelte:head>
 
-<div id="js-veil" aria-hidden="true">
-  <span class="veil-mark">VOIDHAUS</span>
-</div>
-
-<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10000] focus:bg-white focus:px-md focus:py-sm focus:text-ink focus:border focus:border-ink">Skip to content</a>
+<a href="#main" class="skip-link label">Skip to content</a>
 
 <Nav />
 <Cart />
@@ -69,16 +46,16 @@
 
 <footer class="footer">
   <div class="wrap">
-    <div class="rule js-rule"></div>
+    <div class="rule"></div>
     <div class="footer-inner">
       <div class="footer-brand">
         <span class="label muted">© {new Date().getFullYear()} {SITE.name}</span>
-        <span class="label muted">{SITE.ateliers.map((a) => a.city).join(' · ')}</span>
+        <span class="label muted">{SITE.ateliers.map((atelier) => atelier.city).join(" · ")}</span>
       </div>
       <nav class="footer-nav" aria-label="Legal navigation">
         <a href="/stockists" class="label muted muted-link">Stockists</a>
-        <a href="/privacy"   class="label muted muted-link">Privacy</a>
-        <a href="/terms"    class="label muted muted-link">Terms</a>
+        <a href="/privacy" class="label muted muted-link">Privacy</a>
+        <a href="/terms" class="label muted muted-link">Terms</a>
         <a href="/contact" class="label muted muted-link">Contact</a>
       </nav>
     </div>
@@ -86,6 +63,20 @@
 </footer>
 
 <style>
+  .skip-link {
+    position: fixed;
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+    z-index: 1000;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    border: 1px solid var(--color-ink);
+    transform: translateY(-200%);
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+  }
   .footer {
     border-top: 1px solid var(--color-rule);
     margin-top: var(--spacing-3xl);

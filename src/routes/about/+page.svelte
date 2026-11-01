@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { IMAGES } from '#lib/data/images.js';
-  import { SITE } from '#lib/data/site.js';
-  import PageHeader from '#lib/components/PageHeader.svelte';
-  import CTAStrip from '#lib/components/CTAStrip.svelte';
+  import CTAStrip from "#lib/components/CTAStrip.svelte";
+  import PageHeader from "#lib/components/PageHeader.svelte";
+  import { SITE_IMAGES } from "#lib/data/products.js";
+  import { SITE } from "#lib/data/site.js";
+  import { productImage } from "#lib/images.js";
 
-  const atelier = IMAGES['atelier'];
+  const atelierImage = productImage(SITE_IMAGES.atelier);
 </script>
 
 <svelte:head>
@@ -18,8 +19,10 @@
   <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl items-start py-2xl md:py-3xl">
     <div class="overflow-hidden">
       <img
-        class="js-atelier-img w-full aspect-[4/5] object-cover bg-off"
-        src={atelier}
+        class="w-full aspect-[4/5] object-cover bg-surface"
+        src={atelierImage.src}
+        srcset={atelierImage.srcset}
+        sizes="(min-width: 768px) 50vw, 100vw"
         alt="Voidhaus atelier"
         loading="lazy"
         decoding="async"
@@ -31,16 +34,19 @@
       <div class="flex flex-col gap-sm">
         <span class="label muted" data-anim="hero">Philosophy</span>
         <p class="serif text-xl md:text-2xl fw-light leading-[1.3]" data-anim="hero" data-delay="0.1">
-          We do not design for seasons.<br/>
+          We do not design for seasons.<br />
           We design for silence.
         </p>
       </div>
       <div class="flex flex-col gap-md" data-anim="hero" data-delay="0.2">
         <p class="text-soft leading-[1.85] max-w-[52ch]">
-          Voidhaus exists at the intersection of restraint and intent. Each piece begins as a question — What remains when everything unnecessary is taken away? — and ends as an answer worn close to the body.
+          Voidhaus exists at the intersection of restraint and intent. Each piece begins as a question — What remains
+          when everything unnecessary is taken away? — and ends as an answer worn close to the body.
         </p>
         <p class="text-soft leading-[1.85] max-w-[52ch]">
-          Our ateliers in Milan, Antwerp, Florence, and Tokyo share a single discipline: no excess, no compromise, no ornament without purpose. The result is a wardrobe that exists outside of time — twelve pieces, four cities, one position.
+          Our ateliers in Milan, Antwerp, Florence, and Tokyo share a single discipline: no excess, no compromise, no
+          ornament without purpose. The result is a wardrobe that exists outside of time — twelve pieces, four cities,
+          one position.
         </p>
       </div>
     </div>
@@ -52,8 +58,8 @@
   <div class="flex flex-col gap-xl py-2xl md:py-3xl">
     <span class="label muted">Ateliers</span>
     <div class="grid gap-xl md:grid-cols-4 md:gap-4xl">
-      {#each SITE.ateliers as atelier}
-        <div class="flex flex-col gap-xs" data-anim="hero">
+      {#each SITE.ateliers as atelier (atelier.city)}
+        <div class="flex flex-col gap-xs">
           <span class="fw-medium">{atelier.city}</span>
           <span class="label muted">{atelier.specialty}</span>
         </div>

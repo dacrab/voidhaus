@@ -1,62 +1,57 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { type CartItem, formatPrice, getCart, saveCart } from "./cart";
+import { describe, expect, it } from "vitest";
+import { CART_STORAGE_KEY, type CartItem, cartItemKey, readCart, writeCart } from "./cart";
 
-function mockBrowserStorage() {
+function memoryStorage(initial?: string) {
   const store = new Map<string, string>();
-  const listeners: Array<(e: Event) => void> = [];
-  vi.stubGlobal("localStorage", {
+  if (initial !== undefined) store.set(CART_STORAGE_KEY, initial);
+  return {
     get length() {
       return store.size;
     },
     clear: () => store.clear(),
-    getItem: (k: string) => store.get(k) ?? null,
-    key: (i: number) => [...store.keys()][i] ?? null,
-    removeItem: (k: string) => store.delete(k),
-    setItem: (k: string, v: string) => store.set(k, v),
-  });
-  vi.stubGlobal("window", {
-    addEventListener: (_t: string, l: (e: Event) => void) => {
-      listeners.push(l);
-    },
-    dispatchEvent: (e: Event) => {
-      listeners.forEach((l) => {
-        l(e);
-      });
-      return true;
-    },
-  });
-  return store;
+    getItem: (key: string) => store.get(key) ?? null,
+    key: (index: number) => [...store.keys()][index] ?? null,
+    removeItem: (key: string) => store.delete(key),
+    setItem: (key: string, value: string) => store.set(key, value),
+  } satisfies Storage;
 }
 
-afterEach(() => vi.unstubAllGlobals());
+const item: CartItem = {
+  slug: "obsidian-coat",
+  name: "Obsidian Coat",
+  price: 3800,
+  size: "M",
+  img: "/img/1-primary.jpg",
+  num: "001",
+};
 
-describe("formatPrice", () => {
-  it.each([
-    [0, "0"],
-    [1400, "1,400"],
-    [1234, "1,234"],
-    [4100, "4,100"],
-  ])("formats %i as %s", (n, expected) => {
-    expect(formatPrice(n)).toBe(expected);
-  });
-});
-
-describe("cart persistence", () => {
+describe("cart storage", () => {
   it("returns an empty cart when storage is empty", () => {
-    mockBrowserStorage();
-    expect(getCart()).toEqual([]);
+    expect(readCart(memoryStorage())).toEqual([]);
   });
 
   it("falls back to an empty cart on corrupted JSON", () => {
-    const store = mockBrowserStorage();
-    store.set("vh-cart", "{not valid json");
-    expect(getCart()).toEqual([]);
+    expect(readCart(memoryStorage("{not valid json"))).toEqual([]);
   });
 
-  it("round-trips saved items", () => {
-    mockBrowserStorage();
-    const item: CartItem = { slug: "x", name: "X", price: 10, size: "M", img: "i", num: "1" };
-    saveCart([item]);
-    expect(getCart()).toEqual([item]);
+  it("falls back to an empty cart on invalid item shapes", () => {
+    expect(readCart(memoryStorage(JSON.stringify([{ slug: "x" }])))).toEqual([]);
+  });
+
+  it("round-trips items", () => {
+    const storage = memoryStorage();
+    writeCart([item], storage);
+    expect(readCart(storage)).toEqual([item]);
+  });
+
+  it("does nothing without storage", () => {
+    expect(readCart(undefined)).toEqual([]);
+    expect(() => writeCart([item], undefined)).not.toThrow();
+  });
+});
+
+describe("cartItemKey", () => {
+  it("distinguishes the same product in different sizes", () => {
+    expect(cartItemKey({ slug: "coat", size: "M" })).not.toBe(cartItemKey({ slug: "coat", size: "L" }));
   });
 });

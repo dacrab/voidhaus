@@ -1,39 +1,57 @@
 <script lang="ts">
-  import { formatPrice, type CartItem } from '#lib/utils/cart.js';
-  import SizeGuide from '#lib/components/SizeGuide.svelte';
-  import ProductCard from '#lib/components/ProductCard.svelte';
-  import PageHeader from '#lib/components/PageHeader.svelte';
-  import { IMAGES } from '#lib/data/images.js';
-  import { PRODUCTS, SHARED_DETAILS } from '#lib/data/products.js';
-  let { data } = $props();
-  const product = $derived(data.product);
-  const mainImg = $derived(IMAGES[product.img] ?? '');
-  const altImg = $derived(product.img2 ? IMAGES[product.img2] ?? '' : '');
-  const related = $derived(PRODUCTS.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3));
+  import { onDestroy } from "svelte";
+  import PageHeader from "#lib/components/PageHeader.svelte";
+  import ProductCard from "#lib/components/ProductCard.svelte";
+  import SizeGuide from "#lib/components/SizeGuide.svelte";
+  import { PRODUCT_DETAILS, PRODUCTS } from "#lib/data/products.js";
+  import { SITE } from "#lib/data/site.js";
+  import { formatPrice } from "#lib/format.js";
+  import { productImage } from "#lib/images.js";
+  import { cart } from "#lib/stores/cart.svelte.js";
+  import type { PageData } from "./$types";
 
-  let selectedSize = $state('');
+  let { data }: { data: PageData } = $props();
+
+  const product = $derived(data.product);
+  const image = $derived(productImage(product.img));
+  const detailImage = $derived(product.img2 ? productImage(product.img2) : undefined);
+  const socialImage = $derived(new URL(product.img, SITE.url).href);
+  const related = $derived(
+    PRODUCTS.filter((item) => item.category === product.category && item.slug !== product.slug).slice(0, 3),
+  );
+
+  let selectedSize = $state("");
   let added = $state(false);
+  let resetTimer: ReturnType<typeof setTimeout> | undefined;
+
+  onDestroy(() => clearTimeout(resetTimer));
 
   function addToCart() {
     if (!selectedSize) return;
-    const item: CartItem = {
+
+    cart.add({
       slug: product.slug,
       name: product.name,
       price: product.price,
       size: selectedSize,
-      img: mainImg,
+      img: product.img,
       num: product.num,
-    };
-    window.dispatchEvent(new CustomEvent('vh:add-to-cart', { detail: item }));
+    });
+    cart.openPanel();
+
     added = true;
-    setTimeout(() => { added = false; }, 2000);
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(() => {
+      added = false;
+    }, 2000);
   }
 </script>
 
 <svelte:head>
   <title>{product.name} — VOIDHAUS</title>
   <meta property="og:title" content="{product.name} — VOIDHAUS" />
-  <meta property="og:image" content={mainImg} />
+  <meta property="og:image" content={socialImage} />
+  <meta name="twitter:image" content={socialImage} />
 </svelte:head>
 
 <PageHeader label={product.num} title={product.name} aside={product.category} />
@@ -46,16 +64,20 @@
   <div class="grid gap-2xl md:grid-cols-2 md:gap-4xl">
     <div class="pdp-images">
       <img
-        class="js-main-img w-full aspect-[3/4] object-cover object-top bg-off"
-        src={mainImg}
+        class="pdp-main w-full aspect-[3/4] object-cover object-top bg-surface"
+        src={image.src}
+        srcset={image.srcset}
+        sizes="(min-width: 768px) 50vw, 100vw"
         alt={product.name}
         width="900"
         height="1200"
       />
-      {#if altImg}
+      {#if detailImage}
         <img
-          class="w-full aspect-[3/4] object-cover object-top bg-off mt-1"
-          src={altImg}
+          class="w-full aspect-[3/4] object-cover object-top bg-surface mt-1"
+          src={detailImage.src}
+          srcset={detailImage.srcset}
+          sizes="(min-width: 768px) 50vw, 100vw"
           alt="{product.name} detail"
           loading="lazy"
           decoding="async"
@@ -65,7 +87,7 @@
       {/if}
     </div>
 
-    <div data-pdp-info>
+    <div>
       <div class="flex flex-col gap-sm pb-lg border-b border-rule" data-anim="hero">
         <span class="label muted">{product.num} / {product.category}</span>
         <span class="serif text-2xl md:text-3xl fw-light">&euro; {formatPrice(product.price)}</span>
@@ -83,12 +105,14 @@
       <div class="flex flex-col gap-sm pb-lg border-b border-rule" data-anim="hero" data-delay="0.3">
         <div class="flex items-center justify-between">
           <span class="label muted">Size</span>
-          <SizeGuide category={product.category === 'Footwear' ? 'Footwear' : 'Clothing'} />
+          <SizeGuide category={product.category === "Footwear" ? "Footwear" : "Clothing"} />
         </div>
         <div class="flex flex-wrap gap-sm">
-          {#each product.sizes as size}
+          {#each product.sizes as size (size)}
             <button
-              class="size-btn {selectedSize === size ? 'size-btn--active' : ''}"
+              class="size-btn"
+              class:size-btn--active={selectedSize === size}
+              type="button"
               onclick={() => (selectedSize = size)}
               aria-pressed={selectedSize === size}
             >
@@ -100,17 +124,20 @@
 
       <div class="pt-lg" data-anim="hero" data-delay="0.4">
         <button
-          class="btn-outline {!selectedSize ? 'op-35 cursor-not-allowed' : ''}"
+          class="btn-outline"
+          class:muted={!selectedSize}
+          class:cursor-not-allowed={!selectedSize}
+          type="button"
           onclick={addToCart}
           disabled={!selectedSize}
         >
-          <span class="label">{added ? 'Added ✓' : 'Add to Selection'}</span>
+          <span class="label">{added ? "Added ✓" : "Add to Selection"}</span>
           <span class="label">&euro; {formatPrice(product.price)}</span>
         </button>
       </div>
 
       <div class="flex flex-col gap-xs pt-lg" data-anim="hero" data-delay="0.5">
-        {#each SHARED_DETAILS as [label, value]}
+        {#each PRODUCT_DETAILS as [label, value] (label)}
           <div class="flex justify-between text-sm border-b border-rule py-xs">
             <span class="label muted">{label}</span>
             <span class="fw-normal text-soft">{value}</span>
@@ -129,8 +156,8 @@
     </div>
     <div class="rule"></div>
     <div class="product-grid">
-      {#each related as p}
-        <ProductCard {...p} />
+      {#each related as item (item.slug)}
+        <ProductCard product={item} />
       {/each}
     </div>
   </section>

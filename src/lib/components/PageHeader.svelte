@@ -7,7 +7,7 @@
   let { label, title, aside }: Props = $props();
 </script>
 
-<div class="ph wrap page-header">
+<div class="page-header wrap">
   <div class="ph-inner">
     <div class="ph-left">
       <span class="label muted" data-anim="hero">{label}</span>
@@ -17,5 +17,5 @@
       <span class="label muted self-end pb-1" data-anim="hero" data-delay="0.2">{aside}</span>
     {/if}
   </div>
-  <div class="rule js-rule"></div>
+  <div class="rule" data-anim="rule"></div>
 </div>

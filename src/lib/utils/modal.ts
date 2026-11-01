@@ -1,48 +1,47 @@
 const FOCUSABLE =
   'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
-function trapFocus(container: HTMLElement, e: KeyboardEvent) {
-  if (e.key !== "Tab") return;
-  const els = [...container.querySelectorAll<HTMLElement>(FOCUSABLE)];
-  if (!els.length) return;
-  const active = document.activeElement;
-  const first = els[0];
-  const last = els[els.length - 1];
+function trapFocus(container: HTMLElement, event: KeyboardEvent): void {
+  if (event.key !== "Tab") return;
+  const focusable = [...container.querySelectorAll<HTMLElement>(FOCUSABLE)];
+  const first = focusable[0];
+  const last = focusable.at(-1);
   if (!(first && last)) return;
-  if (e.shiftKey && active === first) {
-    e.preventDefault();
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
     last.focus();
-  } else if (!e.shiftKey && active === last) {
-    e.preventDefault();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
     first.focus();
   }
 }
 
 export function createModal() {
-  let prevFocus: HTMLElement | null = null;
-  let prevOverflow = "";
+  let previousFocus: HTMLElement | null = null;
+  let previousOverflow = "";
 
-  function open(panelEl?: HTMLElement) {
-    prevFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    prevOverflow = document.body.style.overflow;
+  function open(panel?: HTMLElement): void {
+    previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    if (panelEl) {
-      requestAnimationFrame(() => panelEl.querySelector<HTMLElement>("button,a[href],[tabindex]")?.focus());
+    if (panel) {
+      requestAnimationFrame(() => panel.querySelector<HTMLElement>(FOCUSABLE)?.focus());
     }
   }
 
-  function close() {
-    document.body.style.overflow = prevOverflow;
-    prevFocus?.focus();
+  function close(): void {
+    document.body.style.overflow = previousOverflow;
+    previousFocus?.focus();
   }
 
-  function handleKeydown(panelEl: HTMLElement | undefined, e: KeyboardEvent) {
-    if (!panelEl) return false;
-    if (e.key === "Escape") {
-      e.preventDefault();
+  function handleKeydown(panel: HTMLElement | undefined, event: KeyboardEvent): boolean {
+    if (!panel) return false;
+    if (event.key === "Escape") {
+      event.preventDefault();
       return true;
     }
-    trapFocus(panelEl, e);
+    trapFocus(panel, event);
     return false;
   }
 

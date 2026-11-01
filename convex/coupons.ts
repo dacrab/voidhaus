@@ -20,7 +20,7 @@ export const validate = query({
       return { valid: false, error: "Discount exceeds order total" };
     }
 
-    return { valid: true, discount, type: coupon.type, value: coupon.value, couponId: coupon._id };
+    return { valid: true, type: coupon.type, value: coupon.value, couponId: coupon._id };
   },
 });
 // Note: coupon consumption (usedCount increment) lives in orders.fulfill, guarded by the

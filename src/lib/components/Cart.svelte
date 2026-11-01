@@ -1,104 +1,72 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
-  import { createModal, slideIn } from '#lib/utils/modal.js';
-  import { getCart, saveCart, formatPrice, isValidCartItem, CART_KEY, type CartItem } from '#lib/utils/cart.js';
-  import { CheckoutResponseSchema } from '#lib/utils/schemas.js';
+  import { fade } from "svelte/transition";
+  import { formatPrice } from "#lib/format.js";
+  import { productImage } from "#lib/images.js";
+  import { cart } from "#lib/stores/cart.svelte.js";
+  import { cartItemKey } from "#lib/utils/cart.js";
+  import { createModal, slideIn } from "#lib/utils/modal.js";
+  import { CheckoutResponseSchema } from "#lib/utils/schemas.js";
 
   const modal = createModal();
 
-  let open = $state(false);
-  let items = $state.raw<CartItem[]>([]);
-  let panelEl = $state<HTMLElement | undefined>();
+  let panelEl = $state<HTMLElement>();
   let checking = $state(false);
-  let checkoutError = $state('');
+  let checkoutError = $state("");
 
-  const total = $derived(
-    formatPrice(items.reduce((s, i) => s + i.price, 0))
-  );
+  const total = $derived(formatPrice(cart.items.reduce((sum, item) => sum + item.price, 0)));
+
+  let wasOpen = false;
+  $effect(() => {
+    if (cart.open === wasOpen) return;
+    wasOpen = cart.open;
+    if (cart.open) {
+      modal.open(panelEl);
+    } else {
+      modal.close();
+    }
+  });
 
   async function checkout() {
     checking = true;
-    checkoutError = '';
+    checkoutError = "";
     try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: items.map(i => ({ slug: i.slug, size: i.size })),
+          items: cart.items.map((item) => ({ slug: item.slug, size: item.size })),
         }),
       });
-      const parsed = CheckoutResponseSchema.safeParse(await res.json());
+      const parsed = CheckoutResponseSchema.safeParse(await response.json());
       if (!parsed.success) {
-        checkoutError = 'Something went wrong';
+        checkoutError = "Something went wrong";
         return;
       }
-      if ('url' in parsed.data) {
-        // Don't clear the cart yet — if the customer cancels on Stripe they keep
-        // their selection. The cart is cleared on /checkout/success after payment.
+      if ("url" in parsed.data) {
+        // Keep the cart until payment is confirmed on /checkout/success.
         window.location.href = parsed.data.url;
       } else {
         checkoutError = parsed.data.error;
       }
     } catch {
-      checkoutError = 'Something went wrong';
+      checkoutError = "Something went wrong";
     } finally {
       checking = false;
     }
   }
 
-  function openCart() {
-    open = true;
-    modal.open(panelEl);
-  }
-
   function closeCart() {
-    open = false;
-    modal.close();
+    cart.closePanel();
   }
 
-  function remove(slug: string, size: string) {
-    items = items.filter(i => !(i.slug === slug && i.size === size));
-    saveCart(items);
+  function onKeydown(event: KeyboardEvent) {
+    if (cart.open && modal.handleKeydown(panelEl, event)) closeCart();
   }
-
-  function onKeydown(e: KeyboardEvent) {
-    if (open && modal.handleKeydown(panelEl, e)) closeCart();
-  }
-
-  onMount(() => {
-    items = getCart();
-
-    const onAdd = (e: Event) => {
-      // window-level events are a public bus: any script on the page can dispatch
-      // vh:add-to-cart, so validate the detail before it enters cart state.
-      if (!(e instanceof CustomEvent) || !isValidCartItem(e.detail)) return;
-      const item = e.detail;
-      if (!items.find(i => i.slug === item.slug && i.size === item.size)) {
-        items = [...items, item];
-        saveCart(items);
-      }
-      openCart();
-    };
-
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === CART_KEY) items = getCart();
-    };
-
-    window.addEventListener('vh:open-cart', openCart);
-    window.addEventListener('vh:add-to-cart', onAdd);
-    window.addEventListener('storage', onStorage);
-    return () => {
-      window.removeEventListener('vh:open-cart', openCart);
-      window.removeEventListener('vh:add-to-cart', onAdd);
-      window.removeEventListener('storage', onStorage);
-    };
-  });
 </script>
 
 <svelte:window onkeydown={onKeydown} />
 
-{#if open}
+{#if cart.open}
   <div
     class="backdrop cart-backdrop"
     role="presentation"
@@ -116,40 +84,53 @@
     out:slideIn
   >
     <div class="panel-head">
-      <span class="label">Selection ({items.length})</span>
-      <button class="label ghost-btn" onclick={closeCart} aria-label="Close selection">Close</button>
+      <span class="label">Selection ({cart.count})</span>
+      <button class="label ghost-btn" type="button" onclick={closeCart} aria-label="Close selection">Close</button>
     </div>
     <div class="rule"></div>
 
-    {#if items.length === 0}
+    {#if cart.items.length === 0}
       <div class="empty">
         <p class="empty-msg">Your selection is empty.</p>
         <a href="/collection" class="label empty-link" onclick={closeCart}>Browse Collection →</a>
       </div>
     {:else}
       <ul class="items">
-        {#each items as item (item.slug + item.size)}
+        {#each cart.items as item (cartItemKey(item))}
+          {@const image = productImage(item.img)}
           <li class="item">
             <a href="/product/{item.slug}" class="item-img-link" onclick={closeCart}>
               <div class="item-img-wrap">
-                <img class="item-img" src={item.img} alt={item.name}
-                  width="200" height="267" decoding="async" />
+                <img
+                  class="item-img"
+                  src={image.src}
+                  srcset={image.srcset}
+                  sizes="80px"
+                  alt={item.name}
+                  width="200"
+                  height="267"
+                  decoding="async"
+                />
               </div>
             </a>
             <div class="item-body">
               <div class="item-top">
                 <div>
-                  <span class="label op-30">{item.num}</span>
+                  <span class="label muted">{item.num}</span>
                   <span class="item-name">{item.name}</span>
                   <span class="item-size label">Size {item.size}</span>
                 </div>
-                <button class="label ghost-btn" onclick={() => remove(item.slug, item.size)}
-                  aria-label="Remove {item.name}, size {item.size}">Remove</button>
+                <button
+                  class="label ghost-btn"
+                  type="button"
+                  onclick={() => cart.remove(item.slug, item.size)}
+                  aria-label="Remove {item.name}, size {item.size}">Remove</button
+                >
               </div>
               <span class="item-price label">€ {formatPrice(item.price)}</span>
             </div>
           </li>
-          <div class="rule"></div>
+          <li class="rule" aria-hidden="true"></li>
         {/each}
       </ul>
 
@@ -159,11 +140,11 @@
           <span class="total serif">€ {total}</span>
         </div>
         <p class="ship-note label muted">Duty-free · Worldwide shipping</p>
-        <button class="checkout-btn label" onclick={checkout} disabled={checking}>
-          {checking ? 'Processing…' : 'Complete Selection'}
+        <button class="checkout-btn label" type="button" onclick={checkout} disabled={checking}>
+          {checking ? "Processing…" : "Complete Selection"}
         </button>
         {#if checkoutError}
-          <p class="checkout-error label">{checkoutError}</p>
+          <p class="checkout-error label" role="alert">{checkoutError}</p>
         {/if}
       </div>
     {/if}
@@ -176,7 +157,7 @@
   .panel {
     position: fixed; inset-block: 0; inset-inline-end: 0;
     width: min(420px, 100vw);
-    background: var(--color-white);
+    background: var(--color-canvas);
     z-index: 401;
     display: flex; flex-direction: column;
     border-left: 1px solid var(--color-rule);
@@ -199,8 +180,8 @@
   .items {
     flex: 1; overflow-y: auto; list-style: none;
     background:
-      linear-gradient(var(--color-white) 30%, transparent),
-      linear-gradient(transparent, var(--color-white) 70%) bottom,
+      linear-gradient(var(--color-canvas) 30%, transparent),
+      linear-gradient(transparent, var(--color-canvas) 70%) bottom,
       radial-gradient(farthest-side at 50% 0, var(--scrim-light), transparent),
       radial-gradient(farthest-side at 50% 100%, var(--scrim-light), transparent) bottom;
     background-repeat: no-repeat;
@@ -213,7 +194,7 @@
     gap: 1.5rem; padding: 1.5rem var(--spacing-lg); align-items: start;
   }
 
-  .item-img-wrap { aspect-ratio: 3/4; overflow: hidden; background: var(--color-off); }
+  .item-img-wrap { aspect-ratio: 3 / 4; overflow: hidden; background: var(--color-surface); }
   .item-img {
     width: 100%; height: 100%;
     object-fit: cover; object-position: center;
@@ -242,7 +223,7 @@
   .ship-note  { text-align: center; opacity: var(--op-disabled); letter-spacing: var(--ls-wide); }
 
   .checkout-btn {
-    width: 100%; background: var(--color-ink); color: var(--color-white);
+    width: 100%; background: var(--color-ink); color: var(--color-canvas);
     border: none; padding: var(--spacing-md); letter-spacing: var(--ls-button); transition: background var(--duration-base);
   }
   .checkout-btn:hover { background: var(--color-ink-soft); }
