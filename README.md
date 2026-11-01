@@ -68,6 +68,24 @@ fulfillment. If inventory ran out between the two, the order is recorded as
 `failed` (not paid) and the shortfall is logged for a manual refund — Stripe
 retries stop instead of looping forever.
 
+## Production
+
+- **Convex** — deploy and seed:
+
+  ```sh
+  doppler run --config prd_app -- bunx convex deploy
+  doppler run --config prd_app -- bunx convex run --prod seed:seedStock \
+    '{"token":"…","reseed":true}'
+  ```
+- **Vercel** — production environment variables mirror the `prd_app` Doppler
+  config. `PUBLIC_SITE_URL` sets the canonical origin; leave it unset only for
+  local builds, which fall back to `https://voidhaus.vercel.app`.
+- **Stripe** — webhook endpoint is `/api/webhook` and subscribes to
+  `checkout.session.completed`.
+- **Resend** — `EMAIL_FROM` must use a verified sending domain. Until one is
+  verified, transactional email is skipped; contact messages are still stored
+  in Convex.
+
 ## Rate limits
 
 `/api/checkout`, `/api/contact`, `/api/orders`, and `/api/stock` are
@@ -78,13 +96,14 @@ window is used. Store failures fail open with a single warning.
 ## Config
 
 - **Catalog** → `src/lib/data/products.ts`
-- **Contact info** → `src/lib/data/site.ts`
+- **Contact info & emails** → `src/lib/data/site.ts`
 - **Colours & type** → CSS custom properties in `src/app.css`
 
 ### Environment variables
 
 | Variable | Where | Purpose |
 | --- | --- | --- |
+| `PUBLIC_SITE_URL` | Build + client | Canonical origin for canonical links, sitemap, robots and social images (falls back to `https://voidhaus.vercel.app`) |
 | `CONVEX_URL` | SvelteKit server | Convex client for API routes |
 | `CONVEX_SITE_URL` | SvelteKit server | Convex HTTP actions host (`*.convex.site`) |
 | `STRIPE_SECRET_KEY` | SvelteKit server | Checkout sessions and webhook verification |
@@ -94,8 +113,13 @@ window is used. Store failures fail open with a single warning.
 | `RESEND_API_KEY` | Convex | Order confirmations and contact alerts (optional) |
 | `EMAIL_FROM` | Convex | Verified sender for transactional email (optional) |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | SvelteKit server | Optional shared rate-limit store |
+| `SENTRY_DSN` | SvelteKit server | Server error reporting (optional) |
 | `PUBLIC_SENTRY_DSN` | Client | Browser error reporting (optional) |
 | `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | Build | Source-map upload (optional) |
+
+`RESEND_API_KEY` and `EMAIL_FROM` must both be set for transactional email, and
+`EMAIL_FROM` must use a domain verified in Resend. Without a verified domain,
+emails are skipped and the contact message is still stored in Convex.
 
 Secrets are injected locally with Doppler (`doppler run --`). See
 `.env.example` for the full list.

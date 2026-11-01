@@ -1,5 +1,6 @@
 <script lang="ts">
   import LegalPage from "#lib/components/LegalPage.svelte";
+  import { SITE } from "#lib/data/site.js";
 
   const sections = [
     {
@@ -16,7 +17,7 @@
     },
     {
       title: "Legal Basis",
-      body: "We process your data on the basis of contract performance, legitimate interest, or your explicit consent. You may withdraw consent at any time by contacting studio@voidhaus.com.",
+      body: `We process your data on the basis of contract performance, legitimate interest, or your explicit consent. You may withdraw consent at any time by contacting ${SITE.email.studio}.`,
     },
     {
       title: "Cookies",
@@ -28,7 +29,7 @@
     },
     {
       title: "Your Rights",
-      body: "You have the right to access, rectify, erase, restrict, or port your personal data. To exercise these rights, contact studio@voidhaus.com. You may also lodge a complaint with the Italian data protection authority (Garante).",
+      body: `You have the right to access, rectify, erase, restrict, or port your personal data. To exercise these rights, contact ${SITE.email.studio}. You may also lodge a complaint with the Italian data protection authority (Garante).`,
     },
   ];
 </script>
