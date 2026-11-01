@@ -2,7 +2,7 @@
   import { onDestroy, onMount } from "svelte";
   import ProductCard from "#lib/components/ProductCard.svelte";
   import SizeGuide from "#lib/components/SizeGuide.svelte";
-  import { APPAREL_CATEGORIES, PRODUCT_DETAILS, PRODUCTS } from "#lib/data/products.js";
+  import { PRODUCT_DETAILS, PRODUCTS } from "#lib/data/products.js";
   import { SITE } from "#lib/data/site.js";
   import { formatPrice } from "#lib/format.js";
   import { productImage } from "#lib/images.js";
@@ -17,8 +17,7 @@
   const image = $derived(productImage(product.img));
   const detailImage = $derived(product.img2 ? productImage(product.img2) : undefined);
   const socialImage = $derived(new URL(image.src, SITE_URL).href);
-  const isApparel = $derived(APPAREL_CATEGORIES.includes(product.category));
-  const sized = $derived(isApparel && product.sizes.length > 1);
+  const sized = $derived(product.sizes.length > 1);
   const specs = $derived(product.details ?? PRODUCT_DETAILS);
   const note = $derived(
     sized

@@ -1,25 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <style>
-    .bg   { fill: #1c1b19; }
-    .mark { stroke: #faf9f7; }
-    @media (prefers-color-scheme: light) {
-      .bg   { fill: #faf9f7; }
-      .mark { stroke: #1c1b19; }
-    }
-  </style>
-
-  <!-- Background — dark by default, matches luxury brand favicon convention -->
-  <rect class="bg" width="32" height="32"/>
-
-  <!-- V mark — hairline, architectural, centered -->
-  <!-- Left arm: top-left corner down to bottom center -->
-  <!-- Right arm: bottom center up to top-right corner -->
-  <polyline
-    class="mark"
-    points="7,8 16,24 25,8"
-    stroke-width="1.6"
-    stroke-linecap="butt"
-    stroke-linejoin="miter"
-    fill="none"
-  />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>VOIDHAUS</title>
+  <rect width="64" height="64" fill="#0c0c0b"/>
+  <rect x="5.5" y="5.5" width="53" height="53" fill="none" stroke="#292925" stroke-width="1"/>
+  <path d="M14 16H25L32 36L39 16H50L37.5 50H26.5Z" fill="#e8e5dc"/>
+  <rect x="47" y="43" width="7" height="7" fill="#e8e5dc"/>
 </svg>

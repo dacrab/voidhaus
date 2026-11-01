@@ -191,8 +191,6 @@ export const PRODUCTS = [
   },
 ] as const satisfies readonly Product[];
 
-export const APPAREL_CATEGORIES: readonly Category[] = ["Outerwear", "Body", "Tops", "Ready-to-wear", "Accessories"];
-
 const PRODUCTS_BY_SLUG = new Map<string, Product>(PRODUCTS.map((product) => [product.slug, product]));
 
 export function getProduct(slug: string): Product | undefined {
