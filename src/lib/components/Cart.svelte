@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { APPAREL_CATEGORIES, getProduct } from "#lib/data/products.js";
+  import { getProduct } from "#lib/data/products.js";
   import { formatPrice } from "#lib/format.js";
   import { productImage } from "#lib/images.js";
   import { cart } from "#lib/stores/cart.svelte.js";
@@ -18,8 +18,7 @@
   const total = $derived(formatPrice(cart.items.reduce((sum, item) => sum + item.price, 0)));
 
   function formatLabel(slug: string): string {
-    const product = getProduct(slug);
-    return product && APPAREL_CATEGORIES.includes(product.category) ? "Size" : "Format";
+    return (getProduct(slug)?.sizes.length ?? 0) > 1 ? "Size" : "Format";
   }
 
   let wasOpen = false;

@@ -86,7 +86,7 @@ export const sendOrderConfirmation = internalAction({
           <tbody>${itemsHtml}</tbody>
         </table>
         <p style="font-size: 18px; font-weight: 500;">Total: € ${formatPrice(args.total)}</p>
-        <p style="color: #666; font-size: 14px;">Complimentary worldwide shipping · 5–10 business days</p>
+        <p style="color: #666; font-size: 14px;">Worldwide shipping · 5–10 business days</p>
         <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0;" />
         <p style="color: #999; font-size: 12px;">${SITE.name} — ${SITE.email.studio}</p>
       </div>
