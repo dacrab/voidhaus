@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { isValidEmail, LIMITS } from "../src/lib/data/limits";
+import { internal } from "./_generated/api";
 import { mutation } from "./_generated/server";
 
 export const create = mutation({
@@ -19,6 +20,8 @@ export const create = mutation({
       throw new ConvexError("Message too long");
     }
 
-    return ctx.db.insert("messages", { name, email, message });
+    const id = await ctx.db.insert("messages", { name, email, message });
+    await ctx.scheduler.runAfter(0, internal.emails.sendContactNotification, { name, email, message });
+    return id;
   },
 });
