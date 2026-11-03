@@ -102,7 +102,12 @@ export const POST: RequestHandler = async ({ request }) => {
     return new Response("Invalid signature", { status: 400 });
   }
 
-  if (event.type !== "checkout.session.completed") {
+  const isPaidCheckout =
+    event.type === "checkout.session.completed" &&
+    (event.data.object as Stripe.Checkout.Session).payment_status === "paid";
+  const isAsyncPaymentSucceeded = event.type === "checkout.session.async_payment_succeeded";
+
+  if (!(isPaidCheckout || isAsyncPaymentSucceeded)) {
     return Response.json({ received: true }, { status: 200 });
   }
 
