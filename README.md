@@ -1,45 +1,38 @@
 # VOIDHAUS
 
-A dark luxury fashion storefront — twelve objects for the body and the room.
+Twelve objects for the body and the room.
 
 **Live demo:** https://voidhaus.vercel.app
 
-Browse a small catalog of outerwear, knitwear, accessories and objects made by four ateliers in Milan, Antwerp, Florence and Tokyo. Each piece has its own page with sizes, materials and studio details. Pick a size, add it to your bag, and pay with Stripe Checkout. There is also a lookbook, a stockist list, and a contact form that reaches the studio.
+A dark luxury storefront, kept deliberately small. Outerwear, knitwear, accessories and objects come from four ateliers — Milan, Antwerp, Florence, Tokyo — and every piece gets a proper page with sizes, materials and care notes. Put things in a bag, pay in euros through Stripe, then return to the order page whenever you like. There's a lookbook and a stockist list for browsing, and a contact form that lands with the studio.
 
-## Features
+## In the store
 
-- A tight catalog split across outerwear, body, tops, ready-to-wear, accessories and objects
-- Product pages with size availability, materials, and care notes
-- A shopping bag and Stripe checkout in euros
-- Coupon codes, with usage limits and expiry
-- An order link you can revisit after paying
-- Lookbook, atelier and stockist pages
-- A contact form that saves your message and notifies the studio
+- Six categories, a dozen or so pieces, no infinite scroll
+- Size-by-size availability pulled live, so a sold-out size is visibly sold out
+- Coupons with usage caps and expiry dates
+- An order page you can reopen later from its own link
+- Lookbook, atelier, stockists, privacy and terms pages
+- A contact form that saves the message and pings the studio
 
-## Run it locally
+## Running it
 
-You'll need [Bun](https://bun.sh), a Convex deployment, and Stripe test keys.
+Bun, a Convex deployment, and Stripe test keys.
 
 ```bash
 bun install
-doppler setup        # link secrets, or copy .env.example to .env and fill it in
-bunx convex dev      # start the backend
-bun dev              # start the storefront
+doppler setup        # or copy .env.example to .env and fill it in
+bunx convex dev      # backend
+bun dev              # storefront
 ```
 
-Secrets are normally injected with Doppler; `bun dev` assumes it is set up. Without Doppler, run `bunx vite dev` and keep your keys in `.env`.
+The `dev` script wraps Vite in `doppler run`, so skip Doppler and use `bunx vite dev` if your keys live in `.env` instead.
 
-## Good to know
+## Things that bite
 
-- Checkout needs Stripe keys. Use test keys and Stripe's test cards locally.
-- Sizes are tracked per piece and checked again when an order is confirmed, so two people can't buy the last one.
-- If stock runs out between paying and confirmation, the order is recorded as failed and flagged for a refund.
-- Email confirmations are optional. Without a verified sending domain, orders and messages are still saved.
+- Stock is re-checked at order confirmation. If the last one sold while someone was paying, the order is marked failed rather than paid, and logged for a manual refund — cheap, but honest.
+- Totals are recalculated server-side from the catalog, so a tampered cart doesn't get through.
+- Order confirmation emails need Resend with a verified domain. Without one, orders and messages are still stored; the email is simply skipped.
+- Locally, keep Stripe in test mode and use its test cards.
 
-## Built with
-
-SvelteKit, Svelte, Convex, Stripe, and Tailwind CSS. Hosted on Vercel.
-
-## License
-
-MIT
+SvelteKit and Svelte, Convex, Stripe, Tailwind CSS, on Vercel. MIT.
